@@ -30,6 +30,7 @@ const TEAM_LOGOS = {
   "Motor Lublin":                 "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df58a63ed6fd0dfdcd473_motor-lublin-logo-footylogos.webp",
   "Stal Mielec":                  "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df676952b0dd6df753502_stal-mielec-logo-footylogos.webp",
   "Bruk-Bet Termalica Nieciecza": "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df3f862117e57608389dd_bruk-bet-termalica-nieciecza-logo-footylogos.webp",
+  "Wieczysta Kraków": "https://media.cms.ekstraklasa.org/images/originals/019f0a5d-acca-760e-85ca-6d11d8f504db.png",
   "ŁKS Łódź":                    "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df5501dbe3179dcfa80ed_lks-lodz-logo-footylogos.webp",
   "Wisła Płock":                  "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df6c7a5db3796b344a99a_wisla-plock-logo-footylogos.webp",
   "Lechia Gdańsk":                "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df55819824fd8ee02f046_lechia-gdansk-logo-footylogos.webp",
