@@ -461,7 +461,13 @@ function ChatTab({ user, profile }) {
               return (
                 <div key={msg.id} className="cbw" style={{ alignItems: isMe ? "flex-end" : "flex-start" }}>
                   <div className={`crow ${isMe ? "me" : ""}`}>
-                    {!isMe && <div className="cav2" style={{ background: showName ? av.gradient : "transparent" }}>{showName ? av.initials : ""}</div>}
+                    {!isMe && (
+                      <div className="cav2" style={{ background: showName ? (profiles.find(p=>p.id===msg.user_id)?.favorite_team ? "rgba(0,0,0,0.3)" : av.gradient) : "transparent", border: showName && profiles.find(p=>p.id===msg.user_id)?.favorite_team ? "1px solid rgba(0,122,255,0.15)" : "none", overflow:"hidden" }}>
+                        {showName && (profiles.find(p=>p.id===msg.user_id)?.favorite_team
+                          ? <img src={TEAM_LOGOS[profiles.find(p=>p.id===msg.user_id).favorite_team]} alt="" style={{ width:18, height:18, objectFit:"contain" }} onError={e => e.target.style.display="none"} />
+                          : av.initials)}
+                      </div>
+                    )}
                     <div className={`cb ${isMe ? "mine" : "theirs"}`}>{msg.content}</div>
                   </div>
                   {showName && !isMe && <div className="csnd">{msg.user_name}</div>}
@@ -480,6 +486,37 @@ function ChatTab({ user, profile }) {
     </div>
   );
 }
+// ── TEAM PICKER ───────────────────────────────────────────────────────────────
+function TeamPicker({ onSave, onSkip }) {
+  const [sel, setSel] = useState(null);
+  const teams = Object.keys(TEAM_LOGOS).sort();
+  return (
+    <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.85)", zIndex:200, display:"flex", alignItems:"flex-end", justifyContent:"center", backdropFilter:"blur(20px)" }}>
+      <div style={{ background:"#080e1a", border:"1px solid rgba(255,255,255,0.1)", borderRadius:"28px 28px 0 0", padding:"28px 20px 48px", width:"100%", maxWidth:480, maxHeight:"90vh", display:"flex", flexDirection:"column" }}>
+        <div style={{ width:36, height:4, background:"rgba(255,255,255,0.15)", borderRadius:2, margin:"0 auto 20px" }} />
+        <div style={{ fontFamily:"'Bebas Neue',sans-serif", fontSize:26, color:"#fff", letterSpacing:2, textAlign:"center", marginBottom:4 }}>TWÓJ ULUBIONY KLUB</div>
+        <div style={{ fontSize:13, color:"rgba(255,255,255,0.4)", textAlign:"center", marginBottom:20 }}>Logo pojawi się przy Twoim nicku w rankingu i czacie</div>
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:8, overflowY:"auto", flex:1 }}>
+          {teams.map(name => (
+            <div key={name} onClick={() => setSel(name)}
+              style={{ background: sel===name ? "rgba(0,122,255,0.15)" : "rgba(255,255,255,0.04)", border: `1.5px solid ${sel===name ? "#007aff" : "rgba(255,255,255,0.08)"}`, borderRadius:14, padding:"10px 6px", textAlign:"center", cursor:"pointer", transition:"all 0.18s" }}>
+              <img src={TEAM_LOGOS[name]} alt={name} style={{ width:40, height:40, objectFit:"contain", display:"block", margin:"0 auto 6px" }} onError={e => e.target.style.display="none"} />
+              <div style={{ fontSize:9, color: sel===name ? "#60a5fa" : "rgba(255,255,255,0.5)", fontWeight:600, lineHeight:1.2 }}>{name}</div>
+            </div>
+          ))}
+        </div>
+        <button onClick={() => onSave(sel)} disabled={!sel}
+          style={{ width:"100%", padding:15, background:"linear-gradient(135deg,#0051cc,#007aff)", border:"none", borderRadius:14, color:"#fff", fontFamily:"inherit", fontSize:16, fontWeight:700, cursor:"pointer", marginTop:16, opacity: sel ? 1 : 0.35 }}>
+          Zapisz wybór →
+        </button>
+        <button onClick={onSkip}
+          style={{ width:"100%", padding:11, background:"transparent", border:"none", color:"rgba(255,255,255,0.3)", fontFamily:"inherit", fontSize:13, cursor:"pointer", marginTop:6 }}>
+          Pomiń na razie
+        </button>
+      </div>
+    </div>
+  );
+}
 // ── MAIN APP ──────────────────────────────────────────────────────────────────
 function MainApp({ user, profile, onLogout }) {
   const [tab, setTab] = useState("matches");
@@ -494,6 +531,7 @@ function MainApp({ user, profile, onLogout }) {
   const [editModal, setEditModal] = useState(null);
   const [editData, setEditData] = useState({});
   const [toast, setToast] = useState(null);
+  const [showTeamPicker, setShowTeamPicker] = useState(false);
   const emptyMatch = { league_id: "", home: "", away: "", match_date: "", match_time: "18:00", round: "Kolejka 1", odds_home: "", odds_draw: "", odds_away: "" };
   const [newMatch, setNewMatch] = useState(emptyMatch);
 
@@ -526,7 +564,18 @@ function MainApp({ user, profile, onLogout }) {
     setLoading(false);
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+    if (!profile?.favorite_team) setTimeout(() => setShowTeamPicker(true), 800);
+  }, []);
+
+  const saveTeam = async (teamName) => {
+    if (!teamName) return;
+    await supabase.from("profiles").update({ favorite_team: teamName }).eq("id", user.id);
+    setShowTeamPicker(false);
+    showToast(`Kibicujesz: ${teamName}!`);
+    await load();
+  };
 
   const myTip = id => tips.find(t => t.user_id === user.id && t.match_id === id);
 
@@ -618,6 +667,7 @@ function MainApp({ user, profile, onLogout }) {
       <style>{css}</style>
       <div className="app">
 
+        {showTeamPicker && <TeamPicker onSave={saveTeam} onSkip={() => setShowTeamPicker(false)} />}
         {/* HEADER */}
         <div className="hdr">
           <div className="hdr-photo" /><div className="hdr-ov" />
@@ -758,7 +808,11 @@ function MainApp({ user, profile, onLogout }) {
                 return (
                   <div key={u.id} className={`lbr ${u.id === user.id ? "me" : ""}`}>
                     <div className="lbrank">{i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : <span className="lbrn">#{i + 1}</span>}</div>
-                    <div style={{ width: 36, height: 36, borderRadius: "50%", background: uav.gradient, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, color: "#fff", flexShrink: 0 }}>{uav.initials}</div>
+                    <div style={{ width:36, height:36, borderRadius:"50%", background: u.favorite_team ? "rgba(0,0,0,0.3)" : uav.gradient, border: u.favorite_team ? "1.5px solid rgba(0,122,255,0.2)" : "none", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, overflow:"hidden" }}>
+                      {u.favorite_team
+                        ? <img src={TEAM_LOGOS[u.favorite_team]} alt={u.favorite_team} style={{ width:28, height:28, objectFit:"contain" }} onError={e => e.target.style.display="none"} />
+                        : <span style={{ fontSize:14, fontWeight:700, color:"#fff" }}>{uav.initials}</span>}
+                    </div>
                     <div style={{ flex: 1 }}>
                       <div className="lbn">{u.name}{u.id === user.id && <span className="lbme">TY</span>}</div>
                       <div className="lbs">{u.correct} trafione</div>
