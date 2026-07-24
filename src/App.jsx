@@ -10,29 +10,29 @@ const PHOTO_URL = "https://images.unsplash.com/photo-1569531955323-33c6b2dca44b?
 const PICK_LABELS = { home: "1", draw: "X", away: "2" };
 const PICK_NAMES  = { home: "Gospodarz", draw: "Remis", away: "Gość" };
 
-// Loga klubów Ekstraklasa 2026/27
 const TEAM_LOGOS = {
-  "Lech Poznań":                  "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df557ae7b0d3c31b057d9_lech-poznan-logo-footylogos.webp",
-  "Legia Warszawa":               "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df559e2fc5acdc52a9ebb_legia-warszawa-logo-footylogos.webp",
-  "Jagiellonia Białystok":        "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df523c149ca67381ffbe3_jagiellonia-bialystok-logo-footylogos.webp",
-  "Raków Częstochowa":            "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df606fc56c8c9302093d7_rakow-czestochowa-logo-footylogos.webp",
-  "Pogoń Szczecin":               "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df5e95210fea67e706aa2_pogon-szczecin-logo-footylogos.webp",
-  "Górnik Zabrze":                "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df4da05e50bc41db66cfd_gornik-zabrze-logo-footylogos.webp",
-  "GKS Katowice":                 "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df4ca8b206768fa155676_gks-katowice-logo-footylogos.webp",
-  "Piast Gliwice":                "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df5e71dbe3179dcfad266_piast-gliwice-logo-footylogos.webp",
-  "Wisła Kraków":                 "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a3012facb55a01041811557_wisla-krakow-footylogos.webp",
-  "Cracovia":                     "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df535f6d53ebf9e38f7c3_ks-cracovia-logo-footylogos.webp",
-  "Zagłębie Lubin":               "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df6cf891ff56ef567dc76_zaglebie-lubin-logo-footylogos.webp",
-  "Widzew Łódź":                  "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df6c6c0a6a42dbf5a54d3_widzew-lodz-logo-footylogos.webp",
-  "Radomiak Radom":               "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df6044d55dca3a4dba667_radomiak-radom-logo-footylogos.webp",
-  "Korona Kielce":                "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df5498ba294066bcca15b_korona-kielce-logo-footylogos.webp",
-  "Śląsk Wrocław":                "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df65cf6d53ebf9e39b1c1_slask-wroclaw-logo-footylogos.png",
-  "Motor Lublin":                 "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df58a63ed6fd0dfdcd473_motor-lublin-logo-footylogos.webp",
-  "Stal Mielec":                  "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df676952b0dd6df753502_stal-mielec-logo-footylogos.webp",
   "Bruk-Bet Termalica Nieciecza": "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df3f862117e57608389dd_bruk-bet-termalica-nieciecza-logo-footylogos.webp",
-  "ŁKS Łódź":                    "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df5501dbe3179dcfa80ed_lks-lodz-logo-footylogos.webp",
-  "Wisła Płock":                  "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df6c7a5db3796b344a99a_wisla-plock-logo-footylogos.webp",
+  "Cracovia":                     "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df535f6d53ebf9e38f7c3_ks-cracovia-logo-footylogos.webp",
+  "GKS Katowice":                 "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df4ca8b206768fa155676_gks-katowice-logo-footylogos.webp",
+  "Górnik Zabrze":                "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df4da05e50bc41db66cfd_gornik-zabrze-logo-footylogos.webp",
+  "Jagiellonia Białystok":        "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df523c149ca67381ffbe3_jagiellonia-bialystok-logo-footylogos.webp",
+  "Korona Kielce":                "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df5498ba294066bcca15b_korona-kielce-logo-footylogos.webp",
+  "Lech Poznań":                  "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df557ae7b0d3c31b057d9_lech-poznan-logo-footylogos.webp",
   "Lechia Gdańsk":                "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df55819824fd8ee02f046_lechia-gdansk-logo-footylogos.webp",
+  "Legia Warszawa":               "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df559e2fc5acdc52a9ebb_legia-warszawa-logo-footylogos.webp",
+  "Motor Lublin":                 "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df58a63ed6fd0dfdcd473_motor-lublin-logo-footylogos.webp",
+  "Piast Gliwice":                "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df5e71dbe3179dcfad266_piast-gliwice-logo-footylogos.webp",
+  "Pogoń Szczecin":               "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df5e95210fea67e706aa2_pogon-szczecin-logo-footylogos.webp",
+  "Radomiak Radom":               "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df6044d55dca3a4dba667_radomiak-radom-logo-footylogos.webp",
+  "Raków Częstochowa":            "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df606fc56c8c9302093d7_rakow-czestochowa-logo-footylogos.webp",
+  "Stal Mielec":                  "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df676952b0dd6df753502_stal-mielec-logo-footylogos.webp",
+  "Widzew Łódź":                  "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df6c6c0a6a42dbf5a54d3_widzew-lodz-logo-footylogos.webp",
+  "Wieczysta Kraków":             "https://media.cms.ekstraklasa.org/images/originals/019f0a5d-acca-760e-85ca-6d11d8f504db.png",
+  "Wisła Kraków":                 "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a3012facb55a01041811557_wisla-krakow-footylogos.webp",
+  "Wisła Płock":                  "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df6c7a5db3796b344a99a_wisla-plock-logo-footylogos.webp",
+  "Zagłębie Lubin":               "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df6cf891ff56ef567dc76_zaglebie-lubin-logo-footylogos.webp",
+  "Śląsk Wrocław":                "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df65cf6d53ebf9e39b1c1_slask-wroclaw-logo-footylogos.png",
+  "ŁKS Łódź":                    "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df5501dbe3179dcfa80ed_lks-lodz-logo-footylogos.webp",
 };
 
 const AVATAR_COLORS = [
@@ -60,18 +60,33 @@ const isMatchLocked = (m) => {
   return nowWarsaw >= `${m.match_date}T${m.match_time?.slice(0, 5)}`;
 };
 
-// Logo klubu lub fallback inicjały
 function TeamLogo({ name, size = 32 }) {
   const logo = TEAM_LOGOS[name];
   const av = getAvatar(name);
   if (logo) {
     return (
-      <img
-        src={logo}
-        alt={name}
+      <img src={logo} alt={name}
         style={{ width: size, height: size, objectFit: "contain", flexShrink: 0 }}
         onError={e => { e.target.style.display = "none"; }}
       />
+    );
+  }
+  return (
+    <div style={{ width: size, height: size, borderRadius: "50%", background: av.gradient, display: "flex", alignItems: "center", justifyContent: "center", fontSize: size * 0.38, fontWeight: 700, color: "#fff", flexShrink: 0 }}>
+      {av.initials}
+    </div>
+  );
+}
+
+// Avatar klubu — do czatu i rankingu
+function ClubAvatar({ favoriteTeam, name, size = 32 }) {
+  const av = getAvatar(name);
+  const logo = favoriteTeam ? TEAM_LOGOS[favoriteTeam] : null;
+  if (logo) {
+    return (
+      <div style={{ width: size, height: size, borderRadius: "50%", background: "rgba(0,0,0,0.3)", border: "1.5px solid rgba(0,122,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" }}>
+        <img src={logo} alt={favoriteTeam} style={{ width: size * 0.75, height: size * 0.75, objectFit: "contain" }} onError={e => { e.target.style.display = "none"; }} />
+      </div>
     );
   }
   return (
@@ -87,49 +102,38 @@ const css = `
 body { background:#060a0f; font-family:'Inter',sans-serif; }
 ::-webkit-scrollbar { width:0; }
 
-/* ── AUTH ────────────────────────────────────────── */
 .auth-screen { min-height:100vh; position:relative; overflow:hidden; display:flex; flex-direction:column; justify-content:flex-end; }
 .photo-bg { position:fixed; inset:0; background-image:url('${PHOTO_URL}'); background-size:cover; background-position:center center; }
 .ov1 { position:fixed; inset:0; background:linear-gradient(180deg,rgba(0,0,0,0.08) 0%,rgba(0,0,0,0.55) 55%,rgba(4,8,15,0.96) 78%,#04080f 100%); }
 .ov2 { position:fixed; bottom:0; left:0; right:0; height:60%; background:radial-gradient(ellipse at 50% 100%,rgba(0,100,255,0.08) 0%,transparent 70%); }
-
 .auth-hero { position:relative; z-index:5; padding:0 28px; margin-bottom:24px; animation:heroIn 1.2s cubic-bezier(0.16,1,0.3,1) both; }
 @keyframes heroIn { from{opacity:0;transform:translateY(32px)} to{opacity:1;transform:translateY(0)} }
-.eyebrow { display:flex; align-items:center; gap:8px; margin-bottom:12px; animation:slideIn 0.8s 0.2s both; }
-@keyframes slideIn { from{opacity:0;transform:translateX(-16px)} to{opacity:1;transform:translateX(0)} }
+.eyebrow { display:flex; align-items:center; gap:8px; margin-bottom:12px; }
 .ey-line { width:28px; height:2px; background:#007aff; border-radius:1px; }
 .ey-txt { font-size:10px; font-weight:700; color:#60a5fa; letter-spacing:3px; text-transform:uppercase; }
-.hero-title { font-family:'Bebas Neue',sans-serif; font-size:62px; line-height:0.88; color:#fff; letter-spacing:2px; margin-bottom:12px; animation:titleIn 1s 0.1s cubic-bezier(0.16,1,0.3,1) both; text-shadow:0 4px 40px rgba(0,0,0,0.6); }
-@keyframes titleIn { from{opacity:0;transform:translateY(24px) skewY(2deg)} to{opacity:1;transform:translateY(0) skewY(0)} }
+.hero-title { font-family:'Bebas Neue',sans-serif; font-size:62px; line-height:0.88; color:#fff; letter-spacing:2px; margin-bottom:12px; text-shadow:0 4px 40px rgba(0,0,0,0.6); }
 .hero-blue { color:#60a5fa; filter:drop-shadow(0 0 20px rgba(96,165,250,0.4)); }
-.hero-sub { font-size:15px; font-weight:700; color:rgba(255,255,255,0.88); line-height:1.6; text-shadow:0 2px 12px rgba(0,0,0,0.8); animation:slideIn 0.8s 0.3s both; }
-
+.hero-sub { font-size:15px; font-weight:700; color:rgba(255,255,255,0.88); line-height:1.6; text-shadow:0 2px 12px rgba(0,0,0,0.8); }
 .auth-card { position:relative; z-index:5; margin:0 16px 48px; background:rgba(4,12,24,0.75); border:1px solid rgba(255,255,255,0.1); border-radius:24px; padding:22px; backdrop-filter:blur(30px); animation:cardIn 1s 0.35s cubic-bezier(0.16,1,0.3,1) both; box-shadow:0 0 0 1px rgba(0,122,255,0.08),0 24px 60px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.08); }
 @keyframes cardIn { from{opacity:0;transform:translateY(32px) scale(0.97)} to{opacity:1;transform:translateY(0) scale(1)} }
 .card-shine { position:absolute; top:0; left:50%; transform:translateX(-50%); width:60%; height:1px; background:linear-gradient(90deg,transparent,rgba(96,165,250,0.4),transparent); }
-
 .seg { display:flex; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.07); border-radius:14px; padding:3px; margin-bottom:16px; }
 .seg-btn { flex:1; padding:10px; text-align:center; font-size:14px; font-weight:600; color:rgba(255,255,255,0.35); border-radius:12px; border:none; background:transparent; font-family:'Inter',sans-serif; cursor:pointer; transition:all 0.22s; }
 .seg-btn.on { background:linear-gradient(135deg,#0051cc,#007aff); color:#fff; box-shadow:0 4px 16px rgba(0,122,255,0.3); }
-
 .afield { position:relative; margin-bottom:10px; }
 .aicon { position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:16px; opacity:0.4; pointer-events:none; }
 .ainput { width:100%; padding:13px 16px 13px 42px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.09); border-radius:13px; color:#fff; font-family:'Inter',sans-serif; font-size:15px; outline:none; transition:all 0.22s; }
 .ainput:focus { background:rgba(255,255,255,0.09); border-color:rgba(0,122,255,0.5); box-shadow:0 0 0 3px rgba(0,122,255,0.1); }
 .ainput::placeholder { color:rgba(255,255,255,0.22); }
 .aerr { color:#ff453a; font-size:12px; text-align:center; margin-bottom:8px; font-weight:500; }
-.acta { width:100%; padding:15px; background:linear-gradient(135deg,#0051cc,#007aff); border:none; border-radius:14px; color:#fff; font-family:'Inter',sans-serif; font-size:16px; font-weight:700; cursor:pointer; margin-top:4px; transition:all 0.2s; box-shadow:0 8px 28px rgba(0,122,255,0.35); position:relative; overflow:hidden; }
-.acta::after { content:''; position:absolute; inset:0; background:linear-gradient(180deg,rgba(255,255,255,0.12) 0%,transparent 50%); pointer-events:none; }
-.acta:hover { transform:translateY(-1px); box-shadow:0 12px 36px rgba(0,122,255,0.45); }
+.acta { width:100%; padding:15px; background:linear-gradient(135deg,#0051cc,#007aff); border:none; border-radius:14px; color:#fff; font-family:'Inter',sans-serif; font-size:16px; font-weight:700; cursor:pointer; margin-top:4px; transition:all 0.2s; box-shadow:0 8px 28px rgba(0,122,255,0.35); }
+.acta:hover { transform:translateY(-1px); }
 .acta:disabled { opacity:0.45; cursor:not-allowed; transform:none; }
-.forgot-btn { width:100%; padding:10px; background:transparent; border:none; color:rgba(255,255,255,0.35); font-size:13px; cursor:pointer; margin-top:4px; font-family:'Inter',sans-serif; transition:color 0.2s; }
-.forgot-btn:hover { color:rgba(96,165,250,0.8); }
+.forgot-btn { width:100%; padding:10px; background:transparent; border:none; color:rgba(255,255,255,0.35); font-size:13px; cursor:pointer; margin-top:4px; font-family:'Inter',sans-serif; }
 .back-btn { width:100%; padding:12px; background:transparent; border:none; color:rgba(255,255,255,0.35); font-size:13px; cursor:pointer; margin-top:8px; font-family:'Inter',sans-serif; }
 .reset-ok { background:rgba(0,122,255,0.08); border:1px solid rgba(0,122,255,0.2); border-radius:12px; padding:14px 16px; text-align:center; color:#60a5fa; font-size:14px; font-weight:600; line-height:1.5; }
 
-/* MAIN APP */
 .app { min-height:100vh; background:#060a0f; max-width:480px; margin:0 auto; padding-bottom:100px; font-family:'Inter',sans-serif; }
-
 .hdr { position:relative; overflow:hidden; padding:0 0 20px; min-height:185px; }
 .hdr-photo { position:absolute; inset:-20px -10px 0; background-image:url('${PHOTO_URL}'); background-size:cover; background-position:center 30%; filter:blur(2px) brightness(0.3) saturate(0.8); }
 .hdr-ov { position:absolute; inset:0; background:linear-gradient(180deg,rgba(4,8,20,0.4) 0%,rgba(4,8,20,0.6) 50%,#060a0f 100%); }
@@ -139,24 +143,17 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 .logo span { color:#60a5fa; }
 .hdr-r { display:flex; align-items:center; gap:8px; }
 .upill { display:flex; align-items:center; gap:7px; background:rgba(255,255,255,0.08); border:1px solid rgba(0,122,255,0.2); border-radius:20px; padding:5px 12px 5px 6px; }
-.uav { width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#fff; flex-shrink:0; }
 .uname { font-size:13px; color:rgba(255,255,255,0.85); font-weight:600; }
-.uout { font-size:12px; font-weight:600; color:rgba(255,255,255,0.45); background:none; border:none; cursor:pointer; font-family:inherit; transition:color 0.2s; }
-.uout:hover { color:#fff; }
-
-/* Liga tabs */
+.uout { font-size:12px; font-weight:600; color:rgba(255,255,255,0.45); background:none; border:none; cursor:pointer; font-family:inherit; }
 .league-tabs { display:flex; gap:8px; padding:0 18px; margin-bottom:16px; overflow-x:auto; }
 .league-tab { display:flex; align-items:center; gap:6px; padding:7px 14px; border-radius:20px; border:1.5px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.04); color:rgba(255,255,255,0.45); font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap; transition:all 0.2s; font-family:'Inter',sans-serif; flex-shrink:0; }
 .league-tab.active { border-color:#007aff; background:rgba(0,122,255,0.12); color:#60a5fa; }
-.league-tab-flag { font-size:16px; }
-
 .stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; padding:0 18px; }
 .sbox { background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:10px 12px; backdrop-filter:blur(10px); }
 .slbl { font-size:10px; font-weight:700; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:3px; }
 .sval { font-family:'Bebas Neue',sans-serif; font-size:26px; color:#fff; letter-spacing:1px; line-height:1; }
 .sval.b { color:#60a5fa; filter:drop-shadow(0 0 8px rgba(96,165,250,0.4)); }
 
-/* NAV */
 .nav { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:480px; background:rgba(6,10,15,0.97); border-top:1px solid rgba(0,122,255,0.1); display:flex; z-index:50; backdrop-filter:blur(20px); padding:10px 0 14px; }
 .ni { flex:1; padding:6px 4px 4px; background:transparent; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:4px; }
 .nic { width:48px; height:34px; display:flex; align-items:center; justify-content:center; border-radius:12px; font-size:26px; transition:background 0.2s; }
@@ -169,14 +166,12 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 .ct { padding:14px; }
 .sh { font-size:12px; font-weight:700; color:rgba(255,255,255,0.5); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:10px; padding:0 2px; }
 
-/* MATCH CARDS */
 .mc { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:20px; margin-bottom:10px; overflow:hidden; transition:border-color 0.2s,transform 0.15s; }
 .mc:hover { border-color:rgba(0,122,255,0.25); transform:translateY(-1px); }
 .mt2 { padding:9px 14px; background:rgba(255,255,255,0.02); border-bottom:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; align-items:center; }
 .rbadge { font-size:11px; color:#60a5fa; background:rgba(0,122,255,0.1); border:1px solid rgba(0,122,255,0.2); padding:3px 10px; border-radius:20px; font-weight:700; }
 .mtime { font-size:13px; color:rgba(255,255,255,0.7); font-weight:600; }
 .mb2 { padding:14px; }
-
 .tms { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; gap:8px; }
 .tm { display:flex; align-items:center; gap:8px; flex:1; min-width:0; }
 .tm.r { flex-direction:row-reverse; }
@@ -185,7 +180,6 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 .vs-sep { flex-shrink:0; text-align:center; }
 .vs-txt { font-size:10px; color:rgba(255,255,255,0.25); font-weight:700; letter-spacing:1px; }
 .vs-result { font-family:'Bebas Neue',sans-serif; font-size:22px; color:#60a5fa; letter-spacing:1px; }
-
 .odds { display:flex; gap:8px; }
 .odd { flex:1; border-radius:12px; padding:10px 6px; text-align:center; background:rgba(255,255,255,0.04); border:1.5px solid rgba(255,255,255,0.08); cursor:pointer; transition:all 0.18s; }
 .odd:hover:not(:disabled) { background:rgba(0,122,255,0.1); border-color:rgba(0,122,255,0.4); }
@@ -205,7 +199,6 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 .res-l { background:rgba(255,59,48,0.12); color:#ff3b30; font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; }
 .res-n { background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.4); font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; }
 
-/* LEADERBOARD */
 .lbc { background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.08); border-radius:20px; overflow:hidden; }
 .lbr { display:flex; align-items:center; gap:10px; padding:13px 16px; border-bottom:1px solid rgba(255,255,255,0.05); }
 .lbr:last-child { border-bottom:none; }
@@ -220,7 +213,6 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 .lbp.nm { color:#fff; }
 .lbpl { font-size:9px; color:rgba(255,255,255,0.3); font-weight:600; text-align:right; }
 
-/* RULES */
 .rc { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:20px; overflow:hidden; margin-bottom:10px; }
 .rrow { display:flex; gap:14px; align-items:flex-start; padding:14px 16px; border-bottom:1px solid rgba(255,255,255,0.05); }
 .rrow:last-child { border-bottom:none; }
@@ -233,7 +225,6 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 .pnm { font-size:15px; font-weight:600; color:#fff; }
 .pamt { font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:1px; }
 
-/* ADMIN */
 .ar { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid rgba(255,255,255,0.05); gap:8px; }
 .ar:last-child { border-bottom:none; }
 .an { font-size:14px; font-weight:700; color:#fff; }
@@ -241,7 +232,6 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 .aedt { background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.1); color:rgba(255,255,255,0.75); padding:6px 12px; border-radius:10px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; }
 .ares-btn { background:rgba(0,122,255,0.1); border:1px solid rgba(0,122,255,0.25); color:#60a5fa; padding:6px 12px; border-radius:10px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; }
 
-/* MODAL */
 .mo { position:fixed; inset:0; background:rgba(0,0,0,0.8); display:flex; align-items:flex-end; justify-content:center; z-index:100; backdrop-filter:blur(20px); }
 .mbox { background:#080e1a; border:1px solid rgba(255,255,255,0.1); border-radius:24px 24px 0 0; padding:28px 22px; width:100%; max-width:480px; max-height:92vh; overflow-y:auto; }
 .mh { width:36px; height:4px; background:rgba(255,255,255,0.15); border-radius:2px; margin:0 auto 20px; }
@@ -252,14 +242,13 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 .mi { width:100%; padding:12px 14px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px; color:#fff; font-family:inherit; font-size:14px; outline:none; transition:border-color 0.2s; }
 .mi:focus { border-color:rgba(0,122,255,0.4); }
 .mi::placeholder { color:rgba(255,255,255,0.25); }
-.mprim { width:100%; padding:14px; background:linear-gradient(135deg,#0051cc,#007aff); border:none; border-radius:14px; color:#fff; font-family:inherit; font-size:15px; font-weight:700; cursor:pointer; box-shadow:0 6px 24px rgba(0,122,255,0.3); }
+.mprim { width:100%; padding:14px; background:linear-gradient(135deg,#0051cc,#007aff); border:none; border-radius:14px; color:#fff; font-family:inherit; font-size:15px; font-weight:700; cursor:pointer; }
 .msec { width:100%; padding:12px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:14px; color:rgba(255,255,255,0.5); font-family:inherit; font-size:14px; font-weight:500; cursor:pointer; }
 .msel { width:100%; padding:12px 14px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px; color:#fff; font-family:inherit; font-size:14px; outline:none; }
 
 .toast { position:fixed; bottom:110px; left:50%; transform:translateX(-50%); background:rgba(6,14,28,0.96); border:1px solid rgba(0,122,255,0.25); color:#fff; padding:10px 20px; border-radius:50px; font-size:14px; font-weight:600; z-index:200; white-space:nowrap; animation:toastIn 0.25s ease; backdrop-filter:blur(20px); }
 @keyframes toastIn { from{opacity:0;transform:translateX(-50%) translateY(8px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
 
-/* CHAT */
 .chat-wrap { display:flex; flex-direction:column; height:calc(100vh - 200px); }
 .chat-msgs { flex:1; overflow-y:auto; padding:0 0 8px; }
 .cdt { text-align:center; margin:14px 0 10px; }
@@ -267,11 +256,10 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 .cbw { display:flex; flex-direction:column; margin-bottom:2px; }
 .crow { display:flex; align-items:flex-end; gap:6px; }
 .crow.me { flex-direction:row-reverse; }
-.cav2 { width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:#fff; flex-shrink:0; }
 .cb { padding:9px 13px; border-radius:18px; max-width:76%; word-break:break-word; font-size:15px; line-height:1.4; }
 .cb.mine { background:linear-gradient(135deg,#0051cc,#007aff); color:#fff; font-weight:500; border-bottom-right-radius:4px; }
 .cb.theirs { background:rgba(255,255,255,0.08); color:#fff; border-bottom-left-radius:4px; }
-.csnd { font-size:10px; color:rgba(255,255,255,0.35); margin-left:32px; margin-top:2px; }
+.csnd { font-size:10px; color:rgba(255,255,255,0.35); margin-left:38px; margin-top:2px; }
 .ctm { font-size:10px; color:rgba(255,255,255,0.25); margin-top:2px; text-align:right; }
 .chat-bar { padding:8px 0 16px; display:flex; gap:8px; align-items:center; border-top:1px solid rgba(255,255,255,0.07); }
 .cin { flex:1; padding:11px 16px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.09); border-radius:22px; color:#fff; font-family:inherit; font-size:15px; outline:none; }
@@ -318,6 +306,40 @@ function MatchFormFields({ data, onChange, leagues }) {
   );
 }
 
+// ── TEAM PICKER ───────────────────────────────────────────────────────────────
+function TeamPicker({ onSave, onSkip }) {
+  const [sel, setSel] = useState(null);
+  const teams = Object.keys(TEAM_LOGOS).sort();
+  return (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.88)", zIndex: 200, display: "flex", alignItems: "flex-end", justifyContent: "center", backdropFilter: "blur(20px)" }}>
+      <div style={{ background: "#080e1a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "28px 28px 0 0", padding: "28px 20px 48px", width: "100%", maxWidth: 480, maxHeight: "90vh", display: "flex", flexDirection: "column" }}>
+        <div style={{ width: 36, height: 4, background: "rgba(255,255,255,0.15)", borderRadius: 2, margin: "0 auto 20px" }} />
+        <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 26, color: "#fff", letterSpacing: 2, textAlign: "center", marginBottom: 4 }}>TWÓJ ULUBIONY KLUB</div>
+        <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", textAlign: "center", marginBottom: 20 }}>Logo pojawi się przy Twoim nicku w rankingu i czacie</div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8, overflowY: "auto", flex: 1 }}>
+          {teams.map(name => (
+            <div key={name} onClick={() => setSel(name)}
+              style={{ background: sel === name ? "rgba(0,122,255,0.15)" : "rgba(255,255,255,0.04)", border: `1.5px solid ${sel === name ? "#007aff" : "rgba(255,255,255,0.08)"}`, borderRadius: 14, padding: "10px 6px", textAlign: "center", cursor: "pointer", transition: "all 0.18s" }}>
+              <img src={TEAM_LOGOS[name]} alt={name}
+                style={{ width: 40, height: 40, objectFit: "contain", display: "block", margin: "0 auto 6px" }}
+                onError={e => { e.target.style.opacity = "0.2"; }} />
+              <div style={{ fontSize: 9, color: sel === name ? "#60a5fa" : "rgba(255,255,255,0.5)", fontWeight: 600, lineHeight: 1.2 }}>{name}</div>
+            </div>
+          ))}
+        </div>
+        <button onClick={() => onSave(sel)} disabled={!sel}
+          style={{ width: "100%", padding: 15, background: "linear-gradient(135deg,#0051cc,#007aff)", border: "none", borderRadius: 14, color: "#fff", fontFamily: "inherit", fontSize: 16, fontWeight: 700, cursor: sel ? "pointer" : "not-allowed", marginTop: 16, opacity: sel ? 1 : 0.35 }}>
+          Zapisz wybór →
+        </button>
+        <button onClick={onSkip}
+          style={{ width: "100%", padding: 11, background: "transparent", border: "none", color: "rgba(255,255,255,0.3)", fontFamily: "inherit", fontSize: 13, cursor: "pointer", marginTop: 6 }}>
+          Pomiń na razie
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ── AUTH ──────────────────────────────────────────────────────────────────────
 function AuthScreen({ onAuth }) {
   const [mode, setMode] = useState("login");
@@ -333,9 +355,7 @@ function AuthScreen({ onAuth }) {
   const handleReset = async () => {
     if (!resetEmail.trim()) { setError("Wpisz swój adres e-mail"); return; }
     setLoading(true); setError("");
-    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-      redirectTo: window.location.origin,
-    });
+    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, { redirectTo: window.location.origin });
     setLoading(false);
     if (error) { setError("Nie znaleziono konta z tym adresem"); return; }
     setResetSent(true);
@@ -349,9 +369,7 @@ function AuthScreen({ onAuth }) {
       onAuth(data.user);
     } else {
       if (!name.trim()) { setError("Wpisz swoje imię lub pseudonim"); setLoading(false); return; }
-      const { data, error } = await supabase.auth.signUp({
-        email, password, options: { data: { name: name.trim() } },
-      });
+      const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { name: name.trim() } } });
       if (error) { setError(error.message); setLoading(false); return; }
       if (data.user) {
         await supabase.from("profiles").upsert({ id: data.user.id, name: name.trim(), is_admin: false });
@@ -416,7 +434,7 @@ function AuthScreen({ onAuth }) {
 }
 
 // ── CHAT ──────────────────────────────────────────────────────────────────────
-function ChatTab({ user, profile }) {
+function ChatTab({ user, profile, profiles }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
@@ -446,6 +464,8 @@ function ChatTab({ user, profile }) {
   const fmtD = ts => new Date(ts).toLocaleDateString("pl-PL", { day: "numeric", month: "long", timeZone: "Europe/Warsaw" });
   const grouped = messages.reduce((acc, m) => { const d = fmtD(m.created_at); if (!acc[d]) acc[d] = []; acc[d].push(m); return acc; }, {});
 
+  const getSenderProfile = (userId) => profiles.find(p => p.id === userId);
+
   return (
     <div className="chat-wrap">
       <div className="chat-msgs">
@@ -455,18 +475,20 @@ function ChatTab({ user, profile }) {
             <div className="cdt"><span>{date}</span></div>
             {msgs.map((msg, i) => {
               const isMe = msg.user_id === user.id;
+              const senderProfile = getSenderProfile(msg.user_id);
               const av = getAvatar(msg.user_name);
               const showName = !msgs[i + 1] || msgs[i + 1].user_id !== msg.user_id;
               return (
                 <div key={msg.id} className="cbw" style={{ alignItems: isMe ? "flex-end" : "flex-start" }}>
                   <div className={`crow ${isMe ? "me" : ""}`}>
-                    {!isMe && (
-                      <div className="cav2" style={{ background: showName ? (profiles.find(p=>p.id===msg.user_id)?.favorite_team ? "rgba(0,0,0,0.3)" : av.gradient) : "transparent", border: showName && profiles.find(p=>p.id===msg.user_id)?.favorite_team ? "1px solid rgba(0,122,255,0.15)" : "none", overflow:"hidden" }}>
-                        {showName && (profiles.find(p=>p.id===msg.user_id)?.favorite_team
-                          ? <img src={TEAM_LOGOS[profiles.find(p=>p.id===msg.user_id).favorite_team]} alt="" style={{ width:18, height:18, objectFit:"contain" }} onError={e => e.target.style.display="none"} />
-                          : av.initials)}
-                      </div>
+                    {!isMe && showName && (
+                      <ClubAvatar
+                        favoriteTeam={senderProfile?.favorite_team}
+                        name={msg.user_name}
+                        size={28}
+                      />
                     )}
+                    {!isMe && !showName && <div style={{ width: 28, flexShrink: 0 }} />}
                     <div className={`cb ${isMe ? "mine" : "theirs"}`}>{msg.content}</div>
                   </div>
                   {showName && !isMe && <div className="csnd">{msg.user_name}</div>}
@@ -485,39 +507,9 @@ function ChatTab({ user, profile }) {
     </div>
   );
 }
-// ── TEAM PICKER ───────────────────────────────────────────────────────────────
-function TeamPicker({ onSave, onSkip }) {
-  const [sel, setSel] = useState(null);
-  const teams = Object.keys(TEAM_LOGOS).sort();
-  return (
-    <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.85)", zIndex:200, display:"flex", alignItems:"flex-end", justifyContent:"center", backdropFilter:"blur(20px)" }}>
-      <div style={{ background:"#080e1a", border:"1px solid rgba(255,255,255,0.1)", borderRadius:"28px 28px 0 0", padding:"28px 20px 48px", width:"100%", maxWidth:480, maxHeight:"90vh", display:"flex", flexDirection:"column" }}>
-        <div style={{ width:36, height:4, background:"rgba(255,255,255,0.15)", borderRadius:2, margin:"0 auto 20px" }} />
-        <div style={{ fontFamily:"'Bebas Neue',sans-serif", fontSize:26, color:"#fff", letterSpacing:2, textAlign:"center", marginBottom:4 }}>TWÓJ ULUBIONY KLUB</div>
-        <div style={{ fontSize:13, color:"rgba(255,255,255,0.4)", textAlign:"center", marginBottom:20 }}>Logo pojawi się przy Twoim nicku w rankingu i czacie</div>
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:8, overflowY:"auto", flex:1 }}>
-          {teams.map(name => (
-            <div key={name} onClick={() => setSel(name)}
-              style={{ background: sel===name ? "rgba(0,122,255,0.15)" : "rgba(255,255,255,0.04)", border: `1.5px solid ${sel===name ? "#007aff" : "rgba(255,255,255,0.08)"}`, borderRadius:14, padding:"10px 6px", textAlign:"center", cursor:"pointer", transition:"all 0.18s" }}>
-              <img src={TEAM_LOGOS[name]} alt={name} style={{ width:40, height:40, objectFit:"contain", display:"block", margin:"0 auto 6px" }} onError={e => e.target.style.display="none"} />
-              <div style={{ fontSize:9, color: sel===name ? "#60a5fa" : "rgba(255,255,255,0.5)", fontWeight:600, lineHeight:1.2 }}>{name}</div>
-            </div>
-          ))}
-        </div>
-        <button onClick={() => onSave(sel)} disabled={!sel}
-          style={{ width:"100%", padding:15, background:"linear-gradient(135deg,#0051cc,#007aff)", border:"none", borderRadius:14, color:"#fff", fontFamily:"inherit", fontSize:16, fontWeight:700, cursor:"pointer", marginTop:16, opacity: sel ? 1 : 0.35 }}>
-          Zapisz wybór →
-        </button>
-        <button onClick={onSkip}
-          style={{ width:"100%", padding:11, background:"transparent", border:"none", color:"rgba(255,255,255,0.3)", fontFamily:"inherit", fontSize:13, cursor:"pointer", marginTop:6 }}>
-          Pomiń na razie
-        </button>
-      </div>
-    </div>
-  );
-}
 // ── MAIN APP ──────────────────────────────────────────────────────────────────
-function MainApp({ user, profile, onLogout }) {
+function MainApp({ user, profile: initialProfile, onLogout }) {
+  const [profile, setProfile] = useState(initialProfile);
   const [tab, setTab] = useState("matches");
   const [leagues, setLeagues] = useState([]);
   const [activeLeague, setActiveLeague] = useState(null);
@@ -525,12 +517,12 @@ function MainApp({ user, profile, onLogout }) {
   const [tips, setTips] = useState([]);
   const [profiles, setProfiles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showTeamPicker, setShowTeamPicker] = useState(false);
   const [resultModal, setResultModal] = useState(null);
   const [addModal, setAddModal] = useState(false);
   const [editModal, setEditModal] = useState(null);
   const [editData, setEditData] = useState({});
   const [toast, setToast] = useState(null);
-  const [showTeamPicker, setShowTeamPicker] = useState(false);
   const emptyMatch = { league_id: "", home: "", away: "", match_date: "", match_time: "18:00", round: "Kolejka 1", odds_home: "", odds_draw: "", odds_away: "" };
   const [newMatch, setNewMatch] = useState(emptyMatch);
 
@@ -543,7 +535,6 @@ function MainApp({ user, profile, onLogout }) {
       supabase.from("profiles").select("*"),
     ]);
 
-    // Paginacja tipów — kluczowa lekcja z poprzedniego projektu
     let allTips = [];
     let from = 0;
     const pageSize = 1000;
@@ -565,12 +556,13 @@ function MainApp({ user, profile, onLogout }) {
 
   useEffect(() => {
     load();
-    if (!profile?.favorite_team) setTimeout(() => setShowTeamPicker(true), 800);
+    if (!initialProfile?.favorite_team) setTimeout(() => setShowTeamPicker(true), 800);
   }, []);
 
   const saveTeam = async (teamName) => {
     if (!teamName) return;
     await supabase.from("profiles").update({ favorite_team: teamName }).eq("id", user.id);
+    setProfile(prev => ({ ...prev, favorite_team: teamName }));
     setShowTeamPicker(false);
     showToast(`Kibicujesz: ${teamName}!`);
     await load();
@@ -623,13 +615,11 @@ function MainApp({ user, profile, onLogout }) {
     showToast("Mecz dodany!");
   };
 
-  // Mecze aktywnej ligi
   const leagueMatches = matches.filter(m => m.league_id === activeLeague);
   const upcoming = leagueMatches.filter(m => m.status === "upcoming");
   const finished = leagueMatches.filter(m => m.status === "finished");
   const leagueMatchIds = leagueMatches.map(m => m.id);
 
-  // Ranking dla aktywnej ligi
   const lb = profiles.map(p => ({
     ...p,
     points: tips.filter(t => t.user_id === p.id && leagueMatchIds.includes(t.match_id)).reduce((s, t) => s + (t.points || 0), 0),
@@ -665,9 +655,9 @@ function MainApp({ user, profile, onLogout }) {
     <>
       <style>{css}</style>
       <div className="app">
-        
-{showTeamPicker && <TeamPicker onSave={saveTeam} onSkip={() => setShowTeamPicker(false)} />}
-        {/* HEADER */}
+
+        {showTeamPicker && <TeamPicker onSave={saveTeam} onSkip={() => setShowTeamPicker(false)} />}
+
         <div className="hdr">
           <div className="hdr-photo" /><div className="hdr-ov" />
           <div className="hdr-ct">
@@ -675,24 +665,19 @@ function MainApp({ user, profile, onLogout }) {
               <div className="logo">TYPOWE <span>DZIADY</span></div>
               <div className="hdr-r">
                 <div className="upill">
-                  <div className="uav" style={{ background: av.gradient }}>{av.initials}</div>
+                  <ClubAvatar favoriteTeam={profile?.favorite_team} name={profile?.name || ""} size={24} />
                   <span className="uname">{profile?.name || "Ty"}</span>
                 </div>
                 <button className="uout" onClick={onLogout}>Wyloguj</button>
               </div>
             </div>
-
-            {/* Zakładki lig */}
             <div className="league-tabs">
               {leagues.map(l => (
                 <button key={l.id} className={`league-tab ${activeLeague === l.id ? "active" : ""}`} onClick={() => setActiveLeague(l.id)}>
-                  <span className="league-tab-flag">{l.flag}</span>
-                  {l.name}
+                  {l.flag} {l.name}
                 </button>
               ))}
             </div>
-
-            {/* Statystyki */}
             <div className="stats">
               {[
                 { label: "Punkty", value: myPts.toFixed(2), b: true },
@@ -709,9 +694,9 @@ function MainApp({ user, profile, onLogout }) {
         </div>
 
         <div className="ct">
-          {tab === "chat" && <ChatTab user={user} profile={profile} />}
 
-          {/* ── MECZE ── */}
+          {tab === "chat" && <ChatTab user={user} profile={profile} profiles={profiles} />}
+
           {tab === "matches" && <>
             {upcoming.length === 0 && finished.length === 0 && (
               <div className="empty"><div className="ei">📅</div><div className="et">Brak meczów</div><div className="es">{activeLg ? `Admin wkrótce doda mecze ${activeLg.name}` : "Wybierz ligę"}</div></div>
@@ -729,15 +714,9 @@ function MainApp({ user, profile, onLogout }) {
                     </div>
                     <div className="mb2">
                       <div className="tms">
-                        <div className="tm">
-                          <TeamLogo name={match.home} size={30} />
-                          <span className="tn">{match.home}</span>
-                        </div>
+                        <div className="tm"><TeamLogo name={match.home} size={30} /><span className="tn">{match.home}</span></div>
                         <div className="vs-sep"><span className="vs-txt">VS</span></div>
-                        <div className="tm r">
-                          <TeamLogo name={match.away} size={30} />
-                          <span className="tn">{match.away}</span>
-                        </div>
+                        <div className="tm r"><TeamLogo name={match.away} size={30} /><span className="tn">{match.away}</span></div>
                       </div>
                       <div className="odds">
                         {["home", "draw", "away"].map(pick => (
@@ -769,18 +748,12 @@ function MainApp({ user, profile, onLogout }) {
                     </div>
                     <div className="mb2">
                       <div className="tms">
-                        <div className="tm">
-                          <TeamLogo name={match.home} size={30} />
-                          <span className="tn">{match.home}</span>
-                        </div>
+                        <div className="tm"><TeamLogo name={match.home} size={30} /><span className="tn">{match.home}</span></div>
                         <div className="vs-sep">
                           <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: 1, textAlign: "center" }}>Wynik</div>
                           <div className="vs-result">{PICK_LABELS[match.result]}</div>
                         </div>
-                        <div className="tm r">
-                          <TeamLogo name={match.away} size={30} />
-                          <span className="tn">{match.away}</span>
-                        </div>
+                        <div className="tm r"><TeamLogo name={match.away} size={30} /><span className="tn">{match.away}</span></div>
                       </div>
                       <div className="odds">
                         {["home", "draw", "away"].map(pick => (
@@ -797,36 +770,27 @@ function MainApp({ user, profile, onLogout }) {
             </>}
           </>}
 
-          {/* ── TABELA ── */}
           {tab === "leaderboard" && <>
             <div className="sh">Klasyfikacja — {activeLg?.flag} {activeLg?.name}</div>
             {lb.length === 0 && <div className="empty"><div className="ei">🏆</div><div className="et">Brak uczestników</div></div>}
             <div className="lbc">
-              {lb.map((u, i) => {
-                const uav = getAvatar(u.name);
-                return (
-                  <div key={u.id} className={`lbr ${u.id === user.id ? "me" : ""}`}>
-                    <div className="lbrank">{i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : <span className="lbrn">#{i + 1}</span>}</div>
-                    <div style={{ width:36, height:36, borderRadius:"50%", background: u.favorite_team ? "rgba(0,0,0,0.3)" : uav.gradient, border: u.favorite_team ? "1.5px solid rgba(0,122,255,0.2)" : "none", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, overflow:"hidden" }}>
-                      {u.favorite_team
-                        ? <img src={TEAM_LOGOS[u.favorite_team]} alt={u.favorite_team} style={{ width:28, height:28, objectFit:"contain" }} onError={e => e.target.style.display="none"} />
-                        : <span style={{ fontSize:14, fontWeight:700, color:"#fff" }}>{uav.initials}</span>}
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <div className="lbn">{u.name}{u.id === user.id && <span className="lbme">TY</span>}</div>
-                      <div className="lbs">{u.correct} trafione</div>
-                    </div>
-                    <div style={{ textAlign: "right" }}>
-                      <div className={`lbp ${i === 0 ? "top" : "nm"}`}>{u.points.toFixed(2)}</div>
-                      <div className="lbpl">PKT</div>
-                    </div>
+              {lb.map((u, i) => (
+                <div key={u.id} className={`lbr ${u.id === user.id ? "me" : ""}`}>
+                  <div className="lbrank">{i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : <span className="lbrn">#{i + 1}</span>}</div>
+                  <ClubAvatar favoriteTeam={u.favorite_team} name={u.name} size={36} />
+                  <div style={{ flex: 1 }}>
+                    <div className="lbn">{u.name}{u.id === user.id && <span className="lbme">TY</span>}</div>
+                    <div className="lbs">{u.correct} trafione</div>
                   </div>
-                );
-              })}
+                  <div style={{ textAlign: "right" }}>
+                    <div className={`lbp ${i === 0 ? "top" : "nm"}`}>{u.points.toFixed(2)}</div>
+                    <div className="lbpl">PKT</div>
+                  </div>
+                </div>
+              ))}
             </div>
           </>}
 
-          {/* ── REGULAMIN ── */}
           {tab === "rules" && <>
             <div className="sh">Nagrody</div>
             <div className="rc" style={{ marginBottom: 10 }}>
@@ -844,23 +808,21 @@ function MainApp({ user, profile, onLogout }) {
             </div>
             <div className="sh" style={{ marginTop: 16 }}>Zasady gry</div>
             {[
-              { icon: "⏱️", bg: "rgba(0,122,255,0.1)", title: "Typowanie", text: "Przed każdym meczem wybierasz wynik: wygraną gospodarza (1), remis (X) lub wygraną gości (2). Typ możesz zmienić do momentu rozpoczęcia meczu — po godzinie startu typowanie jest zablokowane.\n\nKursy są aktualizowane na bieżąco na podstawie ofert bukmacherów STS oraz Superbet." },
-              { icon: "🎯", bg: "rgba(255,59,48,0.1)", title: "Punktacja", text: "Za trafiony typ otrzymujesz tyle punktów ile wynosił kurs bukmacherski. Przykład: trafiony typ z kursem 2.10 daje 2.10 pkt. Za chybiony typ otrzymujesz 0 punktów." },
-              { icon: "🏆", bg: "rgba(0,122,255,0.08)", title: "Klasyfikacja", text: "Wygrywa gracz z największą sumą punktów po zakończeniu rundy. Każda liga ma osobny ranking — możesz uczestniczyć we wszystkich jednocześnie." },
+              { icon: "⏱️", bg: "rgba(0,122,255,0.1)", title: "Typowanie", text: "Przed każdym meczem wybierasz wynik: wygraną gospodarza (1), remis (X) lub wygraną gości (2). Typ możesz zmienić do momentu rozpoczęcia meczu — po godzinie startu typowanie jest zablokowane." },
+              { icon: "🎯", bg: "rgba(255,59,48,0.1)", title: "Punktacja", text: "Za trafiony typ otrzymujesz tyle punktów ile wynosił kurs bukmacherski. Za chybiony typ otrzymujesz 0 punktów." },
+              { icon: "🏆", bg: "rgba(0,122,255,0.08)", title: "Klasyfikacja", text: "Wygrywa gracz z największą sumą punktów. Każda liga ma osobny ranking." },
             ].map(s => (
               <div key={s.title} className="rc" style={{ marginBottom: 8 }}>
-                <div className="rrow"><div className="ric" style={{ background: s.bg }}>{s.icon}</div><div><div className="rtit">{s.title}</div><div className="rtxt" style={{ whiteSpace: "pre-line" }}>{s.text}</div></div></div>
+                <div className="rrow"><div className="ric" style={{ background: s.bg }}>{s.icon}</div><div><div className="rtit">{s.title}</div><div className="rtxt">{s.text}</div></div></div>
               </div>
             ))}
           </>}
 
-          {/* ── ADMIN ── */}
           {tab === "admin" && profile?.is_admin && <>
             <div className="sh">Panel administratora</div>
             <button className="mprim" style={{ marginBottom: 16 }} onClick={() => setAddModal(true)}>+ Dodaj mecz</button>
-
             {upcoming.length > 0 && <>
-              <div className="sh">Nadchodzące — {activeLg?.name}</div>
+              <div className="sh">Nadchodzące</div>
               <div className="rc" style={{ marginBottom: 10 }}>
                 {upcoming.map((match, i) => (
                   <div key={match.id} className="ar" style={{ borderBottom: i < upcoming.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
@@ -877,7 +839,7 @@ function MainApp({ user, profile, onLogout }) {
               </div>
             </>}
             {finished.length > 0 && <>
-              <div className="sh">Zakończone — {activeLg?.name}</div>
+              <div className="sh">Zakończone</div>
               <div className="rc">
                 {finished.map((match, i) => (
                   <div key={match.id} className="ar" style={{ borderBottom: i < finished.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
@@ -896,7 +858,6 @@ function MainApp({ user, profile, onLogout }) {
           </>}
         </div>
 
-        {/* NAV */}
         <div className="nav">
           {tabs.map(t => (
             <button key={t.key} className={`ni ${tab === t.key ? "on" : ""}`} onClick={() => setTab(t.key)}>
@@ -907,7 +868,6 @@ function MainApp({ user, profile, onLogout }) {
           ))}
         </div>
 
-        {/* MODALS */}
         {resultModal && (
           <div className="mo" onClick={() => setResultModal(null)}>
             <div className="mbox" onClick={e => e.stopPropagation()}>
@@ -926,7 +886,6 @@ function MainApp({ user, profile, onLogout }) {
             </div>
           </div>
         )}
-
         {addModal && (
           <div className="mo" onClick={() => setAddModal(false)}>
             <div className="mbox" onClick={e => e.stopPropagation()}>
@@ -939,7 +898,6 @@ function MainApp({ user, profile, onLogout }) {
             </div>
           </div>
         )}
-
         {editModal && (
           <div className="mo" onClick={() => setEditModal(null)}>
             <div className="mbox" onClick={e => e.stopPropagation()}>
@@ -952,7 +910,6 @@ function MainApp({ user, profile, onLogout }) {
             </div>
           </div>
         )}
-
         {toast && <div className="toast">{toast}</div>}
       </div>
     </>
@@ -982,8 +939,6 @@ export default function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleLogout = async () => { await supabase.auth.signOut(); };
-
   if (checking) return (
     <>
       <style>{css}</style>
@@ -994,6 +949,6 @@ export default function App() {
   );
 
   return user
-    ? <MainApp user={user} profile={profile} onLogout={handleLogout} />
+    ? <MainApp user={user} profile={profile} onLogout={() => supabase.auth.signOut()} />
     : <AuthScreen onAuth={u => loadProfile(u)} />;
 }
