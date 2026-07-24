@@ -696,11 +696,10 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
           <div className="hdr-ct">
             <div className="hdr-top">
               <div className="logo">TYPOWE <span>DZIADY</span></div>
-              <div className="hdr-r">
-                <div className="upill">
-                  <ClubAvatar favoriteTeam={profile?.favorite_team} name={profile?.name || ""} size={24} />
-                  <span className="uname">{profile?.name || "Ty"}</span>
-                </div>
+              <div className="upill" onClick={() => setShowTeamPicker(true)} style={{ cursor: "pointer" }}>
+  <ClubAvatar favoriteTeam={profile?.favorite_team} name={profile?.name || ""} size={24} />
+  <span className="uname">{profile?.name || "Ty"}</span>
+</div>
                 <button className="uout" onClick={onLogout}>Wyloguj</button>
               </div>
             </div>
