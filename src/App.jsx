@@ -10,30 +10,57 @@ const PHOTO_URL = "https://images.unsplash.com/photo-1569531955323-33c6b2dca44b?
 const PICK_LABELS = { home: "1", draw: "X", away: "2" };
 const PICK_NAMES  = { home: "Gospodarz", draw: "Remis", away: "Gość" };
 
-const TEAM_LOGOS = {
-  "Bruk-Bet Termalica Nieciecza": "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df3f862117e57608389dd_bruk-bet-termalica-nieciecza-logo-footylogos.webp",
-  "Cracovia":                     "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df535f6d53ebf9e38f7c3_ks-cracovia-logo-footylogos.webp",
-  "GKS Katowice":                 "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df4ca8b206768fa155676_gks-katowice-logo-footylogos.webp",
-  "Górnik Zabrze":                "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df4da05e50bc41db66cfd_gornik-zabrze-logo-footylogos.webp",
-  "Jagiellonia Białystok":        "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df523c149ca67381ffbe3_jagiellonia-bialystok-logo-footylogos.webp",
-  "Korona Kielce":                "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df5498ba294066bcca15b_korona-kielce-logo-footylogos.webp",
-  "Lech Poznań":                  "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df557ae7b0d3c31b057d9_lech-poznan-logo-footylogos.webp",
-  "Lechia Gdańsk":                "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df55819824fd8ee02f046_lechia-gdansk-logo-footylogos.webp",
-  "Legia Warszawa":               "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df559e2fc5acdc52a9ebb_legia-warszawa-logo-footylogos.webp",
-  "Motor Lublin":                 "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df58a63ed6fd0dfdcd473_motor-lublin-logo-footylogos.webp",
-  "Piast Gliwice":                "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df5e71dbe3179dcfad266_piast-gliwice-logo-footylogos.webp",
-  "Pogoń Szczecin":               "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df5e95210fea67e706aa2_pogon-szczecin-logo-footylogos.webp",
-  "Radomiak Radom":               "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df6044d55dca3a4dba667_radomiak-radom-logo-footylogos.webp",
-  "Raków Częstochowa":            "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df606fc56c8c9302093d7_rakow-czestochowa-logo-footylogos.webp",
-  "Stal Mielec":                  "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df676952b0dd6df753502_stal-mielec-logo-footylogos.webp",
-  "Widzew Łódź":                  "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df6c6c0a6a42dbf5a54d3_widzew-lodz-logo-footylogos.webp",
-  "Wieczysta Kraków":             "https://media.cms.ekstraklasa.org/images/originals/019f0a5d-acca-760e-85ca-6d11d8f504db.png",
-  "Wisła Kraków":                 "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a3012facb55a01041811557_wisla-krakow-footylogos.webp",
-  "Wisła Płock":                  "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df6c7a5db3796b344a99a_wisla-plock-logo-footylogos.webp",
-  "Zagłębie Lubin":               "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df6cf891ff56ef567dc76_zaglebie-lubin-logo-footylogos.webp",
-  "Śląsk Wrocław":                "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df65cf6d53ebf9e39b1c1_slask-wroclaw-logo-footylogos.png",
-  "ŁKS Łódź":                    "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df5501dbe3179dcfa80ed_lks-lodz-logo-footylogos.webp",
+const TEAMS_BY_LEAGUE = {
+  "Ekstraklasa": {
+    "Bruk-Bet Termalica Nieciecza": "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df3f862117e57608389dd_bruk-bet-termalica-nieciecza-logo-footylogos.webp",
+    "Cracovia":                     "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df535f6d53ebf9e38f7c3_ks-cracovia-logo-footylogos.webp",
+    "GKS Katowice":                 "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df4ca8b206768fa155676_gks-katowice-logo-footylogos.webp",
+    "Górnik Zabrze":                "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df4da05e50bc41db66cfd_gornik-zabrze-logo-footylogos.webp",
+    "Jagiellonia Białystok":        "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df523c149ca67381ffbe3_jagiellonia-bialystok-logo-footylogos.webp",
+    "Korona Kielce":                "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df5498ba294066bcca15b_korona-kielce-logo-footylogos.webp",
+    "Lech Poznań":                  "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df557ae7b0d3c31b057d9_lech-poznan-logo-footylogos.webp",
+    "Lechia Gdańsk":                "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df55819824fd8ee02f046_lechia-gdansk-logo-footylogos.webp",
+    "Legia Warszawa":               "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df559e2fc5acdc52a9ebb_legia-warszawa-logo-footylogos.webp",
+    "Motor Lublin":                 "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df58a63ed6fd0dfdcd473_motor-lublin-logo-footylogos.webp",
+    "Piast Gliwice":                "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df5e71dbe3179dcfad266_piast-gliwice-logo-footylogos.webp",
+    "Pogoń Szczecin":               "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df5e95210fea67e706aa2_pogon-szczecin-logo-footylogos.webp",
+    "Radomiak Radom":               "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df6044d55dca3a4dba667_radomiak-radom-logo-footylogos.webp",
+    "Raków Częstochowa":            "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df606fc56c8c9302093d7_rakow-czestochowa-logo-footylogos.webp",
+    "Stal Mielec":                  "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df676952b0dd6df753502_stal-mielec-logo-footylogos.webp",
+    "Widzew Łódź":                  "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df6c6c0a6a42dbf5a54d3_widzew-lodz-logo-footylogos.webp",
+    "Wieczysta Kraków":             "https://media.cms.ekstraklasa.org/images/originals/019f0a5d-acca-760e-85ca-6d11d8f504db.png",
+    "Wisła Kraków":                 "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a3012facb55a01041811557_wisla-krakow-footylogos.webp",
+    "Wisła Płock":                  "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df6c7a5db3796b344a99a_wisla-plock-logo-footylogos.webp",
+    "Zagłębie Lubin":               "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df6cf891ff56ef567dc76_zaglebie-lubin-logo-footylogos.webp",
+    "Śląsk Wrocław":                "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df65cf6d53ebf9e39b1c1_slask-wroclaw-logo-footylogos.png",
+    "ŁKS Łódź":                    "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df5501dbe3179dcfa80ed_lks-lodz-logo-footylogos.webp",
+  },
+  "Premier League": {
+    "AFC Bournemouth":              "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/afc-bournemouth/afc-bournemouth-logo-footylogos.png",
+    "Arsenal":                      "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/arsenal/arsenal-logo-footylogos.png",
+    "Aston Villa":                  "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/aston-villa/aston-villa-logo-footylogos.png",
+    "Brentford":                    "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/brentford/brentford-logo-footylogos.png",
+    "Brighton & Hove Albion":       "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/brighton-and-hove-albion/brighton-and-hove-albion-logo-footylogos.png",
+    "Chelsea":                      "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/chelsea/chelsea-logo-footylogos.png",
+    "Coventry City":                "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/coventry-city/coventry-city-logo-footylogos.png",
+    "Crystal Palace":               "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/crystal-palace/crystal-palace-logo-footylogos.png",
+    "Everton":                      "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/everton/everton-logo-footylogos.png",
+    "Fulham":                       "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/fulham/fulham-logo-footylogos.png",
+    "Hull City":                    "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/hull-city/hull-city-logo-footylogos.png",
+    "Ipswich Town":                 "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/ipswich-town/ipswich-town-logo-footylogos.png",
+    "Leeds United":                 "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/leeds-united/leeds-united-logo-footylogos.png",
+    "Liverpool":                    "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/liverpool-fc/liverpool-fc-logo-footylogos.png",
+    "Manchester City":              "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/manchester-city/manchester-city-logo-footylogos.png",
+    "Manchester United":            "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/manchester-united/manchester-united-logo-footylogos.png",
+    "Newcastle United":             "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/newcastle-united/newcastle-united-logo-footylogos.png",
+    "Nottingham Forest":            "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/nottingham-forest/nottingham-forest-logo-footylogos.png",
+    "Sunderland":                   "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/sunderland/sunderland-logo-footylogos.png",
+    "Tottenham Hotspur":            "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/tottenham-hotspur/tottenham-hotspur-logo-footylogos.png",
+  },
 };
+
+// Płaski obiekt do szybkiego wyszukiwania logo po nazwie
+const TEAM_LOGOS = Object.values(TEAMS_BY_LEAGUE).reduce((acc, teams) => ({ ...acc, ...teams }), {});
 
 const AVATAR_COLORS = [
   "linear-gradient(135deg,#c8102e,#8b0000)",
@@ -275,21 +302,27 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 
 // ── MATCH FORM ────────────────────────────────────────────────────────────────
 function MatchFormFields({ data, onChange, leagues }) {
-  const teams = Object.keys(TEAM_LOGOS).sort();
+  // Znajdź nazwę aktywnej ligi po league_id
+  const activeLgName = leagues.find(l => l.id === data.league_id)?.name || "";
+  // Wybierz kluby z odpowiedniej ligi, lub wszystkie jeśli brak dopasowania
+  const teamsForLeague = TEAMS_BY_LEAGUE[activeLgName]
+    ? Object.keys(TEAMS_BY_LEAGUE[activeLgName]).sort()
+    : Object.keys(TEAM_LOGOS).sort();
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-      <select className="msel" value={data.league_id} onChange={e => onChange({ ...data, league_id: e.target.value })}>
+      <select className="msel" value={data.league_id} onChange={e => onChange({ ...data, league_id: e.target.value, home: "", away: "" })}>
         <option value="">Wybierz ligę</option>
         {leagues.map(l => <option key={l.id} value={l.id}>{l.flag} {l.name}</option>)}
       </select>
       <div style={{ display: "flex", gap: 8 }}>
         <select className="msel" value={data.home} onChange={e => onChange({ ...data, home: e.target.value })}>
           <option value="">Gospodarz</option>
-          {teams.map(t => <option key={t} value={t}>{t}</option>)}
+          {teamsForLeague.map(t => <option key={t} value={t}>{t}</option>)}
         </select>
         <select className="msel" value={data.away} onChange={e => onChange({ ...data, away: e.target.value })}>
           <option value="">Gość</option>
-          {teams.map(t => <option key={t} value={t}>{t}</option>)}
+          {teamsForLeague.map(t => <option key={t} value={t}>{t}</option>)}
         </select>
       </div>
       <div style={{ display: "flex", gap: 8 }}>
