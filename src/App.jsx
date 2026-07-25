@@ -62,7 +62,7 @@ const TEAMS_BY_LEAGUE = {
   },
   "La Liga": {
     "Atlético Madrid":              `${CDN}/atletico-madrid/atletico-madrid-logo-footylogos.png`,
-    "Athletic Bilbao":              `${CDN}/athletic-bilbao/athletic-bilbao-logo-footylogos.png`,
+    "Athletic Bilbao":              `${CDN}/athletic-club-bilbao/athletic-club-bilbao-logo-footylogos.png`,
     "Barcelona":                    `${CDN}/fc-barcelona/fc-barcelona-logo-footylogos.png`,
     "Celta Vigo":                   `${CDN}/celta-vigo/celta-vigo-logo-footylogos.png`,
     "Deportivo La Coruña":          `${CDN}/deportivo-la-coruna/deportivo-la-coruna-logo-footylogos.png`,
