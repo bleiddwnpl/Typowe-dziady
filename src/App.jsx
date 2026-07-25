@@ -6,56 +6,103 @@ const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const PHOTO_URL = "https://images.unsplash.com/photo-1569531955323-33c6b2dca44b?fm=jpg&q=85&w=1600&auto=format&fit=crop";
+const CDN = "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos";
+const WF  = "https://cdn.prod.website-files.com/68f550992570ca0322737dc2";
 
 const PICK_LABELS = { home: "1", draw: "X", away: "2" };
 const PICK_NAMES  = { home: "Gospodarz", draw: "Remis", away: "Gość" };
 
+// ── LOGA KLUBÓW (pogrupowane per liga) ───────────────────────────────────────
 const TEAMS_BY_LEAGUE = {
   "Ekstraklasa": {
-    "Bruk-Bet Termalica Nieciecza": "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df3f862117e57608389dd_bruk-bet-termalica-nieciecza-logo-footylogos.webp",
-    "Cracovia":                     "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df535f6d53ebf9e38f7c3_ks-cracovia-logo-footylogos.webp",
-    "GKS Katowice":                 "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df4ca8b206768fa155676_gks-katowice-logo-footylogos.webp",
-    "Górnik Zabrze":                "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df4da05e50bc41db66cfd_gornik-zabrze-logo-footylogos.webp",
-    "Jagiellonia Białystok":        "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df523c149ca67381ffbe3_jagiellonia-bialystok-logo-footylogos.webp",
-    "Korona Kielce":                "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df5498ba294066bcca15b_korona-kielce-logo-footylogos.webp",
-    "Lech Poznań":                  "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df557ae7b0d3c31b057d9_lech-poznan-logo-footylogos.webp",
-    "Lechia Gdańsk":                "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df55819824fd8ee02f046_lechia-gdansk-logo-footylogos.webp",
-    "Legia Warszawa":               "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df559e2fc5acdc52a9ebb_legia-warszawa-logo-footylogos.webp",
-    "Motor Lublin":                 "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df58a63ed6fd0dfdcd473_motor-lublin-logo-footylogos.webp",
-    "Piast Gliwice":                "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df5e71dbe3179dcfad266_piast-gliwice-logo-footylogos.webp",
-    "Pogoń Szczecin":               "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df5e95210fea67e706aa2_pogon-szczecin-logo-footylogos.webp",
-    "Radomiak Radom":               "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df6044d55dca3a4dba667_radomiak-radom-logo-footylogos.webp",
-    "Raków Częstochowa":            "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df606fc56c8c9302093d7_rakow-czestochowa-logo-footylogos.webp",
-    "Stal Mielec":                  "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df676952b0dd6df753502_stal-mielec-logo-footylogos.webp",
-    "Widzew Łódź":                  "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df6c6c0a6a42dbf5a54d3_widzew-lodz-logo-footylogos.webp",
-    "Wieczysta Kraków":             "https://media.cms.ekstraklasa.org/images/originals/019f0a5d-acca-760e-85ca-6d11d8f504db.png",
-    "Wisła Kraków":                 "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a3012facb55a01041811557_wisla-krakow-footylogos.webp",
-    "Wisła Płock":                  "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df6c7a5db3796b344a99a_wisla-plock-logo-footylogos.webp",
-    "Zagłębie Lubin":               "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df6cf891ff56ef567dc76_zaglebie-lubin-logo-footylogos.webp",
-    "Śląsk Wrocław":                "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df65cf6d53ebf9e39b1c1_slask-wroclaw-logo-footylogos.png",
-    "ŁKS Łódź":                    "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5df5501dbe3179dcfa80ed_lks-lodz-logo-footylogos.webp",
+    "Bruk-Bet Termalica Nieciecza": `${WF}/6a5df3f862117e57608389dd_bruk-bet-termalica-nieciecza-logo-footylogos.webp`,
+    "Cracovia":                     `${WF}/6a5df535f6d53ebf9e38f7c3_ks-cracovia-logo-footylogos.webp`,
+    "GKS Katowice":                 `${WF}/6a5df4ca8b206768fa155676_gks-katowice-logo-footylogos.webp`,
+    "Górnik Zabrze":                `${WF}/6a5df4da05e50bc41db66cfd_gornik-zabrze-logo-footylogos.webp`,
+    "Jagiellonia Białystok":        `${WF}/6a5df523c149ca67381ffbe3_jagiellonia-bialystok-logo-footylogos.webp`,
+    "Korona Kielce":                `${WF}/6a5df5498ba294066bcca15b_korona-kielce-logo-footylogos.webp`,
+    "Lech Poznań":                  `${WF}/6a5df557ae7b0d3c31b057d9_lech-poznan-logo-footylogos.webp`,
+    "Lechia Gdańsk":                `${WF}/6a5df55819824fd8ee02f046_lechia-gdansk-logo-footylogos.webp`,
+    "Legia Warszawa":               `${WF}/6a5df559e2fc5acdc52a9ebb_legia-warszawa-logo-footylogos.webp`,
+    "Motor Lublin":                 `${WF}/6a5df58a63ed6fd0dfdcd473_motor-lublin-logo-footylogos.webp`,
+    "Piast Gliwice":                `${WF}/6a5df5e71dbe3179dcfad266_piast-gliwice-logo-footylogos.webp`,
+    "Pogoń Szczecin":               `${WF}/6a5df5e95210fea67e706aa2_pogon-szczecin-logo-footylogos.webp`,
+    "Radomiak Radom":               `${WF}/6a5df6044d55dca3a4dba667_radomiak-radom-logo-footylogos.webp`,
+    "Raków Częstochowa":            `${WF}/6a5df606fc56c8c9302093d7_rakow-czestochowa-logo-footylogos.webp`,
+    "Stal Mielec":                  `${WF}/6a5df676952b0dd6df753502_stal-mielec-logo-footylogos.webp`,
+    "Widzew Łódź":                  `${WF}/6a5df6c6c0a6a42dbf5a54d3_widzew-lodz-logo-footylogos.webp`,
+    "Wieczysta Kraków":             `https://media.cms.ekstraklasa.org/images/originals/019f0a5d-acca-760e-85ca-6d11d8f504db.png`,
+    "Wisła Kraków":                 `${WF}/6a3012facb55a01041811557_wisla-krakow-footylogos.webp`,
+    "Wisła Płock":                  `${WF}/6a5df6c7a5db3796b344a99a_wisla-plock-logo-footylogos.webp`,
+    "Zagłębie Lubin":               `${WF}/6a5df6cf891ff56ef567dc76_zaglebie-lubin-logo-footylogos.webp`,
+    "Śląsk Wrocław":                `${WF}/6a5df65cf6d53ebf9e39b1c1_slask-wroclaw-logo-footylogos.png`,
+    "ŁKS Łódź":                    `${WF}/6a5df5501dbe3179dcfa80ed_lks-lodz-logo-footylogos.webp`,
   },
   "Premier League": {
-    "AFC Bournemouth":              "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/afc-bournemouth/afc-bournemouth-logo-footylogos.png",
-    "Arsenal":                      "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/arsenal/arsenal-logo-footylogos.png",
-    "Aston Villa":                  "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/aston-villa/aston-villa-logo-footylogos.png",
-    "Brentford":                    "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/brentford/brentford-logo-footylogos.png",
-    "Brighton & Hove Albion":       "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/brighton-and-hove-albion/brighton-and-hove-albion-logo-footylogos.png",
-    "Chelsea":                      "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/chelsea/chelsea-logo-footylogos.png",
-    "Coventry City":                "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/coventry-city/coventry-city-logo-footylogos.png",
-    "Crystal Palace":               "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/crystal-palace/crystal-palace-logo-footylogos.png",
-    "Everton":                      "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/everton/everton-logo-footylogos.png",
-    "Fulham":                       "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/fulham/fulham-logo-footylogos.png",
-    "Hull City":                    "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/hull-city/hull-city-logo-footylogos.png",
-    "Ipswich Town":                 "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/ipswich-town/ipswich-town-logo-footylogos.png",
-    "Leeds United":                 "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/leeds-united/leeds-united-logo-footylogos.png",
-    "Liverpool":                    "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/liverpool-fc/liverpool-fc-logo-footylogos.png",
-    "Manchester City":              "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/manchester-city/manchester-city-logo-footylogos.png",
-    "Manchester United":            "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/manchester-united/manchester-united-logo-footylogos.png",
-    "Newcastle United":             "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/newcastle-united/newcastle-united-logo-footylogos.png",
-    "Nottingham Forest":            "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/nottingham-forest/nottingham-forest-logo-footylogos.png",
-    "Sunderland":                   "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/sunderland/sunderland-logo-footylogos.png",
-    "Tottenham Hotspur":            "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/tottenham-hotspur/tottenham-hotspur-logo-footylogos.png",
+    "AFC Bournemouth":              `${CDN}/afc-bournemouth/afc-bournemouth-logo-footylogos.png`,
+    "Arsenal":                      `${CDN}/arsenal/arsenal-logo-footylogos.png`,
+    "Aston Villa":                  `${CDN}/aston-villa/aston-villa-logo-footylogos.png`,
+    "Brentford":                    `${CDN}/brentford/brentford-logo-footylogos.png`,
+    "Brighton & Hove Albion":       `${CDN}/brighton-and-hove-albion/brighton-and-hove-albion-logo-footylogos.png`,
+    "Chelsea":                      `${CDN}/chelsea/chelsea-logo-footylogos.png`,
+    "Coventry City":                `${CDN}/coventry-city/coventry-city-logo-footylogos.png`,
+    "Crystal Palace":               `${CDN}/crystal-palace/crystal-palace-logo-footylogos.png`,
+    "Everton":                      `${CDN}/everton/everton-logo-footylogos.png`,
+    "Fulham":                       `${CDN}/fulham/fulham-logo-footylogos.png`,
+    "Hull City":                    `${CDN}/hull-city/hull-city-logo-footylogos.png`,
+    "Ipswich Town":                 `${CDN}/ipswich-town/ipswich-town-logo-footylogos.png`,
+    "Leeds United":                 `${CDN}/leeds-united/leeds-united-logo-footylogos.png`,
+    "Liverpool":                    `${CDN}/liverpool-fc/liverpool-fc-logo-footylogos.png`,
+    "Manchester City":              `${CDN}/manchester-city/manchester-city-logo-footylogos.png`,
+    "Manchester United":            `${CDN}/manchester-united/manchester-united-logo-footylogos.png`,
+    "Newcastle United":             `${CDN}/newcastle-united/newcastle-united-logo-footylogos.png`,
+    "Nottingham Forest":            `${CDN}/nottingham-forest/nottingham-forest-logo-footylogos.png`,
+    "Sunderland":                   `${CDN}/sunderland/sunderland-logo-footylogos.png`,
+    "Tottenham Hotspur":            `${CDN}/tottenham-hotspur/tottenham-hotspur-logo-footylogos.png`,
+  },
+  "La Liga": {
+    "Atlético Madrid":              `${CDN}/atletico-madrid/atletico-madrid-logo-footylogos.png`,
+    "Athletic Bilbao":              `${CDN}/athletic-bilbao/athletic-bilbao-logo-footylogos.png`,
+    "Barcelona":                    `${CDN}/fc-barcelona/fc-barcelona-logo-footylogos.png`,
+    "Celta Vigo":                   `${CDN}/celta-vigo/celta-vigo-logo-footylogos.png`,
+    "Deportivo La Coruña":          `${CDN}/deportivo-la-coruna/deportivo-la-coruna-logo-footylogos.png`,
+    "Espanyol":                     `${CDN}/espanyol/espanyol-logo-footylogos.png`,
+    "Getafe":                       `${CDN}/getafe-cf/getafe-cf-logo-footylogos.png`,
+    "Girona":                       `${CDN}/girona-fc/girona-fc-logo-footylogos.png`,
+    "Levante":                      `${CDN}/levante-ud/levante-ud-logo-footylogos.png`,
+    "Mallorca":                     `${CDN}/real-mallorca/real-mallorca-logo-footylogos.png`,
+    "Osasuna":                      `${CDN}/ca-osasuna/ca-osasuna-logo-footylogos.png`,
+    "Racing Santander":             `${CDN}/racing-de-santander/racing-de-santander-logo-footylogos.png`,
+    "Rayo Vallecano":               `${CDN}/rayo-vallecano/rayo-vallecano-logo-footylogos.png`,
+    "Real Betis":                   `${CDN}/real-betis/real-betis-logo-footylogos.png`,
+    "Real Madrid":                  `${CDN}/real-madrid/real-madrid-logo-footylogos.png`,
+    "Real Sociedad":                `${CDN}/real-sociedad/real-sociedad-logo-footylogos.png`,
+    "Sevilla":                      `${CDN}/sevilla-fc/sevilla-fc-logo-footylogos.png`,
+    "Valencia":                     `${CDN}/valencia-cf/valencia-cf-logo-footylogos.png`,
+    "Villarreal":                   `${CDN}/villarreal-cf/villarreal-cf-logo-footylogos.png`,
+    "Valladolid":                   `${CDN}/real-valladolid/real-valladolid-logo-footylogos.png`,
+  },
+  "Serie A": {
+    "AC Milan":                     `${CDN}/ac-milan/ac-milan-logo-footylogos.png`,
+    "Atalanta":                     `${CDN}/atalanta-bc/atalanta-bc-logo-footylogos.png`,
+    "Bologna":                      `${CDN}/bologna-fc/bologna-fc-logo-footylogos.png`,
+    "Cagliari":                     `${CDN}/cagliari-calcio/cagliari-calcio-logo-footylogos.png`,
+    "Como":                         `${CDN}/como-1907/como-1907-logo-footylogos.png`,
+    "Empoli":                       `${CDN}/empoli-fc/empoli-fc-logo-footylogos.png`,
+    "Fiorentina":                   `${CDN}/acf-fiorentina/acf-fiorentina-logo-footylogos.png`,
+    "Genoa":                        `${CDN}/genoa-cfc/genoa-cfc-logo-footylogos.png`,
+    "Inter Milan":                  `${CDN}/fc-internazionale/fc-internazionale-logo-footylogos.png`,
+    "Juventus":                     `${CDN}/juventus-fc/juventus-fc-logo-footylogos.png`,
+    "Lazio":                        `${CDN}/ss-lazio/ss-lazio-logo-footylogos.png`,
+    "Lecce":                        `${CDN}/us-lecce/us-lecce-logo-footylogos.png`,
+    "Monza":                        `${CDN}/ac-monza/ac-monza-logo-footylogos.png`,
+    "Napoli":                       `${CDN}/ssc-napoli/ssc-napoli-logo-footylogos.png`,
+    "Parma":                        `${CDN}/parma-calcio/parma-calcio-logo-footylogos.png`,
+    "AS Roma":                      `${CDN}/as-roma/as-roma-logo-footylogos.png`,
+    "Sassuolo":                     `${CDN}/us-sassuolo/us-sassuolo-logo-footylogos.png`,
+    "Torino":                       `${CDN}/torino-fc/torino-fc-logo-footylogos.png`,
+    "Udinese":                      `${CDN}/udinese-calcio/udinese-calcio-logo-footylogos.png`,
+    "Venezia":                      `${CDN}/venezia-fc/venezia-fc-logo-footylogos.png`,
   },
 };
 
@@ -87,6 +134,7 @@ const isMatchLocked = (m) => {
   return nowWarsaw >= `${m.match_date}T${m.match_time?.slice(0, 5)}`;
 };
 
+// Logo drużyny — obrazek lub inicjały
 function TeamLogo({ name, size = 32 }) {
   const logo = TEAM_LOGOS[name];
   const av = getAvatar(name);
@@ -94,8 +142,7 @@ function TeamLogo({ name, size = 32 }) {
     return (
       <img src={logo} alt={name}
         style={{ width: size, height: size, objectFit: "contain", flexShrink: 0 }}
-        onError={e => { e.target.style.display = "none"; }}
-      />
+        onError={e => { e.target.style.display = "none"; }} />
     );
   }
   return (
@@ -105,14 +152,16 @@ function TeamLogo({ name, size = 32 }) {
   );
 }
 
-// Avatar klubu — do czatu i rankingu
+// Avatar w kółku — do czatu i rankingu
 function ClubAvatar({ favoriteTeam, name, size = 32 }) {
   const av = getAvatar(name);
   const logo = favoriteTeam ? TEAM_LOGOS[favoriteTeam] : null;
   if (logo) {
     return (
       <div style={{ width: size, height: size, borderRadius: "50%", background: "rgba(0,0,0,0.3)", border: "1.5px solid rgba(0,122,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" }}>
-        <img src={logo} alt={favoriteTeam} style={{ width: size * 0.75, height: size * 0.75, objectFit: "contain" }} onError={e => { e.target.style.display = "none"; }} />
+        <img src={logo} alt={favoriteTeam}
+          style={{ width: size * 0.72, height: size * 0.72, objectFit: "contain" }}
+          onError={e => { e.target.style.display = "none"; }} />
       </div>
     );
   }
@@ -165,17 +214,19 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 .hdr-photo { position:absolute; inset:-20px -10px 0; background-image:url('${PHOTO_URL}'); background-size:cover; background-position:center 30%; filter:blur(2px) brightness(0.3) saturate(0.8); }
 .hdr-ov { position:absolute; inset:0; background:linear-gradient(180deg,rgba(4,8,20,0.4) 0%,rgba(4,8,20,0.6) 50%,#060a0f 100%); }
 .hdr-ct { position:relative; z-index:2; padding:20px 18px 0; }
-.hdr-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+.hdr-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
 .logo { font-family:'Bebas Neue',sans-serif; font-size:26px; color:#fff; letter-spacing:2px; }
 .logo span { color:#60a5fa; }
 .hdr-r { display:flex; align-items:center; gap:8px; }
-.upill { display:flex; align-items:center; gap:7px; background:rgba(255,255,255,0.08); border:1px solid rgba(0,122,255,0.2); border-radius:20px; padding:5px 12px 5px 6px; }
+.upill { display:flex; align-items:center; gap:7px; background:rgba(255,255,255,0.08); border:1px solid rgba(0,122,255,0.2); border-radius:20px; padding:5px 12px 5px 6px; cursor:pointer; transition:border-color 0.2s; }
+.upill:hover { border-color:rgba(0,122,255,0.5); }
 .uname { font-size:13px; color:rgba(255,255,255,0.85); font-weight:600; }
-.uout { font-size:12px; font-weight:600; color:rgba(255,255,255,0.45); background:none; border:none; cursor:pointer; font-family:inherit; }
-.league-tabs { display:flex; gap:8px; padding:0 18px; margin-bottom:16px; overflow-x:auto; }
-.league-tab { display:flex; align-items:center; gap:6px; padding:7px 14px; border-radius:20px; border:1.5px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.04); color:rgba(255,255,255,0.45); font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap; transition:all 0.2s; font-family:'Inter',sans-serif; flex-shrink:0; }
+.uout { font-size:12px; font-weight:600; color:rgba(255,255,255,0.45); background:none; border:none; cursor:pointer; font-family:inherit; transition:color 0.2s; }
+.uout:hover { color:#fff; }
+.league-tabs { display:flex; gap:8px; margin-bottom:14px; overflow-x:auto; padding-bottom:2px; }
+.league-tab { display:flex; align-items:center; gap:5px; padding:6px 13px; border-radius:20px; border:1.5px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.04); color:rgba(255,255,255,0.45); font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; transition:all 0.2s; font-family:'Inter',sans-serif; flex-shrink:0; }
 .league-tab.active { border-color:#007aff; background:rgba(0,122,255,0.12); color:#60a5fa; }
-.stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; padding:0 18px; }
+.stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
 .sbox { background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:10px 12px; backdrop-filter:blur(10px); }
 .slbl { font-size:10px; font-weight:700; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:3px; }
 .sval { font-family:'Bebas Neue',sans-serif; font-size:26px; color:#fff; letter-spacing:1px; line-height:1; }
@@ -183,7 +234,7 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 
 .nav { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:480px; background:rgba(6,10,15,0.97); border-top:1px solid rgba(0,122,255,0.1); display:flex; z-index:50; backdrop-filter:blur(20px); padding:10px 0 14px; }
 .ni { flex:1; padding:6px 4px 4px; background:transparent; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:4px; }
-.nic { width:48px; height:34px; display:flex; align-items:center; justify-content:center; border-radius:12px; font-size:26px; transition:background 0.2s; }
+.nic { width:48px; height:34px; display:flex; align-items:center; justify-content:center; border-radius:12px; font-size:24px; transition:background 0.2s; }
 .ni.on .nic { background:rgba(0,122,255,0.12); }
 .nlbl { font-size:11px; font-weight:600; color:rgba(255,255,255,0.4); transition:color 0.2s; }
 .ni.on .nlbl { color:#60a5fa; }
@@ -197,12 +248,12 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 .mc:hover { border-color:rgba(0,122,255,0.25); transform:translateY(-1px); }
 .mt2 { padding:9px 14px; background:rgba(255,255,255,0.02); border-bottom:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; align-items:center; }
 .rbadge { font-size:11px; color:#60a5fa; background:rgba(0,122,255,0.1); border:1px solid rgba(0,122,255,0.2); padding:3px 10px; border-radius:20px; font-weight:700; }
-.mtime { font-size:13px; color:rgba(255,255,255,0.7); font-weight:600; }
+.mtime { font-size:12px; color:rgba(255,255,255,0.65); font-weight:600; }
 .mb2 { padding:14px; }
-.tms { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; gap:8px; }
-.tm { display:flex; align-items:center; gap:8px; flex:1; min-width:0; }
+.tms { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; gap:6px; }
+.tm { display:flex; align-items:center; gap:7px; flex:1; min-width:0; }
 .tm.r { flex-direction:row-reverse; }
-.tn { font-size:14px; font-weight:700; color:#fff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.tn { font-size:13px; font-weight:700; color:#fff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .tm.r .tn { text-align:right; }
 .vs-sep { flex-shrink:0; text-align:center; }
 .vs-txt { font-size:10px; color:rgba(255,255,255,0.25); font-weight:700; letter-spacing:1px; }
@@ -254,7 +305,7 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 
 .ar { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid rgba(255,255,255,0.05); gap:8px; }
 .ar:last-child { border-bottom:none; }
-.an { font-size:14px; font-weight:700; color:#fff; }
+.an { font-size:13px; font-weight:700; color:#fff; }
 .at { font-size:11px; color:rgba(255,255,255,0.45); margin-top:2px; }
 .aedt { background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.1); color:rgba(255,255,255,0.75); padding:6px 12px; border-radius:10px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; }
 .ares-btn { background:rgba(0,122,255,0.1); border:1px solid rgba(0,122,255,0.25); color:#60a5fa; padding:6px 12px; border-radius:10px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; }
@@ -269,7 +320,7 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 .mi { width:100%; padding:12px 14px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px; color:#fff; font-family:inherit; font-size:14px; outline:none; transition:border-color 0.2s; }
 .mi:focus { border-color:rgba(0,122,255,0.4); }
 .mi::placeholder { color:rgba(255,255,255,0.25); }
-.mprim { width:100%; padding:14px; background:linear-gradient(135deg,#0051cc,#007aff); border:none; border-radius:14px; color:#fff; font-family:inherit; font-size:15px; font-weight:700; cursor:pointer; }
+.mprim { width:100%; padding:14px; background:linear-gradient(135deg,#0051cc,#007aff); border:none; border-radius:14px; color:#fff; font-family:inherit; font-size:15px; font-weight:700; cursor:pointer; box-shadow:0 6px 20px rgba(0,122,255,0.3); }
 .msec { width:100%; padding:12px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:14px; color:rgba(255,255,255,0.5); font-family:inherit; font-size:14px; font-weight:500; cursor:pointer; }
 .msel { width:100%; padding:12px 14px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px; color:#fff; font-family:inherit; font-size:14px; outline:none; }
 
@@ -292,7 +343,7 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 .cin { flex:1; padding:11px 16px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.09); border-radius:22px; color:#fff; font-family:inherit; font-size:15px; outline:none; }
 .cin:focus { border-color:rgba(0,122,255,0.3); }
 .cin::placeholder { color:rgba(255,255,255,0.25); }
-.csend { width:38px; height:38px; background:linear-gradient(135deg,#0051cc,#007aff); border:none; border-radius:50%; color:#fff; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-weight:700; }
+.csend { width:38px; height:38px; background:linear-gradient(135deg,#0051cc,#007aff); border:none; border-radius:50%; color:#fff; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0; }
 .csend:disabled { background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.2); }
 .empty { text-align:center; padding:50px 0; color:rgba(255,255,255,0.3); }
 .ei { font-size:40px; margin-bottom:10px; }
@@ -300,11 +351,9 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 .es { font-size:13px; margin-top:4px; }
 `;
 
-// ── MATCH FORM ────────────────────────────────────────────────────────────────
+// ── FORMULARZ MECZU ───────────────────────────────────────────────────────────
 function MatchFormFields({ data, onChange, leagues }) {
-  // Znajdź nazwę aktywnej ligi po league_id
   const activeLgName = leagues.find(l => l.id === data.league_id)?.name || "";
-  // Wybierz kluby z odpowiedniej ligi, lub wszystkie jeśli brak dopasowania
   const teamsForLeague = TEAMS_BY_LEAGUE[activeLgName]
     ? Object.keys(TEAMS_BY_LEAGUE[activeLgName]).sort()
     : Object.keys(TEAM_LOGOS).sort();
@@ -342,30 +391,36 @@ function MatchFormFields({ data, onChange, leagues }) {
 // ── TEAM PICKER ───────────────────────────────────────────────────────────────
 function TeamPicker({ onSave, onSkip }) {
   const [sel, setSel] = useState(null);
-  const teams = Object.keys(TEAM_LOGOS).sort();
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.88)", zIndex: 200, display: "flex", alignItems: "flex-end", justifyContent: "center", backdropFilter: "blur(20px)" }}>
       <div style={{ background: "#080e1a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "28px 28px 0 0", padding: "28px 20px 48px", width: "100%", maxWidth: 480, maxHeight: "90vh", display: "flex", flexDirection: "column" }}>
         <div style={{ width: 36, height: 4, background: "rgba(255,255,255,0.15)", borderRadius: 2, margin: "0 auto 20px" }} />
-        <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 26, color: "#fff", letterSpacing: 2, textAlign: "center", marginBottom: 4 }}>TWÓJ ULUBIONY KLUB</div>
-        <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", textAlign: "center", marginBottom: 20 }}>Logo pojawi się przy Twoim nicku w rankingu i czacie</div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8, overflowY: "auto", flex: 1 }}>
-          {teams.map(name => (
-            <div key={name} onClick={() => setSel(name)}
-              style={{ background: sel === name ? "rgba(0,122,255,0.15)" : "rgba(255,255,255,0.04)", border: `1.5px solid ${sel === name ? "#007aff" : "rgba(255,255,255,0.08)"}`, borderRadius: 14, padding: "10px 6px", textAlign: "center", cursor: "pointer", transition: "all 0.18s" }}>
-              <img src={TEAM_LOGOS[name]} alt={name}
-                style={{ width: 40, height: 40, objectFit: "contain", display: "block", margin: "0 auto 6px" }}
-                onError={e => { e.target.style.opacity = "0.2"; }} />
-              <div style={{ fontSize: 9, color: sel === name ? "#60a5fa" : "rgba(255,255,255,0.5)", fontWeight: 600, lineHeight: 1.2 }}>{name}</div>
+        <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 24, color: "#fff", letterSpacing: 2, textAlign: "center", marginBottom: 4 }}>TWÓJ ULUBIONY KLUB</div>
+        <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", textAlign: "center", marginBottom: 18 }}>Logo pojawi się przy Twoim nicku w rankingu i czacie</div>
+        <div style={{ overflowY: "auto", flex: 1 }}>
+          {Object.entries(TEAMS_BY_LEAGUE).map(([lgName, teams]) => (
+            <div key={lgName}>
+              <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.3)", letterSpacing: 2, textTransform: "uppercase", padding: "10px 4px 6px" }}>{lgName}</div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8, marginBottom: 8 }}>
+                {Object.entries(teams).map(([name, logo]) => (
+                  <div key={name} onClick={() => setSel(name)}
+                    style={{ background: sel === name ? "rgba(0,122,255,0.15)" : "rgba(255,255,255,0.04)", border: `1.5px solid ${sel === name ? "#007aff" : "rgba(255,255,255,0.08)"}`, borderRadius: 12, padding: "10px 6px", textAlign: "center", cursor: "pointer", transition: "all 0.18s" }}>
+                    <img src={logo} alt={name}
+                      style={{ width: 36, height: 36, objectFit: "contain", display: "block", margin: "0 auto 5px" }}
+                      onError={e => { e.target.style.opacity = "0.15"; }} />
+                    <div style={{ fontSize: 8, color: sel === name ? "#60a5fa" : "rgba(255,255,255,0.5)", fontWeight: 600, lineHeight: 1.2 }}>{name}</div>
+                  </div>
+                ))}
+              </div>
             </div>
           ))}
         </div>
         <button onClick={() => onSave(sel)} disabled={!sel}
-          style={{ width: "100%", padding: 15, background: "linear-gradient(135deg,#0051cc,#007aff)", border: "none", borderRadius: 14, color: "#fff", fontFamily: "inherit", fontSize: 16, fontWeight: 700, cursor: sel ? "pointer" : "not-allowed", marginTop: 16, opacity: sel ? 1 : 0.35 }}>
+          style={{ width: "100%", padding: 14, background: "linear-gradient(135deg,#0051cc,#007aff)", border: "none", borderRadius: 14, color: "#fff", fontFamily: "inherit", fontSize: 15, fontWeight: 700, cursor: sel ? "pointer" : "not-allowed", marginTop: 14, opacity: sel ? 1 : 0.35 }}>
           Zapisz wybór →
         </button>
         <button onClick={onSkip}
-          style={{ width: "100%", padding: 11, background: "transparent", border: "none", color: "rgba(255,255,255,0.3)", fontFamily: "inherit", fontSize: 13, cursor: "pointer", marginTop: 6 }}>
+          style={{ width: "100%", padding: 10, background: "transparent", border: "none", color: "rgba(255,255,255,0.3)", fontFamily: "inherit", fontSize: 13, cursor: "pointer", marginTop: 6 }}>
           Pomiń na razie
         </button>
       </div>
@@ -440,7 +495,7 @@ function AuthScreen({ onAuth }) {
                 {error && <div className="aerr">{error}</div>}
                 <button className="acta" onClick={handleReset} disabled={loading}>{loading ? "Wysyłanie..." : "Wyślij link resetujący →"}</button>
               </>}
-              {resetSent && <div className="reset-ok">✓ Link wysłany!<br />Sprawdź swoją skrzynkę e-mail.</div>}
+              {resetSent && <div className="reset-ok">✓ Link wysłany! Sprawdź skrzynkę e-mail.</div>}
               <button className="back-btn" onClick={() => { setResetMode(false); setResetSent(false); setError(""); }}>← Wróć do logowania</button>
             </>
           ) : (
@@ -496,8 +551,7 @@ function ChatTab({ user, profile, profiles }) {
   const fmt = ts => new Date(ts).toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Warsaw" });
   const fmtD = ts => new Date(ts).toLocaleDateString("pl-PL", { day: "numeric", month: "long", timeZone: "Europe/Warsaw" });
   const grouped = messages.reduce((acc, m) => { const d = fmtD(m.created_at); if (!acc[d]) acc[d] = []; acc[d].push(m); return acc; }, {});
-
-  const getSenderProfile = (userId) => profiles.find(p => p.id === userId);
+  const getSenderProfile = uid => profiles.find(p => p.id === uid);
 
   return (
     <div className="chat-wrap">
@@ -508,19 +562,13 @@ function ChatTab({ user, profile, profiles }) {
             <div className="cdt"><span>{date}</span></div>
             {msgs.map((msg, i) => {
               const isMe = msg.user_id === user.id;
-              const senderProfile = getSenderProfile(msg.user_id);
+              const sp = getSenderProfile(msg.user_id);
               const av = getAvatar(msg.user_name);
               const showName = !msgs[i + 1] || msgs[i + 1].user_id !== msg.user_id;
               return (
                 <div key={msg.id} className="cbw" style={{ alignItems: isMe ? "flex-end" : "flex-start" }}>
                   <div className={`crow ${isMe ? "me" : ""}`}>
-                    {!isMe && showName && (
-                      <ClubAvatar
-                        favoriteTeam={senderProfile?.favorite_team}
-                        name={msg.user_name}
-                        size={28}
-                      />
-                    )}
+                    {!isMe && showName && <ClubAvatar favoriteTeam={sp?.favorite_team} name={msg.user_name} size={28} />}
                     {!isMe && !showName && <div style={{ width: 28, flexShrink: 0 }} />}
                     <div className={`cb ${isMe ? "mine" : "theirs"}`}>{msg.content}</div>
                   </div>
@@ -567,7 +615,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
       supabase.from("matches").select("*").order("match_date").order("match_time"),
       supabase.from("profiles").select("*"),
     ]);
-
+    // Paginacja tipów — kluczowa lekcja z poprzedniego projektu
     let allTips = [];
     let from = 0;
     const pageSize = 1000;
@@ -578,7 +626,6 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
       if (page.length < pageSize) break;
       from += pageSize;
     }
-
     setLeagues(lg || []);
     setMatches(m || []);
     setTips(allTips);
@@ -662,8 +709,6 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
   const myPts = lb.find(u => u.id === user.id)?.points || 0;
   const myRank = lb.findIndex(u => u.id === user.id) + 1;
   const myCorrect = tips.filter(t => t.user_id === user.id && leagueMatchIds.includes(t.match_id) && t.points > 0).length;
-
-  const av = getAvatar(profile?.name || "");
   const activeLg = leagues.find(l => l.id === activeLeague);
 
   const tabs = [
@@ -691,15 +736,17 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
 
         {showTeamPicker && <TeamPicker onSave={saveTeam} onSkip={() => setShowTeamPicker(false)} />}
 
+        {/* HEADER */}
         <div className="hdr">
           <div className="hdr-photo" /><div className="hdr-ov" />
           <div className="hdr-ct">
             <div className="hdr-top">
               <div className="logo">TYPOWE <span>DZIADY</span></div>
-              <div className="upill" onClick={() => setShowTeamPicker(true)} style={{ cursor: "pointer" }}>
-  <ClubAvatar favoriteTeam={profile?.favorite_team} name={profile?.name || ""} size={24} />
-  <span className="uname">{profile?.name || "Ty"}</span>
-</div>
+              <div className="hdr-r">
+                <div className="upill" onClick={() => setShowTeamPicker(true)}>
+                  <ClubAvatar favoriteTeam={profile?.favorite_team} name={profile?.name || ""} size={24} />
+                  <span className="uname">{profile?.name || "Ty"}</span>
+                </div>
                 <button className="uout" onClick={onLogout}>Wyloguj</button>
               </div>
             </div>
@@ -729,6 +776,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
 
           {tab === "chat" && <ChatTab user={user} profile={profile} profiles={profiles} />}
 
+          {/* ── MECZE ── */}
           {tab === "matches" && <>
             {upcoming.length === 0 && finished.length === 0 && (
               <div className="empty"><div className="ei">📅</div><div className="et">Brak meczów</div><div className="es">{activeLg ? `Admin wkrótce doda mecze ${activeLg.name}` : "Wybierz ligę"}</div></div>
@@ -802,6 +850,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
             </>}
           </>}
 
+          {/* ── TABELA ── */}
           {tab === "leaderboard" && <>
             <div className="sh">Klasyfikacja — {activeLg?.flag} {activeLg?.name}</div>
             {lb.length === 0 && <div className="empty"><div className="ei">🏆</div><div className="et">Brak uczestników</div></div>}
@@ -823,6 +872,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
             </div>
           </>}
 
+          {/* ── REGULAMIN ── */}
           {tab === "rules" && <>
             <div className="sh">Nagrody</div>
             <div className="rc" style={{ marginBottom: 10 }}>
@@ -850,38 +900,39 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
             ))}
           </>}
 
+          {/* ── ADMIN ── */}
           {tab === "admin" && profile?.is_admin && <>
             <div className="sh">Panel administratora</div>
             <button className="mprim" style={{ marginBottom: 16 }} onClick={() => setAddModal(true)}>+ Dodaj mecz</button>
             {upcoming.length > 0 && <>
-              <div className="sh">Nadchodzące</div>
+              <div className="sh">Nadchodzące — {activeLg?.name}</div>
               <div className="rc" style={{ marginBottom: 10 }}>
-                {upcoming.map((match, i) => (
-                  <div key={match.id} className="ar" style={{ borderBottom: i < upcoming.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
+                {upcoming.map((m, i) => (
+                  <div key={m.id} className="ar" style={{ borderBottom: i < upcoming.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div className="an">{match.home} vs {match.away}</div>
-                      <div className="at">{match.match_date} · {match.match_time?.slice(0, 5)} · {match.round}</div>
+                      <div className="an">{m.home} vs {m.away}</div>
+                      <div className="at">{m.match_date} · {m.match_time?.slice(0, 5)} · {m.round}</div>
                     </div>
                     <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
-                      <button className="aedt" onClick={() => openEdit(match)}>Edytuj</button>
-                      <button className="ares-btn" onClick={() => setResultModal(match)}>Wynik</button>
+                      <button className="aedt" onClick={() => openEdit(m)}>Edytuj</button>
+                      <button className="ares-btn" onClick={() => setResultModal(m)}>Wynik</button>
                     </div>
                   </div>
                 ))}
               </div>
             </>}
             {finished.length > 0 && <>
-              <div className="sh">Zakończone</div>
+              <div className="sh">Zakończone — {activeLg?.name}</div>
               <div className="rc">
-                {finished.map((match, i) => (
-                  <div key={match.id} className="ar" style={{ borderBottom: i < finished.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
+                {finished.map((m, i) => (
+                  <div key={m.id} className="ar" style={{ borderBottom: i < finished.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div className="an">{match.home} vs {match.away}</div>
-                      <div className="at" style={{ color: "#60a5fa" }}>Wynik: {PICK_LABELS[match.result]}</div>
+                      <div className="an">{m.home} vs {m.away}</div>
+                      <div className="at" style={{ color: "#60a5fa" }}>Wynik: {PICK_LABELS[m.result]}</div>
                     </div>
                     <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
-                      <button className="aedt" onClick={() => openEdit(match)}>Edytuj</button>
-                      <button className="ares-btn" onClick={() => setResultModal(match)}>Popraw</button>
+                      <button className="aedt" onClick={() => openEdit(m)}>Edytuj</button>
+                      <button className="ares-btn" onClick={() => setResultModal(m)}>Popraw</button>
                     </div>
                   </div>
                 ))}
@@ -890,6 +941,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
           </>}
         </div>
 
+        {/* NAV */}
         <div className="nav">
           {tabs.map(t => (
             <button key={t.key} className={`ni ${tab === t.key ? "on" : ""}`} onClick={() => setTab(t.key)}>
@@ -900,6 +952,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
           ))}
         </div>
 
+        {/* MODALS */}
         {resultModal && (
           <div className="mo" onClick={() => setResultModal(null)}>
             <div className="mbox" onClick={e => e.stopPropagation()}>
