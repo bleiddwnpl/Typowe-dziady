@@ -711,12 +711,16 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
   const myCorrect = tips.filter(t => t.user_id === user.id && leagueMatchIds.includes(t.match_id) && t.points > 0).length;
   const activeLg = leagues.find(l => l.id === activeLeague);
 
+  // Admin globalny LUB admin tej konkretnej ligi
+  const isAdminOfActiveLeague = profile?.is_admin ||
+    (profile?.admin_leagues && activeLeague && profile.admin_leagues.includes(activeLeague));
+
   const tabs = [
     { key: "matches", icon: "⚽", label: "Mecze" },
     { key: "leaderboard", icon: "🏆", label: "Tabela" },
     { key: "chat", icon: "💬", label: "Czat" },
     { key: "rules", icon: "📋", label: "Regulamin" },
-    ...(profile?.is_admin ? [{ key: "admin", icon: "⚙️", label: "Admin" }] : []),
+    ...(isAdminOfActiveLeague ? [{ key: "admin", icon: "⚙️", label: "Admin" }] : []),
   ];
 
   if (loading) return (
@@ -901,7 +905,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
           </>}
 
           {/* ── ADMIN ── */}
-          {tab === "admin" && profile?.is_admin && <>
+          {tab === "admin" && isAdminOfActiveLeague && <>
             <div className="sh">Panel administratora</div>
             <button className="mprim" style={{ marginBottom: 16 }} onClick={() => setAddModal(true)}>+ Dodaj mecz</button>
             {upcoming.length > 0 && <>
