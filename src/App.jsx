@@ -110,7 +110,6 @@ const TEAMS_BY_LEAGUE = {
 // Płaski obiekt do szybkiego wyszukiwania logo po nazwie
 const TEAM_LOGOS = Object.values(TEAMS_BY_LEAGUE).reduce((acc, teams) => ({ ...acc, ...teams }), {});
 
-const WF = "https://cdn.prod.website-files.com/68f550992570ca0322737dc2";
 const LEAGUE_LOGOS = {
   "Ekstraklasa":    `${WF}/6a5df45705e50bc41db6072b_ekstraklasa-poland-logo-footylogos.webp`,
   "Premier League": `${WF}/6a468c1ae8dc10fb1957db15_premier-league-england-logo-footylogos.webp`,
