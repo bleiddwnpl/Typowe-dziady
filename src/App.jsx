@@ -72,7 +72,7 @@ const TEAMS_BY_LEAGUE = {
     "Levante":                      `${CDN}/levante-ud/levante-ud-logo-footylogos.png`,
     "Mallorca":                     `${CDN}/rcd-mallorca/rcd-mallorca-logo-footylogos.png`,
     "Osasuna":                      `${CDN}/osasuna/osasuna-logo-footylogos.png`,
-    "Racing Santander":             `${CDN}/racing-de-santander/racing-de-santander-logo-footylogos.png`,
+    "Racing Santander":             `${CDN}/real-racing-club-santander/real-racing-club-santander-logo-footylogos.png`,
     "Rayo Vallecano":               `${CDN}/rayo-vallecano/rayo-vallecano-logo-footylogos.png`,
     "Real Betis":                   `${CDN}/real-betis-balompie/real-betis-balompie-logo-footylogos.png`,
     "Real Madrid":                  `${CDN}/real-madrid/real-madrid-logo-footylogos.png`,
