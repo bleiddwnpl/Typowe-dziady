@@ -76,7 +76,7 @@ const TEAMS_BY_LEAGUE = {
     "Rayo Vallecano":               `${CDN}/rayo-vallecano/rayo-vallecano-logo-footylogos.png`,
     "Real Betis":                   `${CDN}/real-betis-balompie/real-betis-balompie-logo-footylogos.png`,
     "Real Madrid":                  `${CDN}/real-madrid/real-madrid-logo-footylogos.png`,
-    "Real Sociedad":                `${CDN}/racing-santander/racing-santander-logo-footylogos.png`,
+    "Real Sociedad":                `${CDN}/real-sociedad/real-sociedad-logo-footylogos.png`,
     "Sevilla":                      `${CDN}/sevilla-fc/sevilla-fc-logo-footylogos.png`,
     "Valencia":                     `${CDN}/valencia-cf/valencia-cf-logo-footylogos.png`,
     "Villarreal":                   `${CDN}/villarreal-cf/villarreal-cf-logo-footylogos.png`,
