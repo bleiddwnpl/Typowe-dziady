@@ -110,6 +110,14 @@ const TEAMS_BY_LEAGUE = {
 // Płaski obiekt do szybkiego wyszukiwania logo po nazwie
 const TEAM_LOGOS = Object.values(TEAMS_BY_LEAGUE).reduce((acc, teams) => ({ ...acc, ...teams }), {});
 
+const WF = "https://cdn.prod.website-files.com/68f550992570ca0322737dc2";
+const LEAGUE_LOGOS = {
+  "Ekstraklasa":    `${WF}/6a5df45705e50bc41db6072b_ekstraklasa-poland-logo-footylogos.webp`,
+  "Premier League": `${WF}/6a468c1ae8dc10fb1957db15_premier-league-england-logo-footylogos.webp`,
+  "La Liga":        `https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/laliga-spain/laliga-spain-logo-footylogos.png`,
+  "Serie A":        `${WF}/6a468a21f1682fa05497a4ed_serie-a-italy-logo-footylogos.webp`,
+};
+
 const AVATAR_COLORS = [
   "linear-gradient(135deg,#c8102e,#8b0000)",
   "linear-gradient(135deg,#ff9500,#ff6b00)",
@@ -224,9 +232,13 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 .uname { font-size:13px; color:rgba(255,255,255,0.85); font-weight:600; }
 .uout { font-size:12px; font-weight:600; color:rgba(255,255,255,0.45); background:none; border:none; cursor:pointer; font-family:inherit; transition:color 0.2s; }
 .uout:hover { color:#fff; }
-.league-tabs { display:flex; gap:8px; margin-bottom:14px; overflow-x:auto; padding-bottom:2px; }
-.league-tab { display:flex; align-items:center; gap:5px; padding:6px 13px; border-radius:20px; border:1.5px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.04); color:rgba(255,255,255,0.45); font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap; transition:all 0.2s; font-family:'Inter',sans-serif; flex-shrink:0; }
-.league-tab.active { border-color:#007aff; background:rgba(0,122,255,0.12); color:#60a5fa; }
+.league-tabs { display:flex; gap:10px; margin-bottom:16px; }
+.league-tab { width:60px; height:60px; border-radius:16px; border:2px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.04); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s; flex-shrink:0; position:relative; }
+.league-tab:hover { border-color:rgba(0,122,255,0.35); background:rgba(0,122,255,0.06); }
+.league-tab.active { border-color:#007aff; background:rgba(0,122,255,0.15); box-shadow:0 0 0 3px rgba(0,122,255,0.12); }
+.league-tab img { width:40px; height:40px; object-fit:contain; }
+.league-tab .ldot { position:absolute; bottom:-8px; left:50%; transform:translateX(-50%); width:4px; height:4px; background:#007aff; border-radius:50%; opacity:0; }
+.league-tab.active .ldot { opacity:1; }
 .stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
 .sbox { background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:10px 12px; backdrop-filter:blur(10px); }
 .slbl { font-size:10px; font-weight:700; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:3px; }
@@ -757,8 +769,9 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
             </div>
             <div className="league-tabs">
               {leagues.map(l => (
-                <button key={l.id} className={`league-tab ${activeLeague === l.id ? "active" : ""}`} onClick={() => setActiveLeague(l.id)}>
-                  {l.flag} {l.name}
+                <button key={l.id} className={`league-tab ${activeLeague === l.id ? "active" : ""}`} onClick={() => setActiveLeague(l.id)} title={l.name}>
+                  <img src={LEAGUE_LOGOS[l.name]} alt={l.name} onError={e => { e.target.style.opacity = "0.2"; }} />
+                  <div className="ldot" />
                 </button>
               ))}
             </div>
