@@ -435,6 +435,41 @@ function TeamPicker({ onSave, onSkip }) {
   );
 }
 
+// ── TIP DISTRIBUTION ─────────────────────────────────────────────────────────
+function TipDistribution({ matchId, tips }) {
+  const matchTips = tips.filter(t => t.match_id === matchId);
+  const total = matchTips.length;
+  if (total === 0) return null;
+
+  const homeCount = matchTips.filter(t => t.pick === "home").length;
+  const drawCount = matchTips.filter(t => t.pick === "draw").length;
+  const awayCount = matchTips.filter(t => t.pick === "away").length;
+
+  const homePct = Math.round((homeCount / total) * 100);
+  const drawPct = Math.round((drawCount / total) * 100);
+  const awayPct = 100 - homePct - drawPct;
+
+  const cols = [
+    { pct: homePct, label: "GOSP.", color: "#34c759", bg: "rgba(52,199,89,0.2)", border: "#34c759" },
+    { pct: drawPct, label: "REMIS", color: "rgba(255,255,255,0.4)", bg: "rgba(255,255,255,0.06)", border: "rgba(255,255,255,0.15)" },
+    { pct: awayPct, label: "GOŚĆ", color: "#ff3b30", bg: "rgba(255,59,48,0.15)", border: "#ff3b30" },
+  ];
+
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginTop: 10 }}>
+      {cols.map(col => (
+        <div key={col.label} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
+          <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 15, color: col.color, letterSpacing: 0.5 }}>{col.pct}%</div>
+          <div style={{ width: "100%", height: 28, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+            <div style={{ width: "100%", borderRadius: "4px 4px 0 0", background: col.bg, border: `1.5px solid ${col.border}`, height: `${Math.max(col.pct, 8)}%` }} />
+          </div>
+          <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: 0.5, color: col.color }}>{col.label}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // ── FINISHED MATCHES (zwijane) ────────────────────────────────────────────────
 function FinishedMatches({ matches, myTip }) {
   const [open, setOpen] = useState(false);
@@ -876,6 +911,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
                       </div>
                       {lck && <div className="lck">⛔ Typowanie zamknięte</div>}
                       {!lck && tip && <div className="tipok">✓ Typ: {PICK_LABELS[tip.pick]} · +{parseFloat(match[`odds_${tip.pick}`]).toFixed(2)} pkt</div>}
+                      <TipDistribution matchId={match.id} tips={tips} />
                     </div>
                   </div>
                 );
