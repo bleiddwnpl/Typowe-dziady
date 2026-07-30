@@ -12,6 +12,14 @@ const WF  = "https://cdn.prod.website-files.com/68f550992570ca0322737dc2";
 const PICK_LABELS = { home: "1", draw: "X", away: "2" };
 const PICK_NAMES  = { home: "Gospodarz", draw: "Remis", away: "Gość" };
 
+// ── LOGA LIG ─────────────────────────────────────────────────────────────────
+const LEAGUE_LOGOS = {
+  "Ekstraklasa":    `${WF}/6a5df45705e50bc41db6072b_ekstraklasa-poland-logo-footylogos.webp`,
+  "Premier League": `${WF}/6a468c1ae8dc10fb1957db15_premier-league-england-logo-footylogos.webp`,
+  "La Liga":        `${CDN}/laliga-spain/laliga-spain-logo-footylogos.png`,
+  "Serie A":        `${WF}/6a468a21f1682fa05497a4ed_serie-a-italy-logo-footylogos.webp`,
+};
+
 // ── LOGA KLUBÓW (pogrupowane per liga) ───────────────────────────────────────
 const TEAMS_BY_LEAGUE = {
   "Ekstraklasa": {
@@ -72,7 +80,7 @@ const TEAMS_BY_LEAGUE = {
     "Levante":                      `${CDN}/levante-ud/levante-ud-logo-footylogos.png`,
     "Mallorca":                     `${CDN}/rcd-mallorca/rcd-mallorca-logo-footylogos.png`,
     "Osasuna":                      `${CDN}/osasuna/osasuna-logo-footylogos.png`,
-    "Racing Santander": "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a5dfeef3bcf8f77ef7a61e7_racing-santander-logo-footylogos.webp",
+    "Racing Santander":             `${WF}/6a5dfeef3bcf8f77ef7a61e7_racing-santander-logo-footylogos.webp`,
     "Rayo Vallecano":               `${CDN}/rayo-vallecano/rayo-vallecano-logo-footylogos.png`,
     "Real Betis":                   `${CDN}/real-betis-balompie/real-betis-balompie-logo-footylogos.png`,
     "Real Madrid":                  `${CDN}/real-madrid/real-madrid-logo-footylogos.png`,
@@ -83,39 +91,30 @@ const TEAMS_BY_LEAGUE = {
     "Valladolid":                   `${CDN}/real-valladolid/real-valladolid-logo-footylogos.png`,
   },
   "Serie A": {
-    "AC Milan":      "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a2dabf8be544df394f36f0b_68f591085f8ea61de0a1cc6a_juventus-footballlogos-org.webp",
-    "Atalanta":      "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a18dc636c0dc2b32f114cb9_atalanta-footylogos.png",
-    "Bologna":       "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/68f590332f7e2e5f2f5c3c77_bologna-footballlogos-org.webp",
-    "Cagliari":      "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/68f58fb0f8b72e10fcca8279_cagliari-footballlogos-org.webp",
-    "Como":          "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/68f58fe39039ffc9b88a657e_como-1907-footballlogos-org.webp",
-    "Empoli":        `${CDN}/empoli-fc/empoli-fc-logo-footylogos.png`,
-    "Fiorentina":    "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a2dabf259cd193f6f9a9ee8_68f58f8cf8b72e10fcca7f4e_fiorentina-footballlogos-org.webp",
-    "Genoa":         "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/68f590871f0d9bd8bb64af24_genoa-footballlogos-org.webp",
-    "Inter Milan":   "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a2dabf8be544df394f36f0b_68f590dc82d343819638a796_inter-milan-footballlogos-org.webp",
-    "Juventus":      "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a2dabfe3f65f5442c3327cf_68f591085f8ea61de0a1cc6a_juventus-footballlogos-org.webp",
-    "Lazio":         "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/68f591295ba37a0850ada7ff_lazio-footballlogos-org.webp",
-    "Lecce":         "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/68f591503b74d5a9a7f6435c_lecce-footballlogos-org.webp",
-    "AC Milan":      "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a2dabc3c4421c75c1c638d4_68f59173c54aab3bb289682d_ac-milan-footballlogos-org.webp",
-    "Monza":         "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/68f8204886bc8a6aa2d34dad_ac-monza-footballlogos-org.svg",
-    "Napoli":        "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a2dac0f635d5e15f396735b_69fb26f9f2009903393e5eff_napoli-footylogos.webp",
-    "Parma":         "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/68f591c871c3891858936f5c_parma-footballlogos-org.webp",
-    "AS Roma":       "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/69f685fdf9803881d891451c_roma-footylogos.webp",
-    "Sassuolo":      "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/68f5923bdfbd72754cd17a3c_sassuolo-footballlogos-org.webp",
-    "Torino":        "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/68f5926167bb453c3fe7cec0_torino-footballlogos-org.webp",
-    "Udinese":       "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/68f5928a0decdd9736d3a737_udinese-footballlogos-org.webp",
-    "Venezia":       "https://cdn.prod.website-files.com/68f550992570ca0322737dc2/6a22b69668cb15f202ecc027_venezia-fc-footylogos.webp",
+    "AC Milan":     `${WF}/6a2dabc3c4421c75c1c638d4_68f59173c54aab3bb289682d_ac-milan-footballlogos-org.webp`,
+    "Atalanta":     `${WF}/6a18dc636c0dc2b32f114cb9_atalanta-footylogos.png`,
+    "Bologna":      `${WF}/68f590332f7e2e5f2f5c3c77_bologna-footballlogos-org.webp`,
+    "Cagliari":     `${WF}/68f58fb0f8b72e10fcca8279_cagliari-footballlogos-org.webp`,
+    "Como":         `${CDN}/como-1907/como-1907-logo-footylogos.png`,
+    "Empoli":       `${CDN}/empoli-fc/empoli-fc-logo-footylogos.png`,
+    "Fiorentina":   `${WF}/6a2dabf259cd193f6f9a9ee8_68f58f8cf8b72e10fcca7f4e_fiorentina-footballlogos-org.webp`,
+    "Genoa":        `${WF}/68f590871f0d9bd8bb64af24_genoa-footballlogos-org.webp`,
+    "Inter Milan":  `${WF}/6a2dabf8be544df394f36f0b_68f590dc82d343819638a796_inter-milan-footballlogos-org.webp`,
+    "Juventus":     `${WF}/6a2dabfe3f65f5442c3327cf_68f591085f8ea61de0a1cc6a_juventus-footballlogos-org.webp`,
+    "Lazio":        `${WF}/68f591295ba37a0850ada7ff_lazio-footballlogos-org.webp`,
+    "Lecce":        `${WF}/68f591503b74d5a9a7f6435c_lecce-footballlogos-org.webp`,
+    "Monza":        `${CDN}/ac-monza/ac-monza-logo-footylogos.png`,
+    "Napoli":       `${WF}/6a2dac0f635d5e15f396735b_69fb26f9f2009903393e5eff_napoli-footylogos.webp`,
+    "Parma":        `${WF}/68f591c871c3891858936f5c_parma-footballlogos-org.webp`,
+    "AS Roma":      `${WF}/69f685fdf9803881d891451c_roma-footylogos.webp`,
+    "Sassuolo":     `${WF}/68f5923bdfbd72754cd17a3c_sassuolo-footballlogos-org.webp`,
+    "Torino":       `${WF}/68f5926167bb453c3fe7cec0_torino-footballlogos-org.webp`,
+    "Udinese":      `${WF}/68f5928a0decdd9736d3a737_udinese-footballlogos-org.webp`,
+    "Venezia":      `${CDN}/venezia-fc/venezia-fc-logo-footylogos.png`,
   },
 };
 
-// Płaski obiekt do szybkiego wyszukiwania logo po nazwie
 const TEAM_LOGOS = Object.values(TEAMS_BY_LEAGUE).reduce((acc, teams) => ({ ...acc, ...teams }), {});
-
-const LEAGUE_LOGOS = {
-  "Ekstraklasa":    `${WF}/6a5df45705e50bc41db6072b_ekstraklasa-poland-logo-footylogos.webp`,
-  "Premier League": `${WF}/6a468c1ae8dc10fb1957db15_premier-league-england-logo-footylogos.webp`,
-  "La Liga":        `https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos/laliga-spain/laliga-spain-logo-footylogos.png`,
-  "Serie A":        `${WF}/6a468a21f1682fa05497a4ed_serie-a-italy-logo-footylogos.webp`,
-};
 
 const AVATAR_COLORS = [
   "linear-gradient(135deg,#c8102e,#8b0000)",
@@ -142,17 +141,14 @@ const isMatchLocked = (m) => {
   return nowWarsaw >= `${m.match_date}T${m.match_time?.slice(0, 5)}`;
 };
 
-// Logo drużyny — obrazek lub inicjały
 function TeamLogo({ name, size = 32 }) {
   const logo = TEAM_LOGOS[name];
   const av = getAvatar(name);
-  if (logo) {
-    return (
-      <img src={logo} alt={name}
-        style={{ width: size, height: size, objectFit: "contain", flexShrink: 0 }}
-        onError={e => { e.target.style.display = "none"; }} />
-    );
-  }
+  if (logo) return (
+    <img src={logo} alt={name}
+      style={{ width: size, height: size, objectFit: "contain", flexShrink: 0 }}
+      onError={e => { e.target.style.display = "none"; }} />
+  );
   return (
     <div style={{ width: size, height: size, borderRadius: "50%", background: av.gradient, display: "flex", alignItems: "center", justifyContent: "center", fontSize: size * 0.38, fontWeight: 700, color: "#fff", flexShrink: 0 }}>
       {av.initials}
@@ -160,19 +156,16 @@ function TeamLogo({ name, size = 32 }) {
   );
 }
 
-// Avatar w kółku — do czatu i rankingu
 function ClubAvatar({ favoriteTeam, name, size = 32 }) {
   const av = getAvatar(name);
   const logo = favoriteTeam ? TEAM_LOGOS[favoriteTeam] : null;
-  if (logo) {
-    return (
-      <div style={{ width: size, height: size, borderRadius: "50%", background: "rgba(0,0,0,0.3)", border: "1.5px solid rgba(0,122,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" }}>
-        <img src={logo} alt={favoriteTeam}
-          style={{ width: size * 0.72, height: size * 0.72, objectFit: "contain" }}
-          onError={e => { e.target.style.display = "none"; }} />
-      </div>
-    );
-  }
+  if (logo) return (
+    <div style={{ width: size, height: size, borderRadius: "50%", background: "rgba(0,0,0,0.3)", border: "1.5px solid rgba(0,122,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" }}>
+      <img src={logo} alt={favoriteTeam}
+        style={{ width: size * 0.72, height: size * 0.72, objectFit: "contain" }}
+        onError={e => { e.target.style.display = "none"; }} />
+    </div>
+  );
   return (
     <div style={{ width: size, height: size, borderRadius: "50%", background: av.gradient, display: "flex", alignItems: "center", justifyContent: "center", fontSize: size * 0.38, fontWeight: 700, color: "#fff", flexShrink: 0 }}>
       {av.initials}
@@ -218,11 +211,11 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 .reset-ok { background:rgba(0,122,255,0.08); border:1px solid rgba(0,122,255,0.2); border-radius:12px; padding:14px 16px; text-align:center; color:#60a5fa; font-size:14px; font-weight:600; line-height:1.5; }
 
 .app { min-height:100vh; background:#060a0f; max-width:480px; margin:0 auto; padding-bottom:100px; font-family:'Inter',sans-serif; }
-.hdr { position:relative; overflow:hidden; padding:0 0 20px; min-height:185px; }
+.hdr { position:relative; overflow:hidden; padding:0 0 20px; min-height:190px; }
 .hdr-photo { position:absolute; inset:-20px -10px 0; background-image:url('${PHOTO_URL}'); background-size:cover; background-position:center 30%; filter:blur(2px) brightness(0.3) saturate(0.8); }
 .hdr-ov { position:absolute; inset:0; background:linear-gradient(180deg,rgba(4,8,20,0.4) 0%,rgba(4,8,20,0.6) 50%,#060a0f 100%); }
 .hdr-ct { position:relative; z-index:2; padding:20px 18px 0; }
-.hdr-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+.hdr-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
 .logo { font-family:'Bebas Neue',sans-serif; font-size:26px; color:#fff; letter-spacing:2px; }
 .logo span { color:#60a5fa; }
 .hdr-r { display:flex; align-items:center; gap:8px; }
@@ -231,6 +224,7 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 .uname { font-size:13px; color:rgba(255,255,255,0.85); font-weight:600; }
 .uout { font-size:12px; font-weight:600; color:rgba(255,255,255,0.45); background:none; border:none; cursor:pointer; font-family:inherit; transition:color 0.2s; }
 .uout:hover { color:#fff; }
+
 .league-tabs { display:flex; gap:10px; margin-bottom:16px; }
 .league-tab { width:60px; height:60px; border-radius:16px; border:2px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.04); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s; flex-shrink:0; position:relative; }
 .league-tab:hover { border-color:rgba(0,122,255,0.35); background:rgba(0,122,255,0.06); }
@@ -238,6 +232,7 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 .league-tab img { width:40px; height:40px; object-fit:contain; }
 .league-tab .ldot { position:absolute; bottom:-8px; left:50%; transform:translateX(-50%); width:4px; height:4px; background:#007aff; border-radius:50%; opacity:0; }
 .league-tab.active .ldot { opacity:1; }
+
 .stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
 .sbox { background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:10px 12px; backdrop-filter:blur(10px); }
 .slbl { font-size:10px; font-weight:700; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:3px; }
@@ -440,6 +435,56 @@ function TeamPicker({ onSave, onSkip }) {
   );
 }
 
+// ── FINISHED MATCHES (zwijane) ────────────────────────────────────────────────
+function FinishedMatches({ matches, myTip }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ marginTop: 8 }}>
+      <button onClick={() => setOpen(p => !p)}
+        style={{ width: "100%", padding: "12px 16px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, color: "rgba(255,255,255,0.45)", fontFamily: "inherit", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", transition: "all 0.2s" }}>
+        <span>📁 Zakończone mecze ({matches.length})</span>
+        <span style={{ fontSize: 11, opacity: 0.6 }}>{open ? "▲ Ukryj" : "▼ Pokaż"}</span>
+      </button>
+      {open && (
+        <div style={{ marginTop: 8 }}>
+          {matches.map(match => {
+            const tip = myTip(match.id);
+            const isCor = tip?.pick === match.result;
+            return (
+              <div key={match.id} className="mc" style={{ opacity: 0.85 }}>
+                <div className="mt2">
+                  <span style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", fontWeight: 600 }}>{match.round}</span>
+                  <span className={isCor && tip ? "res-w" : tip ? "res-l" : "res-n"}>
+                    {tip ? (isCor ? `+${parseFloat(match[`odds_${tip.pick}`]).toFixed(2)} pkt ✓` : "0 pkt ✗") : "Brak typu"}
+                  </span>
+                </div>
+                <div className="mb2">
+                  <div className="tms">
+                    <div className="tm"><TeamLogo name={match.home} size={28} /><span className="tn">{match.home}</span></div>
+                    <div className="vs-sep">
+                      <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: 1, textAlign: "center" }}>Wynik</div>
+                      <div className="vs-result">{PICK_LABELS[match.result]}</div>
+                    </div>
+                    <div className="tm r"><TeamLogo name={match.away} size={28} /><span className="tn">{match.away}</span></div>
+                  </div>
+                  <div className="odds">
+                    {["home", "draw", "away"].map(pick => (
+                      <button key={pick} className={`odd ${pick === match.result ? "ok" : tip?.pick === pick ? "no" : ""}`} disabled>
+                        <div className="ol">{PICK_LABELS[pick]}</div>
+                        <div className="ov" style={{ color: pick === match.result ? "#34c759" : "rgba(255,255,255,0.3)" }}>{parseFloat(match[`odds_${pick}`]).toFixed(2)}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── AUTH ──────────────────────────────────────────────────────────────────────
 function AuthScreen({ onAuth }) {
   const [mode, setMode] = useState("login");
@@ -563,7 +608,7 @@ function ChatTab({ user, profile, profiles }) {
   const fmt = ts => new Date(ts).toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Warsaw" });
   const fmtD = ts => new Date(ts).toLocaleDateString("pl-PL", { day: "numeric", month: "long", timeZone: "Europe/Warsaw" });
   const grouped = messages.reduce((acc, m) => { const d = fmtD(m.created_at); if (!acc[d]) acc[d] = []; acc[d].push(m); return acc; }, {});
-  const getSenderProfile = uid => profiles.find(p => p.id === uid);
+  const getSP = uid => profiles.find(p => p.id === uid);
 
   return (
     <div className="chat-wrap">
@@ -574,7 +619,7 @@ function ChatTab({ user, profile, profiles }) {
             <div className="cdt"><span>{date}</span></div>
             {msgs.map((msg, i) => {
               const isMe = msg.user_id === user.id;
-              const sp = getSenderProfile(msg.user_id);
+              const sp = getSP(msg.user_id);
               const av = getAvatar(msg.user_name);
               const showName = !msgs[i + 1] || msgs[i + 1].user_id !== msg.user_id;
               return (
@@ -627,7 +672,6 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
       supabase.from("matches").select("*").order("match_date").order("match_time"),
       supabase.from("profiles").select("*"),
     ]);
-    // Paginacja tipów — kluczowa lekcja z poprzedniego projektu
     let allTips = [];
     let from = 0;
     const pageSize = 1000;
@@ -712,18 +756,24 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
   const finished = leagueMatches.filter(m => m.status === "finished");
   const leagueMatchIds = leagueMatches.map(m => m.id);
 
-  const lb = profiles.map(p => ({
-    ...p,
-    points: tips.filter(t => t.user_id === p.id && leagueMatchIds.includes(t.match_id)).reduce((s, t) => s + (t.points || 0), 0),
-    correct: tips.filter(t => t.user_id === p.id && leagueMatchIds.includes(t.match_id) && t.points > 0).length,
-  })).sort((a, b) => b.points - a.points);
+  const lb = profiles.map(p => {
+    const myTips = tips.filter(t => t.user_id === p.id && leagueMatchIds.includes(t.match_id));
+    const correct = myTips.filter(t => t.points > 0).length;
+    const points = myTips.reduce((s, t) => s + (t.points || 0), 0);
+    const balance = myTips.reduce((s, t) => {
+      const match = matches.find(m => m.id === t.match_id);
+      if (!match || match.status !== "finished") return s;
+      if (t.points > 0) return s + (parseFloat(match[`odds_${match.result}`]) * 100) - 100;
+      return s - 100;
+    }, 0);
+    return { ...p, points, correct, balance };
+  }).sort((a, b) => b.points - a.points);
 
   const myPts = lb.find(u => u.id === user.id)?.points || 0;
   const myRank = lb.findIndex(u => u.id === user.id) + 1;
   const myCorrect = tips.filter(t => t.user_id === user.id && leagueMatchIds.includes(t.match_id) && t.points > 0).length;
   const activeLg = leagues.find(l => l.id === activeLeague);
 
-  // Admin globalny LUB admin tej konkretnej ligi
   const isAdminOfActiveLeague = profile?.is_admin ||
     (profile?.admin_leagues && activeLeague && profile.admin_leagues.includes(activeLeague));
 
@@ -752,7 +802,6 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
 
         {showTeamPicker && <TeamPicker onSave={saveTeam} onSkip={() => setShowTeamPicker(false)} />}
 
-        {/* HEADER */}
         <div className="hdr">
           <div className="hdr-photo" /><div className="hdr-ov" />
           <div className="hdr-ct">
@@ -766,14 +815,17 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
                 <button className="uout" onClick={onLogout}>Wyloguj</button>
               </div>
             </div>
+
             <div className="league-tabs">
               {leagues.map(l => (
-                <button key={l.id} className={`league-tab ${activeLeague === l.id ? "active" : ""}`} onClick={() => setActiveLeague(l.id)} title={l.name}>
+                <button key={l.id} className={`league-tab ${activeLeague === l.id ? "active" : ""}`}
+                  onClick={() => setActiveLeague(l.id)} title={l.name}>
                   <img src={LEAGUE_LOGOS[l.name]} alt={l.name} onError={e => { e.target.style.opacity = "0.2"; }} />
                   <div className="ldot" />
                 </button>
               ))}
             </div>
+
             <div className="stats">
               {[
                 { label: "Punkty", value: myPts.toFixed(2), b: true },
@@ -793,7 +845,6 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
 
           {tab === "chat" && <ChatTab user={user} profile={profile} profiles={profiles} />}
 
-          {/* ── MECZE ── */}
           {tab === "matches" && <>
             {upcoming.length === 0 && finished.length === 0 && (
               <div className="empty"><div className="ei">📅</div><div className="et">Brak meczów</div><div className="es">{activeLg ? `Admin wkrótce doda mecze ${activeLg.name}` : "Wybierz ligę"}</div></div>
@@ -830,44 +881,9 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
                 );
               })}
             </>}
-            {finished.length > 0 && <>
-              <div className="sh" style={{ marginTop: 8 }}>Zakończone</div>
-              {finished.map(match => {
-                const tip = myTip(match.id);
-                const isCor = tip?.pick === match.result;
-                return (
-                  <div key={match.id} className="mc" style={{ opacity: 0.85 }}>
-                    <div className="mt2">
-                      <span style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", fontWeight: 600 }}>{match.round}</span>
-                      <span className={isCor && tip ? "res-w" : tip ? "res-l" : "res-n"}>
-                        {tip ? (isCor ? `+${parseFloat(match[`odds_${tip.pick}`]).toFixed(2)} pkt ✓` : "0 pkt ✗") : "Brak typu"}
-                      </span>
-                    </div>
-                    <div className="mb2">
-                      <div className="tms">
-                        <div className="tm"><TeamLogo name={match.home} size={30} /><span className="tn">{match.home}</span></div>
-                        <div className="vs-sep">
-                          <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: 1, textAlign: "center" }}>Wynik</div>
-                          <div className="vs-result">{PICK_LABELS[match.result]}</div>
-                        </div>
-                        <div className="tm r"><TeamLogo name={match.away} size={30} /><span className="tn">{match.away}</span></div>
-                      </div>
-                      <div className="odds">
-                        {["home", "draw", "away"].map(pick => (
-                          <button key={pick} className={`odd ${pick === match.result ? "ok" : tip?.pick === pick ? "no" : ""}`} disabled>
-                            <div className="ol">{PICK_LABELS[pick]}</div>
-                            <div className="ov" style={{ color: pick === match.result ? "#34c759" : "rgba(255,255,255,0.3)" }}>{parseFloat(match[`odds_${pick}`]).toFixed(2)}</div>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </>}
+            {finished.length > 0 && <FinishedMatches matches={finished} myTip={myTip} />}
           </>}
 
-          {/* ── TABELA ── */}
           {tab === "leaderboard" && <>
             <div className="sh">Klasyfikacja — {activeLg?.flag} {activeLg?.name}</div>
             {lb.length === 0 && <div className="empty"><div className="ei">🏆</div><div className="et">Brak uczestników</div></div>}
@@ -878,7 +894,12 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
                   <ClubAvatar favoriteTeam={u.favorite_team} name={u.name} size={36} />
                   <div style={{ flex: 1 }}>
                     <div className="lbn">{u.name}{u.id === user.id && <span className="lbme">TY</span>}</div>
-                    <div className="lbs">{u.correct} trafione</div>
+                    <div className="lbs">
+                      {u.correct} trafione ·{" "}
+                      <span style={{ color: u.balance >= 0 ? "#34c759" : "#ff3b30", fontWeight: 700 }}>
+                        {u.balance >= 0 ? "+" : ""}{u.balance.toFixed(0)} zł
+                      </span>
+                    </div>
                   </div>
                   <div style={{ textAlign: "right" }}>
                     <div className={`lbp ${i === 0 ? "top" : "nm"}`}>{u.points.toFixed(2)}</div>
@@ -889,7 +910,6 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
             </div>
           </>}
 
-          {/* ── REGULAMIN ── */}
           {tab === "rules" && <>
             <div className="sh">Nagrody</div>
             <div className="rc" style={{ marginBottom: 10 }}>
@@ -917,12 +937,11 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
             ))}
           </>}
 
-          {/* ── ADMIN ── */}
           {tab === "admin" && isAdminOfActiveLeague && <>
-            <div className="sh">Panel administratora</div>
+            <div className="sh">Panel — {activeLg?.name}</div>
             <button className="mprim" style={{ marginBottom: 16 }} onClick={() => setAddModal(true)}>+ Dodaj mecz</button>
             {upcoming.length > 0 && <>
-              <div className="sh">Nadchodzące — {activeLg?.name}</div>
+              <div className="sh">Nadchodzące</div>
               <div className="rc" style={{ marginBottom: 10 }}>
                 {upcoming.map((m, i) => (
                   <div key={m.id} className="ar" style={{ borderBottom: i < upcoming.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
@@ -939,7 +958,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
               </div>
             </>}
             {finished.length > 0 && <>
-              <div className="sh">Zakończone — {activeLg?.name}</div>
+              <div className="sh">Zakończone</div>
               <div className="rc">
                 {finished.map((m, i) => (
                   <div key={m.id} className="ar" style={{ borderBottom: i < finished.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
@@ -958,7 +977,6 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
           </>}
         </div>
 
-        {/* NAV */}
         <div className="nav">
           {tabs.map(t => (
             <button key={t.key} className={`ni ${tab === t.key ? "on" : ""}`} onClick={() => setTab(t.key)}>
@@ -969,7 +987,6 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
           ))}
         </div>
 
-        {/* MODALS */}
         {resultModal && (
           <div className="mo" onClick={() => setResultModal(null)}>
             <div className="mbox" onClick={e => e.stopPropagation()}>
