@@ -449,23 +449,30 @@ function TipDistribution({ matchId, tips }) {
   const drawPct = Math.round((drawCount / total) * 100);
   const awayPct = 100 - homePct - drawPct;
 
-  const cols = [
-    { pct: homePct, label: "GOSP.", color: "#34c759", bg: "rgba(52,199,89,0.2)", border: "#34c759" },
-    { pct: drawPct, label: "REMIS", color: "rgba(255,255,255,0.4)", bg: "rgba(255,255,255,0.06)", border: "rgba(255,255,255,0.15)" },
-    { pct: awayPct, label: "GOŚĆ", color: "#ff3b30", bg: "rgba(255,59,48,0.15)", border: "#ff3b30" },
-  ];
-
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginTop: 10 }}>
-      {cols.map(col => (
-        <div key={col.label} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
-          <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 15, color: col.color, letterSpacing: 0.5 }}>{col.pct}%</div>
-          <div style={{ width: "100%", height: 28, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
-            <div style={{ width: "100%", borderRadius: "4px 4px 0 0", background: col.bg, border: `1.5px solid ${col.border}`, height: `${Math.max(col.pct, 8)}%` }} />
-          </div>
-          <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: 0.5, color: col.color }}>{col.label}</div>
+    <div style={{ display: "flex", flexDirection: "column", gap: 5, marginTop: 10 }}>
+      <div style={{ display: "flex", height: 8, borderRadius: 8, overflow: "hidden", gap: 2 }}>
+        <div style={{ width: `${homePct}%`, background: "#34c759", borderRadius: "8px 0 0 8px", transition: "width 0.4s ease" }} />
+        <div style={{ width: `${drawPct}%`, background: "rgba(255,255,255,0.25)", transition: "width 0.4s ease" }} />
+        <div style={{ width: `${awayPct}%`, background: "#ff3b30", borderRadius: "0 8px 8px 0", transition: "width 0.4s ease" }} />
+      </div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#34c759", flexShrink: 0 }} />
+          <span style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", fontWeight: 700 }}>Gosp.</span>
+          <span style={{ fontSize: 11, fontWeight: 800, color: "#34c759" }}>&nbsp;{homePct}%</span>
         </div>
-      ))}
+        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <div style={{ width: 7, height: 7, borderRadius: "50%", background: "rgba(255,255,255,0.3)", flexShrink: 0 }} />
+          <span style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", fontWeight: 700 }}>Remis</span>
+          <span style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,0.5)" }}>&nbsp;{drawPct}%</span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#ff3b30", flexShrink: 0 }} />
+          <span style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", fontWeight: 700 }}>Gość</span>
+          <span style={{ fontSize: 11, fontWeight: 800, color: "#ff3b30" }}>&nbsp;{awayPct}%</span>
+        </div>
+      </div>
     </div>
   );
 }
