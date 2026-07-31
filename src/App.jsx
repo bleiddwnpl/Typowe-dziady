@@ -89,6 +89,9 @@ const TEAMS_BY_LEAGUE = {
     "Valencia":                     `${CDN}/valencia-cf/valencia-cf-logo-footylogos.png`,
     "Villarreal":                   `${CDN}/villarreal-cf/villarreal-cf-logo-footylogos.png`,
     "Valladolid":                   `${CDN}/real-valladolid/real-valladolid-logo-footylogos.png`,
+    "Deportivo Alavés":             `${CDN}/deportivo-alaves/deportivo-alaves-logo-footylogos.png`,
+    "Elche":                        `${CDN}/elche-cf/elche-cf-logo-footylogos.png`,
+    "Málaga":                       `${CDN}/malaga-cf/malaga-cf-logo-footylogos.png`,
   },
   "Serie A": {
     "AC Milan":     `${WF}/6a2dabc3c4421c75c1c638d4_68f59173c54aab3bb289682d_ac-milan-footballlogos-org.webp`,
@@ -111,6 +114,7 @@ const TEAMS_BY_LEAGUE = {
     "Torino":       `${WF}/68f5926167bb453c3fe7cec0_torino-footballlogos-org.webp`,
     "Udinese":      `${WF}/68f5928a0decdd9736d3a737_udinese-footballlogos-org.webp`,
     "Venezia":      `${CDN}/venezia-fc/venezia-fc-logo-footylogos.png`,
+    "Frosinone":    `${CDN}/frosinone-calcio/frosinone-calcio-logo-footylogos.png`,
   },
 };
 
