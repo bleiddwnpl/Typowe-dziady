@@ -756,7 +756,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
     const validOpts = newPollOpts.filter(o => o.trim());
     if (validOpts.length < 2) { showToast("Dodaj co najmniej 2 odpowiedzi"); return; }
     const { data: poll, error } = await supabase.from("polls")
-      .insert({ league_id: activeLeague, question: newPollQ.trim(), status: "active" })
+      .insert({ league_id: activeLeague, question: newPollQ.trim(), status: "active", closes_at: null })
       .select().single();
     if (error) { showToast("⚠️ Błąd tworzenia ankiety"); return; }
     for (const label of validOpts) {
