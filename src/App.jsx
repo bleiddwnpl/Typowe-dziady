@@ -5,7 +5,7 @@ const SUPABASE_URL = "https://lutrkrahqwumjlsatzzd.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1dHJrcmFocXd1bWpsc2F0enpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ1OTM5NTIsImV4cCI6MjEwMDE2OTk1Mn0.qx7b31OQXzBxiOen1I9y9szePuO8fVonQxtEJPJ51Rg";
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const PHOTO_URL = "https://images.unsplash.com/photo-1569531955323-33c6b2dca44b?fm=jpg&q=85&w=1600&auto=format&fit=crop";
+const STADIUM_URL = "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=1200&auto=format&fit=crop";
 const CDN = "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos";
 const WF  = "https://cdn.prod.website-files.com/68f550992570ca0322737dc2";
 
@@ -45,26 +45,26 @@ const TEAMS_BY_LEAGUE = {
     "ŁKS Łódź":         `${WF}/6a5df5501dbe3179dcfa80ed_lks-lodz-logo-footylogos.webp`,
   },
   "Premier League": {
-    "AFC Bournemouth":    `${CDN}/afc-bournemouth/afc-bournemouth-logo-footylogos.png`,
-    "Arsenal":            `${CDN}/arsenal/arsenal-logo-footylogos.png`,
-    "Aston Villa":        `${CDN}/aston-villa/aston-villa-logo-footylogos.png`,
-    "Brentford":          `${CDN}/brentford/brentford-logo-footylogos.png`,
+    "AFC Bournemouth":        `${CDN}/afc-bournemouth/afc-bournemouth-logo-footylogos.png`,
+    "Arsenal":                `${CDN}/arsenal/arsenal-logo-footylogos.png`,
+    "Aston Villa":            `${CDN}/aston-villa/aston-villa-logo-footylogos.png`,
+    "Brentford":              `${CDN}/brentford/brentford-logo-footylogos.png`,
     "Brighton & Hove Albion": `${CDN}/brighton-and-hove-albion/brighton-and-hove-albion-logo-footylogos.png`,
-    "Chelsea":            `${CDN}/chelsea/chelsea-logo-footylogos.png`,
-    "Coventry City":      `${CDN}/coventry-city/coventry-city-logo-footylogos.png`,
-    "Crystal Palace":     `${CDN}/crystal-palace/crystal-palace-logo-footylogos.png`,
-    "Everton":            `${CDN}/everton/everton-logo-footylogos.png`,
-    "Fulham":             `${CDN}/fulham/fulham-logo-footylogos.png`,
-    "Hull City":          `${CDN}/hull-city/hull-city-logo-footylogos.png`,
-    "Ipswich Town":       `${CDN}/ipswich-town/ipswich-town-logo-footylogos.png`,
-    "Leeds United":       `${CDN}/leeds-united/leeds-united-logo-footylogos.png`,
-    "Liverpool":          `${CDN}/liverpool-fc/liverpool-fc-logo-footylogos.png`,
-    "Manchester City":    `${CDN}/manchester-city/manchester-city-logo-footylogos.png`,
-    "Manchester United":  `${CDN}/manchester-united/manchester-united-logo-footylogos.png`,
-    "Newcastle United":   `${CDN}/newcastle-united/newcastle-united-logo-footylogos.png`,
-    "Nottingham Forest":  `${CDN}/nottingham-forest/nottingham-forest-logo-footylogos.png`,
-    "Sunderland":         `${CDN}/sunderland/sunderland-logo-footylogos.png`,
-    "Tottenham Hotspur":  `${CDN}/tottenham-hotspur/tottenham-hotspur-logo-footylogos.png`,
+    "Chelsea":                `${CDN}/chelsea/chelsea-logo-footylogos.png`,
+    "Coventry City":          `${CDN}/coventry-city/coventry-city-logo-footylogos.png`,
+    "Crystal Palace":         `${CDN}/crystal-palace/crystal-palace-logo-footylogos.png`,
+    "Everton":                `${CDN}/everton/everton-logo-footylogos.png`,
+    "Fulham":                 `${CDN}/fulham/fulham-logo-footylogos.png`,
+    "Hull City":              `${CDN}/hull-city/hull-city-logo-footylogos.png`,
+    "Ipswich Town":           `${CDN}/ipswich-town/ipswich-town-logo-footylogos.png`,
+    "Leeds United":           `${CDN}/leeds-united/leeds-united-logo-footylogos.png`,
+    "Liverpool":              `${CDN}/liverpool-fc/liverpool-fc-logo-footylogos.png`,
+    "Manchester City":        `${CDN}/manchester-city/manchester-city-logo-footylogos.png`,
+    "Manchester United":      `${CDN}/manchester-united/manchester-united-logo-footylogos.png`,
+    "Newcastle United":       `${CDN}/newcastle-united/newcastle-united-logo-footylogos.png`,
+    "Nottingham Forest":      `${CDN}/nottingham-forest/nottingham-forest-logo-footylogos.png`,
+    "Sunderland":             `${CDN}/sunderland/sunderland-logo-footylogos.png`,
+    "Tottenham Hotspur":      `${CDN}/tottenham-hotspur/tottenham-hotspur-logo-footylogos.png`,
   },
   "La Liga": {
     "Atlético Madrid":   `${CDN}/atletico-madrid/atletico-madrid-logo-footylogos.png`,
@@ -145,7 +145,11 @@ const isMatchLocked = (m) => {
 function TeamLogo({ name, size = 32 }) {
   const logo = TEAM_LOGOS[name];
   const av = getAvatar(name);
-  if (logo) return <img src={logo} alt={name} style={{ width: size, height: size, objectFit: "contain", flexShrink: 0 }} onError={e => { e.target.style.display = "none"; }} />;
+  if (logo) return (
+    <div style={{ width: size, height: size, background: "rgba(255,255,255,0.9)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" }}>
+      <img src={logo} alt={name} style={{ width: size * 0.85, height: size * 0.85, objectFit: "contain" }} onError={e => { e.target.style.display = "none"; }} />
+    </div>
+  );
   return <div style={{ width: size, height: size, borderRadius: "50%", background: av.gradient, display: "flex", alignItems: "center", justifyContent: "center", fontSize: size * 0.38, fontWeight: 700, color: "#fff", flexShrink: 0 }}>{av.initials}</div>;
 }
 
@@ -153,7 +157,7 @@ function ClubAvatar({ favoriteTeam, name, size = 32 }) {
   const av = getAvatar(name);
   const logo = favoriteTeam ? TEAM_LOGOS[favoriteTeam] : null;
   if (logo) return (
-    <div style={{ width: size, height: size, borderRadius: "50%", background: "rgba(0,0,0,0.3)", border: "1.5px solid rgba(0,122,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" }}>
+    <div style={{ width: size, height: size, borderRadius: "50%", background: "rgba(255,255,255,0.9)", border: "1.5px solid rgba(0,122,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" }}>
       <img src={logo} alt={favoriteTeam} style={{ width: size * 0.72, height: size * 0.72, objectFit: "contain" }} onError={e => { e.target.style.display = "none"; }} />
     </div>
   );
@@ -166,19 +170,17 @@ const css = `
 body { background:#060a0f; font-family:'Inter',sans-serif; }
 ::-webkit-scrollbar { width:0; }
 .auth-screen { min-height:100vh; position:relative; overflow:hidden; display:flex; flex-direction:column; justify-content:flex-end; }
-.photo-bg { position:fixed; inset:0; background-image:url('https://images.unsplash.com/photo-1569531955323-33c6b2dca44b?fm=jpg&q=85&w=1600&auto=format&fit=crop'); background-size:cover; background-position:center; }
-.ov1 { position:fixed; inset:0; background:linear-gradient(180deg,rgba(0,0,0,0.08) 0%,rgba(0,0,0,0.55) 55%,rgba(4,8,15,0.96) 78%,#04080f 100%); }
-.ov2 { position:fixed; bottom:0; left:0; right:0; height:60%; background:radial-gradient(ellipse at 50% 100%,rgba(0,100,255,0.08) 0%,transparent 70%); }
-.auth-hero { position:relative; z-index:5; padding:0 28px; margin-bottom:24px; animation:heroIn 1.2s cubic-bezier(0.16,1,0.3,1) both; }
-@keyframes heroIn { from{opacity:0;transform:translateY(32px)} to{opacity:1;transform:translateY(0)} }
+.photo-bg { position:fixed; inset:0; background-image:url('${STADIUM_URL}'); background-size:cover; background-position:center 30%; }
+.ov1 { position:fixed; inset:0; background:linear-gradient(180deg,rgba(0,0,0,0.3) 0%,rgba(0,0,0,0.6) 50%,rgba(4,8,15,0.97) 78%,#04080f 100%); }
+.ov2 { position:fixed; bottom:0; left:0; right:0; height:60%; background:radial-gradient(ellipse at 50% 100%,rgba(0,100,255,0.07) 0%,transparent 70%); }
+.auth-hero { position:relative; z-index:5; padding:0 28px; margin-bottom:24px; }
 .eyebrow { display:flex; align-items:center; gap:8px; margin-bottom:12px; }
 .ey-line { width:28px; height:2px; background:#007aff; border-radius:1px; }
 .ey-txt { font-size:10px; font-weight:700; color:#60a5fa; letter-spacing:3px; text-transform:uppercase; }
-.hero-title { font-family:'Bebas Neue',sans-serif; font-size:62px; line-height:0.88; color:#fff; letter-spacing:2px; margin-bottom:12px; text-shadow:0 4px 40px rgba(0,0,0,0.6); }
+.hero-title { font-family:'Bebas Neue',sans-serif; font-size:62px; line-height:0.88; color:#fff; letter-spacing:2px; margin-bottom:12px; text-shadow:0 4px 40px rgba(0,0,0,0.8); }
 .hero-blue { color:#60a5fa; filter:drop-shadow(0 0 20px rgba(96,165,250,0.4)); }
-.hero-sub { font-size:15px; font-weight:700; color:rgba(255,255,255,0.88); line-height:1.6; text-shadow:0 2px 12px rgba(0,0,0,0.8); }
-.auth-card { position:relative; z-index:5; margin:0 16px 48px; background:rgba(4,12,24,0.75); border:1px solid rgba(255,255,255,0.1); border-radius:24px; padding:22px; backdrop-filter:blur(30px); animation:cardIn 1s 0.35s cubic-bezier(0.16,1,0.3,1) both; box-shadow:0 0 0 1px rgba(0,122,255,0.08),0 24px 60px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.08); }
-@keyframes cardIn { from{opacity:0;transform:translateY(32px) scale(0.97)} to{opacity:1;transform:translateY(0) scale(1)} }
+.hero-sub { font-size:15px; font-weight:700; color:rgba(255,255,255,0.88); line-height:1.6; text-shadow:0 2px 12px rgba(0,0,0,0.9); }
+.auth-card { position:relative; z-index:5; margin:0 16px 48px; background:rgba(4,12,24,0.82); border:1px solid rgba(255,255,255,0.1); border-radius:24px; padding:22px; backdrop-filter:blur(30px); box-shadow:0 0 0 1px rgba(0,122,255,0.08),0 24px 60px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.08); }
 .card-shine { position:absolute; top:0; left:50%; transform:translateX(-50%); width:60%; height:1px; background:linear-gradient(90deg,transparent,rgba(96,165,250,0.4),transparent); }
 .seg { display:flex; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.07); border-radius:14px; padding:3px; margin-bottom:16px; }
 .seg-btn { flex:1; padding:10px; text-align:center; font-size:14px; font-weight:600; color:rgba(255,255,255,0.35); border-radius:12px; border:none; background:transparent; font-family:'Inter',sans-serif; cursor:pointer; transition:all 0.22s; }
@@ -186,7 +188,7 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 .afield { position:relative; margin-bottom:10px; }
 .aicon { position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:16px; opacity:0.4; pointer-events:none; }
 .ainput { width:100%; padding:13px 16px 13px 42px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.09); border-radius:13px; color:#fff; font-family:'Inter',sans-serif; font-size:15px; outline:none; transition:all 0.22s; }
-.ainput:focus { background:rgba(255,255,255,0.09); border-color:rgba(0,122,255,0.5); box-shadow:0 0 0 3px rgba(0,122,255,0.1); }
+.ainput:focus { background:rgba(255,255,255,0.09); border-color:rgba(0,122,255,0.5); }
 .ainput::placeholder { color:rgba(255,255,255,0.22); }
 .aerr { color:#ff453a; font-size:12px; text-align:center; margin-bottom:8px; font-weight:500; }
 .acta { width:100%; padding:15px; background:linear-gradient(135deg,#0051cc,#007aff); border:none; border-radius:14px; color:#fff; font-family:'Inter',sans-serif; font-size:16px; font-weight:700; cursor:pointer; margin-top:4px; transition:all 0.2s; box-shadow:0 8px 28px rgba(0,122,255,0.35); }
@@ -196,29 +198,29 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 .back-btn { width:100%; padding:12px; background:transparent; border:none; color:rgba(255,255,255,0.35); font-size:13px; cursor:pointer; margin-top:8px; font-family:'Inter',sans-serif; }
 .reset-ok { background:rgba(0,122,255,0.08); border:1px solid rgba(0,122,255,0.2); border-radius:12px; padding:14px 16px; text-align:center; color:#60a5fa; font-size:14px; font-weight:600; line-height:1.5; }
 .app { min-height:100vh; background:#060a0f; max-width:480px; margin:0 auto; padding-bottom:100px; font-family:'Inter',sans-serif; }
-.hdr { position:relative; overflow:hidden; padding:0 0 20px; min-height:190px; }
-.hdr-photo { position:absolute; inset:-20px -10px 0; background-image:url('https://images.unsplash.com/photo-1569531955323-33c6b2dca44b?fm=jpg&q=85&w=1600&auto=format&fit=crop'); background-size:cover; background-position:center 30%; filter:blur(2px) brightness(0.3) saturate(0.8); }
-.hdr-ov { position:absolute; inset:0; background:linear-gradient(180deg,rgba(4,8,20,0.4) 0%,rgba(4,8,20,0.6) 50%,#060a0f 100%); }
+.hdr { position:relative; overflow:hidden; padding:0 0 20px; min-height:200px; }
+.hdr-photo { position:absolute; inset:0; background-image:url('${STADIUM_URL}'); background-size:cover; background-position:center 35%; filter:brightness(0.22) saturate(0.7); }
+.hdr-ov { position:absolute; inset:0; background:linear-gradient(180deg,rgba(6,10,15,0.15) 0%,rgba(6,10,15,0.45) 55%,#060a0f 100%); }
 .hdr-ct { position:relative; z-index:2; padding:20px 18px 0; }
 .hdr-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
 .logo { font-family:'Bebas Neue',sans-serif; font-size:26px; color:#fff; letter-spacing:2px; }
 .logo span { color:#60a5fa; }
 .hdr-r { display:flex; align-items:center; gap:8px; }
-.upill { display:flex; align-items:center; gap:7px; background:rgba(255,255,255,0.08); border:1px solid rgba(0,122,255,0.2); border-radius:20px; padding:5px 12px 5px 6px; cursor:pointer; transition:border-color 0.2s; }
+.upill { display:flex; align-items:center; gap:7px; background:rgba(0,0,0,0.45); border:1px solid rgba(0,122,255,0.2); border-radius:20px; padding:5px 12px 5px 6px; cursor:pointer; transition:border-color 0.2s; backdrop-filter:blur(10px); }
 .upill:hover { border-color:rgba(0,122,255,0.5); }
 .uname { font-size:13px; color:rgba(255,255,255,0.85); font-weight:600; }
 .uout { font-size:12px; font-weight:600; color:rgba(255,255,255,0.45); background:none; border:none; cursor:pointer; font-family:inherit; }
 .uout:hover { color:#fff; }
 .league-tabs { display:flex; gap:10px; margin-bottom:16px; }
-.league-tab { width:60px; height:60px; border-radius:16px; border:2px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.04); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s; flex-shrink:0; position:relative; }
-.league-tab:hover { border-color:rgba(0,122,255,0.35); background:rgba(0,122,255,0.06); }
+.league-tab { width:60px; height:60px; border-radius:16px; border:2px solid rgba(255,255,255,0.1); background:rgba(0,0,0,0.4); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s; flex-shrink:0; position:relative; backdrop-filter:blur(8px); }
+.league-tab:hover { border-color:rgba(0,122,255,0.35); }
 .league-tab.active { border-color:#007aff; background:rgba(0,122,255,0.15); box-shadow:0 0 0 3px rgba(0,122,255,0.12); }
 .league-tab img { width:40px; height:40px; object-fit:contain; }
 .league-tab .ldot { position:absolute; bottom:-8px; left:50%; transform:translateX(-50%); width:4px; height:4px; background:#007aff; border-radius:50%; opacity:0; }
 .league-tab.active .ldot { opacity:1; }
 .stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
-.sbox { background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:10px 12px; }
-.slbl { font-size:10px; font-weight:700; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:3px; }
+.sbox { background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:10px 12px; backdrop-filter:blur(10px); }
+.slbl { font-size:10px; font-weight:700; color:rgba(255,255,255,0.45); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:3px; }
 .sval { font-family:'Bebas Neue',sans-serif; font-size:26px; color:#fff; letter-spacing:1px; line-height:1; }
 .sval.b { color:#60a5fa; filter:drop-shadow(0 0 8px rgba(96,165,250,0.4)); }
 .nav { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:480px; background:rgba(6,10,15,0.97); border-top:1px solid rgba(0,122,255,0.1); display:flex; z-index:50; backdrop-filter:blur(20px); padding:10px 0 14px; }
@@ -269,8 +271,8 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 .lbr.me { background:rgba(0,122,255,0.05); border-left:2px solid #007aff; }
 .lbrank { font-size:20px; width:28px; text-align:center; flex-shrink:0; }
 .lbrn { font-family:'Bebas Neue',sans-serif; font-size:17px; color:rgba(255,255,255,0.3); }
-.lbn { font-size:15px; font-weight:600; color:#fff; }
-.lbme { font-size:9px; color:#60a5fa; background:rgba(0,122,255,0.12); padding:1px 6px; border-radius:6px; font-weight:700; margin-left:4px; }
+.lbn { font-size:15px; font-weight:600; color:#fff; display:flex; align-items:center; flex-wrap:wrap; gap:4px; }
+.lbme { font-size:9px; color:#60a5fa; background:rgba(0,122,255,0.12); padding:1px 6px; border-radius:6px; font-weight:700; }
 .lbs { font-size:11px; color:rgba(255,255,255,0.4); margin-top:2px; }
 .lbp { font-family:'Bebas Neue',sans-serif; font-size:24px; letter-spacing:0.5px; }
 .lbp.top { color:#60a5fa; filter:drop-shadow(0 0 8px rgba(96,165,250,0.3)); }
@@ -336,12 +338,12 @@ function MatchFormFields({ data, onChange, leagues }) {
   const lgName = leagues.find(l => l.id === data.league_id)?.name || "";
   const teams = TEAMS_BY_LEAGUE[lgName] ? Object.keys(TEAMS_BY_LEAGUE[lgName]).sort() : Object.keys(TEAM_LOGOS).sort();
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
       <select className="msel" value={data.league_id} onChange={e => onChange({ ...data, league_id: e.target.value, home: "", away: "" })}>
         <option value="">Wybierz ligę</option>
         {leagues.map(l => <option key={l.id} value={l.id}>{l.flag} {l.name}</option>)}
       </select>
-      <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+      <div style={{ display: "flex", gap: 8 }}>
         <select className="msel" style={{ marginBottom: 0 }} value={data.home} onChange={e => onChange({ ...data, home: e.target.value })}>
           <option value="">Gospodarz</option>
           {teams.map(t => <option key={t} value={t}>{t}</option>)}
@@ -351,11 +353,11 @@ function MatchFormFields({ data, onChange, leagues }) {
           {teams.map(t => <option key={t} value={t}>{t}</option>)}
         </select>
       </div>
-      <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+      <div style={{ display: "flex", gap: 8 }}>
         <input className="mi" style={{ marginBottom: 0 }} type="date" value={data.match_date} onChange={e => onChange({ ...data, match_date: e.target.value })} />
         <input className="mi" style={{ marginBottom: 0 }} type="time" value={data.match_time} onChange={e => onChange({ ...data, match_time: e.target.value })} />
       </div>
-      <input className="mi" placeholder="Kolejka (np. Kolejka 1)" value={data.round} onChange={e => onChange({ ...data, round: e.target.value })} style={{ marginTop: 8 }} />
+      <input className="mi" style={{ marginBottom: 0 }} placeholder="Kolejka (np. Kolejka 1)" value={data.round} onChange={e => onChange({ ...data, round: e.target.value })} />
       <div style={{ display: "flex", gap: 8 }}>
         <input className="mi" style={{ marginBottom: 0 }} type="number" step="0.01" min="1" placeholder="Kurs 1" value={data.odds_home} onChange={e => onChange({ ...data, odds_home: e.target.value })} />
         <input className="mi" style={{ marginBottom: 0 }} type="number" step="0.01" min="1" placeholder="Kurs X" value={data.odds_draw} onChange={e => onChange({ ...data, odds_draw: e.target.value })} />
@@ -382,7 +384,9 @@ function TeamPicker({ onSave, onSkip }) {
                 {Object.entries(teams).map(([name, logo]) => (
                   <div key={name} onClick={() => setSel(name)}
                     style={{ background: sel === name ? "rgba(0,122,255,0.15)" : "rgba(255,255,255,0.04)", border: `1.5px solid ${sel === name ? "#007aff" : "rgba(255,255,255,0.08)"}`, borderRadius: 12, padding: "10px 6px", textAlign: "center", cursor: "pointer", transition: "all 0.18s" }}>
-                    <img src={logo} alt={name} style={{ width: 36, height: 36, objectFit: "contain", display: "block", margin: "0 auto 5px" }} onError={e => { e.target.style.opacity = "0.15"; }} />
+                    <div style={{ width: 36, height: 36, background: "rgba(255,255,255,0.9)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 5px" }}>
+                      <img src={logo} alt={name} style={{ width: 30, height: 30, objectFit: "contain" }} onError={e => { e.target.style.opacity = "0.2"; }} />
+                    </div>
                     <div style={{ fontSize: 8, color: sel === name ? "#60a5fa" : "rgba(255,255,255,0.5)", fontWeight: 600, lineHeight: 1.2 }}>{name}</div>
                   </div>
                 ))}
@@ -413,7 +417,7 @@ function TipDistribution({ matchId, tips }) {
         <div style={{ width: `${a}%`, background: "#ff3b30", borderRadius: "0 8px 8px 0", transition: "width 0.4s" }} />
       </div>
       <div style={{ display: "flex", justifyContent: "space-between" }}>
-        {[["#34c759","Gosp.",h],[" rgba(255,255,255,0.5)","Remis",d],["#ff3b30","Gość",a]].map(([color,label,pct]) => (
+        {[["#34c759","Gosp.",h],["rgba(255,255,255,0.5)","Remis",d],["#ff3b30","Gość",a]].map(([color,label,pct]) => (
           <div key={label} style={{ display: "flex", alignItems: "center", gap: 4 }}>
             <div style={{ width: 7, height: 7, borderRadius: "50%", background: color, flexShrink: 0 }} />
             <span style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", fontWeight: 700 }}>{label}</span>
@@ -425,17 +429,16 @@ function TipDistribution({ matchId, tips }) {
   );
 }
 
-// ── POLL CARD (tylko opinie, bez punktów) ─────────────────────────────────────
+// ── POLL CARD ─────────────────────────────────────────────────────────────────
 function PollCard({ poll, options, votes, userId, onVote }) {
   const myVote = votes.find(v => v.poll_id === poll.id && v.user_id === userId);
   const totalVotes = votes.filter(v => v.poll_id === poll.id).length;
   const closed = poll.status === "closed";
-
   return (
     <div style={{ background: "rgba(167,139,250,0.04)", border: "1px solid rgba(167,139,250,0.15)", borderRadius: 20, marginBottom: 12, overflow: "hidden" }}>
       <div style={{ padding: "10px 14px", background: "rgba(167,139,250,0.06)", borderBottom: "1px solid rgba(167,139,250,0.1)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <span style={{ fontSize: 11, fontWeight: 700, color: "#a78bfa", background: "rgba(167,139,250,0.1)", border: "1px solid rgba(167,139,250,0.2)", padding: "3px 10px", borderRadius: 20 }}>🗳️ ANKIETA</span>
-        <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", fontWeight: 600 }}>{totalVotes} głosów</span>
+        <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", fontWeight: 600 }}>{totalVotes} głosów{closed ? " · Zamknięta" : ""}</span>
       </div>
       <div style={{ padding: "14px 14px 12px" }}>
         <div style={{ fontSize: 15, fontWeight: 700, color: "#fff", marginBottom: 12, lineHeight: 1.4 }}>{poll.question}</div>
@@ -446,31 +449,26 @@ function PollCard({ poll, options, votes, userId, onVote }) {
             const isMyVote = myVote?.option_id === opt.id;
             const showBar = !!myVote || closed;
             return (
-              <button key={opt.id}
-                onClick={() => !myVote && !closed && onVote(poll.id, opt.id)}
-                disabled={!!myVote || closed}
+              <button key={opt.id} onClick={() => !myVote && !closed && onVote(poll.id, opt.id)} disabled={!!myVote || closed}
                 style={{ width: "100%", padding: "10px 14px", background: isMyVote ? "rgba(167,139,250,0.12)" : "rgba(255,255,255,0.04)", border: `1.5px solid ${isMyVote ? "#a78bfa" : "rgba(255,255,255,0.1)"}`, borderRadius: 12, cursor: myVote || closed ? "default" : "pointer", position: "relative", overflow: "hidden", textAlign: "left", fontFamily: "inherit", transition: "all 0.2s" }}>
-                {showBar && (
-                  <div style={{ position: "absolute", inset: 0, background: isMyVote ? "rgba(167,139,250,0.08)" : "rgba(255,255,255,0.03)", width: `${pct}%`, transition: "width 0.5s ease" }} />
-                )}
+                {showBar && <div style={{ position: "absolute", inset: 0, background: isMyVote ? "rgba(167,139,250,0.08)" : "rgba(255,255,255,0.03)", width: `${pct}%`, transition: "width 0.5s ease" }} />}
                 <div style={{ position: "relative", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontSize: 14, fontWeight: isMyVote ? 700 : 500, color: isMyVote ? "#c4b5fd" : "#fff" }}>
-                    {isMyVote && "✓ "}{opt.label}
-                  </span>
+                  <span style={{ fontSize: 14, fontWeight: isMyVote ? 700 : 500, color: isMyVote ? "#c4b5fd" : "#fff" }}>{isMyVote && "✓ "}{opt.label}</span>
                   {showBar && <span style={{ fontSize: 12, fontWeight: 700, color: isMyVote ? "#a78bfa" : "rgba(255,255,255,0.4)" }}>{pct}%</span>}
                 </div>
               </button>
             );
           })}
         </div>
-        {myVote && <div style={{ marginTop: 10, fontSize: 12, color: "#a78bfa", fontWeight: 600, textAlign: "center" }}>Twoja opinia została zapisana ✓</div>}
-        {!myVote && !closed && <div style={{ marginTop: 10, fontSize: 11, color: "rgba(255,255,255,0.3)", textAlign: "center" }}>Zagłosuj — wyniki pojawią się po oddaniu głosu</div>}
+        <div style={{ marginTop: 10, fontSize: 12, color: myVote ? "#a78bfa" : "rgba(255,255,255,0.3)", fontWeight: myVote ? 600 : 400, textAlign: "center" }}>
+          {myVote ? "Twoja opinia została zapisana ✓" : !closed ? "Zagłosuj — wyniki pojawią się po oddaniu głosu" : "Ankieta zamknięta"}
+        </div>
       </div>
     </div>
   );
 }
 
-// ── FINISHED MATCHES (zwijane) ────────────────────────────────────────────────
+// ── FINISHED MATCHES ──────────────────────────────────────────────────────────
 function FinishedMatches({ matches, myTip }) {
   const [open, setOpen] = useState(false);
   return (
@@ -829,6 +827,22 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
   const leagueMatchIds = leagueMatches.map(m => m.id);
   const leaguePolls = polls.filter(p => p.league_id === activeLeague);
 
+  // Gwiazdki za kolejkę
+  const roundStars = {};
+  const rounds = [...new Set(finished.map(m => m.round))];
+  rounds.forEach(round => {
+    const roundMatchIds = finished.filter(m => m.round === round).map(m => m.id);
+    const scores = profiles.map(p => ({
+      id: p.id,
+      pts: tips.filter(t => t.user_id === p.id && roundMatchIds.includes(t.match_id)).reduce((s, t) => s + (t.points || 0), 0),
+    })).filter(p => p.pts > 0);
+    if (scores.length === 0) return;
+    const maxPts = Math.max(...scores.map(s => s.pts));
+    scores.filter(s => s.pts === maxPts).forEach(s => {
+      roundStars[s.id] = (roundStars[s.id] || 0) + 1;
+    });
+  });
+
   const lb = profiles.map(p => {
     const myTips = tips.filter(t => t.user_id === p.id && leagueMatchIds.includes(t.match_id));
     const points = myTips.reduce((s, t) => s + (t.points || 0), 0);
@@ -963,7 +977,15 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
                   <div className="lbrank">{i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : <span className="lbrn">#{i + 1}</span>}</div>
                   <ClubAvatar favoriteTeam={u.favorite_team} name={u.name} size={36} />
                   <div style={{ flex: 1 }}>
-                    <div className="lbn">{u.name}{u.id === user.id && <span className="lbme">TY</span>}</div>
+                    <div className="lbn">
+                      {u.name}
+                      {u.id === user.id && <span className="lbme">TY</span>}
+                      {roundStars[u.id] > 0 && (
+                        <span style={{ fontSize: 11, fontWeight: 700, color: "#fbbf24", background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.2)", padding: "1px 7px", borderRadius: 20 }}>
+                          ⭐ ×{roundStars[u.id]}
+                        </span>
+                      )}
+                    </div>
                     <div className="lbs">
                       {u.correct} trafione ·{" "}
                       <span style={{ color: u.balance >= 0 ? "#34c759" : "#ff3b30", fontWeight: 700 }}>
@@ -983,7 +1005,12 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
           {tab === "rules" && <>
             <div className="sh">Nagrody</div>
             <div className="rc" style={{ marginBottom: 10 }}>
-              {[{ emoji: "🥇", name: "1. miejsce", amount: "100 zł", color: "#ffd700", bg: "rgba(255,215,0,0.08)" }, { emoji: "🥈", name: "2. miejsce", amount: "30 zł", color: "#c0c0c0", bg: "rgba(192,192,192,0.08)" }, { emoji: "🥉", name: "3. miejsce", amount: "20 zł", color: "#cd7f32", bg: "rgba(205,127,50,0.08)" }].map((r, i, arr) => (
+              {[
+                { emoji: "🥇", name: "1. miejsce", amount: "100 zł", color: "#ffd700", bg: "rgba(255,215,0,0.08)" },
+                { emoji: "🥈", name: "2. miejsce", amount: "30 zł", color: "#c0c0c0", bg: "rgba(192,192,192,0.08)" },
+                { emoji: "🥉", name: "3. miejsce", amount: "20 zł", color: "#cd7f32", bg: "rgba(205,127,50,0.08)" },
+                { emoji: "🏆", name: "Klasyfikacja Ekstraklasy — 1. miejsce", amount: "100 zł", color: "#f97316", bg: "rgba(249,115,22,0.08)" },
+              ].map((r, i, arr) => (
                 <div key={r.name} className="prow" style={{ borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
                   <div className="pic2" style={{ background: r.bg }}>{r.emoji}</div>
                   <div style={{ flex: 1 }}><div className="pnm">{r.name}</div></div>
@@ -992,7 +1019,12 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
               ))}
             </div>
             <div className="sh" style={{ marginTop: 16 }}>Zasady gry</div>
-            {[{ icon: "⏱️", bg: "rgba(0,122,255,0.1)", title: "Typowanie", text: "Wybierasz wynik meczu: 1, X lub 2. Typ możesz zmienić przed godziną startu." }, { icon: "🎯", bg: "rgba(255,59,48,0.1)", title: "Punktacja", text: "Za trafiony typ dostajesz tyle punktów ile wynosił kurs. Za chybiony — 0 pkt." }, { icon: "🏆", bg: "rgba(0,122,255,0.08)", title: "Klasyfikacja", text: "Wygrywa gracz z największą sumą punktów. Każda liga ma osobny ranking." }].map(s => (
+            {[
+              { icon: "⏱️", bg: "rgba(0,122,255,0.1)", title: "Typowanie", text: "Wybierasz wynik meczu: 1, X lub 2. Typ możesz zmienić przed godziną startu — po jej upływie typowanie jest zablokowane." },
+              { icon: "🎯", bg: "rgba(255,59,48,0.1)", title: "Punktacja", text: "Za trafiony typ dostajesz tyle punktów ile wynosił kurs bukmacherski. Za chybiony typ — 0 punktów." },
+              { icon: "⭐", bg: "rgba(251,191,36,0.1)", title: "Gwiazdki za kolejkę", text: "Gracz z najwyższą sumą punktów w danej kolejce zdobywa gwiazdkę ⭐. Przy remisie gwiazdkę dostają wszyscy z najwyższym wynikiem. Licznik gwiazdek widoczny jest w rankingu." },
+              { icon: "🏆", bg: "rgba(0,122,255,0.08)", title: "Klasyfikacja", text: "Wygrywa gracz z największą sumą punktów po zakończeniu sezonu. Każda liga ma osobny ranking. Zwycięzca klasyfikacji Ekstraklasy otrzymuje dodatkową nagrodę 100 zł." },
+            ].map(s => (
               <div key={s.title} className="rc" style={{ marginBottom: 8 }}>
                 <div className="rrow"><div className="ric" style={{ background: s.bg }}>{s.icon}</div><div><div className="rtit">{s.title}</div><div className="rtxt">{s.text}</div></div></div>
               </div>
@@ -1085,7 +1117,6 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
           ))}
         </div>
 
-        {/* MODAL — wynik meczu */}
         {resultModal && (
           <div className="mo" onClick={() => setResultModal(null)}>
             <div className="mbox" onClick={e => e.stopPropagation()}>
@@ -1105,7 +1136,6 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
           </div>
         )}
 
-        {/* MODAL — dodaj mecz */}
         {addModal && (
           <div className="mo" onClick={() => setAddModal(false)}>
             <div className="mbox" onClick={e => e.stopPropagation()}>
@@ -1119,7 +1149,6 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
           </div>
         )}
 
-        {/* MODAL — edytuj mecz */}
         {editModal && (
           <div className="mo" onClick={() => setEditModal(null)}>
             <div className="mbox" onClick={e => e.stopPropagation()}>
@@ -1133,7 +1162,6 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
           </div>
         )}
 
-        {/* MODAL — dodaj ankietę */}
         {addPollModal && (
           <div className="mo" onClick={() => setAddPollModal(false)}>
             <div className="mbox" onClick={e => e.stopPropagation()}>
@@ -1141,7 +1169,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
               <div className="mtt">🗳️ Dodaj ankietę</div>
               <div className="mst">Zbierz opinie od uczestników</div>
               <input className="mi" placeholder="Pytanie (np. Który trener odejdzie pierwszy?)" value={newPollQ} onChange={e => setNewPollQ(e.target.value)} />
-              <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.4)", letterSpacing: 1, textTransform: "uppercase", margin: "8px 0 6px" }}>Odpowiedzi</div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.4)", letterSpacing: 1, textTransform: "uppercase", margin: "4px 0 8px" }}>Odpowiedzi</div>
               {newPollOpts.map((opt, i) => (
                 <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
                   <input className="mi" style={{ marginBottom: 0, flex: 1 }} placeholder={`Odpowiedź ${i + 1}`} value={opt} onChange={e => { const o = [...newPollOpts]; o[i] = e.target.value; setNewPollOpts(o); }} />
