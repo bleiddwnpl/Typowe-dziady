@@ -1069,18 +1069,41 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
             {upcoming.length > 0 && <>
               <div className="sh">Nadchodzące</div>
               <div className="rc" style={{ marginBottom: 10 }}>
-                {upcoming.map((m, i) => (
-                  <div key={m.id} className="ar" style={{ borderBottom: i < upcoming.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div className="an">{m.home} vs {m.away}</div>
-                      <div className="at">{m.match_date} · {m.match_time?.slice(0, 5)} · {m.round}</div>
+                {upcoming.map((m, i) => {
+                  const notTipped = profiles.filter(p => !tips.find(t => t.match_id === m.id && t.user_id === p.id));
+                  return (
+                    <div key={m.id} style={{ borderBottom: i < upcoming.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
+                      <div className="ar" style={{ borderBottom: notTipped.length > 0 ? "none" : undefined }}>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div className="an">{m.home} vs {m.away}</div>
+                          <div className="at">{m.match_date} · {m.match_time?.slice(0, 5)} · {m.round}</div>
+                        </div>
+                        <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                          <button className="aedt" onClick={() => openEdit(m)}>Edytuj</button>
+                          <button className="ares-btn" onClick={() => setResultModal(m)}>Wynik</button>
+                        </div>
+                      </div>
+                      <div style={{ padding: "0 16px 10px" }}>
+                        {notTipped.length === 0 ? (
+                          <div style={{ fontSize: 11, color: "#34c759", fontWeight: 600 }}>✓ Wszyscy wytypowali</div>
+                        ) : (
+                          <>
+                            <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.3)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 5 }}>
+                              Brak typu ({notTipped.length}):
+                            </div>
+                            <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                              {notTipped.map(p => (
+                                <span key={p.id} style={{ fontSize: 11, fontWeight: 600, color: "#ff9500", background: "rgba(255,149,0,0.08)", border: "1px solid rgba(255,149,0,0.2)", padding: "2px 9px", borderRadius: 20 }}>
+                                  {p.name}
+                                </span>
+                              ))}
+                            </div>
+                          </>
+                        )}
+                      </div>
                     </div>
-                    <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
-                      <button className="aedt" onClick={() => openEdit(m)}>Edytuj</button>
-                      <button className="ares-btn" onClick={() => setResultModal(m)}>Wynik</button>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </>}
             {finished.length > 0 && <>
