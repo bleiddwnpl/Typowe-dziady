@@ -382,9 +382,7 @@ function TeamPicker({ onSave, onSkip }) {
                 {Object.entries(teams).map(([name, logo]) => (
                   <div key={name} onClick={() => setSel(name)}
                     style={{ background: sel === name ? "rgba(0,122,255,0.15)" : "rgba(255,255,255,0.04)", border: `1.5px solid ${sel === name ? "#007aff" : "rgba(255,255,255,0.08)"}`, borderRadius: 12, padding: "10px 6px", textAlign: "center", cursor: "pointer", transition: "all 0.18s" }}>
-                    <div style={{ width: 36, height: 36, background: "rgba(255,255,255,0.9)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 5px" }}>
-                      <img src={logo} alt={name} style={{ width: 30, height: 30, objectFit: "contain" }} onError={e => { e.target.style.opacity = "0.2"; }} />
-                    </div>
+                    <img src={logo} alt={name} style={{ width: 36, height: 36, objectFit: "contain", display: "block", margin: "0 auto 5px" }} onError={e => { e.target.style.opacity = "0.2"; }} />
                     <div style={{ fontSize: 8, color: sel === name ? "#60a5fa" : "rgba(255,255,255,0.5)", fontWeight: 600, lineHeight: 1.2 }}>{name}</div>
                   </div>
                 ))}
