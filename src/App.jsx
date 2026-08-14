@@ -127,12 +127,7 @@ const AVATAR_COLORS = [
   "linear-gradient(135deg,#5ac8fa,#007aff)",
   "linear-gradient(135deg,#ffcc00,#ff9500)",
 ];
-function TeamLogo({ name, size = 32 }) {
-  const logo = TEAM_LOGOS[name];
-  const av = getAvatar(name);
-  if (logo) return (
-    <img src={logo} alt={name} style={{ width: size, height: size, objectFit: "contain", flexShrink: 0 }} onError={e => { e.target.style.display = "none"; }} />
-  );
+
 const getAvatar = (name = "") => ({
   initials: name.slice(0, 1).toUpperCase() || "?",
   gradient: AVATAR_COLORS[name.charCodeAt(0) % AVATAR_COLORS.length],
@@ -147,7 +142,12 @@ const isMatchLocked = (m) => {
   return now >= `${m.match_date}T${m.match_time?.slice(0, 5)}`;
 };
 
-
+function TeamLogo({ name, size = 32 }) {
+  const logo = TEAM_LOGOS[name];
+  const av = getAvatar(name);
+  if (logo) return (
+    <img src={logo} alt={name} style={{ width: size, height: size, objectFit: "contain", flexShrink: 0 }} onError={e => { e.target.style.display = "none"; }} />
+  );
   return <div style={{ width: size, height: size, borderRadius: "50%", background: av.gradient, display: "flex", alignItems: "center", justifyContent: "center", fontSize: size * 0.38, fontWeight: 700, color: "#fff", flexShrink: 0 }}>{av.initials}</div>;
 }
 
