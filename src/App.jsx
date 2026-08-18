@@ -1014,6 +1014,43 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
                 </div>
               ))}
             </div>
+            <div className="sh" style={{ marginTop: 16 }}>Aktualni liderzy</div>
+            <div className="rc" style={{ marginBottom: 10 }}>
+              {leagues.map((lg, i, arr) => {
+                const lgMatchIds = matches.filter(m => m.league_id === lg.id).map(m => m.id);
+                const lgLb = profiles.map(p => ({
+                  ...p,
+                  points: tips.filter(t => t.user_id === p.id && lgMatchIds.includes(t.match_id)).reduce((s, t) => s + (t.points || 0), 0),
+                })).sort((a, b) => b.points - a.points);
+                const leader = lgLb[0];
+                const lgLogo = LEAGUE_LOGOS[lg.name];
+                return (
+                  <div key={lg.id} className="prow" style={{ borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
+                    <div style={{ width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <img src={lgLogo} alt={lg.name} style={{ width: 36, height: 36, objectFit: "contain" }} onError={e => { e.target.style.opacity = "0.3"; }} />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", fontWeight: 600, marginBottom: 3 }}>{lg.flag} {lg.name}</div>
+                      {leader && leader.points > 0 ? (
+                        <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                          <ClubAvatar favoriteTeam={leader.favorite_team} name={leader.name} size={22} />
+                          <span style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{leader.name}</span>
+                          {leader.id === user.id && <span className="lbme">TY</span>}
+                        </div>
+                      ) : (
+                        <span style={{ fontSize: 13, color: "rgba(255,255,255,0.25)" }}>Brak danych</span>
+                      )}
+                    </div>
+                    {leader && leader.points > 0 && (
+                      <div style={{ textAlign: "right" }}>
+                        <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: "#60a5fa", letterSpacing: 0.5 }}>{leader.points.toFixed(2)}</div>
+                        <div style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", fontWeight: 600 }}>PKT</div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
             <div className="sh" style={{ marginTop: 16 }}>Zasady gry</div>
             {[
               { icon: "⏱️", bg: "rgba(0,122,255,0.1)", title: "Typowanie", text: "Wybierasz wynik meczu: 1, X lub 2. Typ możesz zmienić przed godziną startu — po jej upływie typowanie jest zablokowane." },
