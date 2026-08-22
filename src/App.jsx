@@ -1001,18 +1001,46 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
           {tab === "rules" && <>
             <div className="sh">Nagrody</div>
             <div className="rc" style={{ marginBottom: 10 }}>
-              {[
-                { emoji: "🥇", name: "1. miejsce", amount: "100 zł", color: "#ffd700", bg: "rgba(255,215,0,0.08)" },
-                { emoji: "🥈", name: "2. miejsce", amount: "30 zł", color: "#c0c0c0", bg: "rgba(192,192,192,0.08)" },
-                { emoji: "🥉", name: "3. miejsce", amount: "20 zł", color: "#cd7f32", bg: "rgba(205,127,50,0.08)" },
-                { emoji: "🏆", name: "Klasyfikacja Ekstraklasy — 1. miejsce", amount: "100 zł", color: "#f97316", bg: "rgba(249,115,22,0.08)" },
-              ].map((r, i, arr) => (
-                <div key={r.name} className="prow" style={{ borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
-                  <div className="pic2" style={{ background: r.bg }}>{r.emoji}</div>
-                  <div style={{ flex: 1 }}><div className="pnm">{r.name}</div></div>
-                  <div className="pamt" style={{ color: r.color }}>{r.amount}</div>
-                </div>
-              ))}
+              {(() => {
+                const ekstraklasaId = leagues.find(l => l.name === "Ekstraklasa")?.id;
+                const ekstraLb = profiles.map(p => ({
+                  ...p,
+                  points: tips.filter(t => t.user_id === p.id && matches.filter(m => m.league_id === ekstraklasaId).map(m => m.id).includes(t.match_id)).reduce((s, t) => s + (t.points || 0), 0),
+                })).sort((a, b) => b.points - a.points);
+                const activeLgMatchIds = leagueMatchIds;
+                const globalLb = profiles.map(p => ({
+                  ...p,
+                  points: tips.filter(t => t.user_id === p.id && activeLgMatchIds.includes(t.match_id)).reduce((s, t) => s + (t.points || 0), 0),
+                })).sort((a, b) => b.points - a.points);
+
+                const prizes = [
+                  { emoji: "🥇", name: "1. miejsce", amount: "100 zł", color: "#ffd700", bg: "rgba(255,215,0,0.08)", leader: globalLb[0] },
+                  { emoji: "🥈", name: "2. miejsce", amount: "30 zł", color: "#c0c0c0", bg: "rgba(192,192,192,0.08)", leader: globalLb[1] },
+                  { emoji: "🥉", name: "3. miejsce", amount: "20 zł", color: "#cd7f32", bg: "rgba(205,127,50,0.08)", leader: globalLb[2] },
+                  { emoji: "🏆", name: "Klasyfikacja Ekstraklasy — 1. miejsce", amount: "100 zł", color: "#f97316", bg: "rgba(249,115,22,0.08)", leader: ekstraLb[0] },
+                ];
+
+                return prizes.map((r, i, arr) => (
+                  <div key={r.name} className="prow" style={{ borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", flexDirection: "column", alignItems: "flex-start", gap: 8 }}>
+                    <div style={{ display: "flex", alignItems: "center", width: "100%", gap: 12 }}>
+                      <div className="pic2" style={{ background: r.bg }}>{r.emoji}</div>
+                      <div style={{ flex: 1 }}><div className="pnm">{r.name}</div></div>
+                      <div className="pamt" style={{ color: r.color }}>{r.amount}</div>
+                    </div>
+                    {r.leader && r.leader.points > 0 && (
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, paddingLeft: 60, width: "100%" }}>
+                        <ClubAvatar favoriteTeam={r.leader.favorite_team} name={r.leader.name} size={22} />
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.7)" }}>{r.leader.name}</span>
+                        {r.leader.id === user.id && <span className="lbme">TY</span>}
+                        <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.4)" }}>{r.leader.points.toFixed(2)} pkt</span>
+                      </div>
+                    )}
+                    {(!r.leader || r.leader.points === 0) && (
+                      <div style={{ paddingLeft: 60, fontSize: 12, color: "rgba(255,255,255,0.2)" }}>Brak danych</div>
+                    )}
+                  </div>
+                ));
+              })()}
             </div>
             <div className="sh" style={{ marginTop: 16 }}>Aktualni liderzy</div>
             <div className="rc" style={{ marginBottom: 10 }}>
