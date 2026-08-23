@@ -38,7 +38,7 @@ const TEAMS_BY_LEAGUE = {
     "Stal Mielec":       `${WF}/6a5df676952b0dd6df753502_stal-mielec-logo-footylogos.webp`,
     "Widzew Łódź":       `${WF}/6a5df6c6c0a6a42dbf5a54d3_widzew-lodz-logo-footylogos.webp`,
     "Wieczysta Kraków":  `https://media.cms.ekstraklasa.org/images/originals/019f0a5d-acca-760e-85ca-6d11d8f504db.png`,
-    "Wisła Kraków":      `${WF}/6a3012facb55a01041811557_wisla-krakow-footylogos.webp`,
+    "Znak pedała":      `${WF}/6a3012facb55a01041811557_wisla-krakow-footylogos.webp`,
     "Wisła Płock":       `${WF}/6a5df6c7a5db3796b344a99a_wisla-plock-logo-footylogos.webp`,
     "Zagłębie Lubin":    `${WF}/6a5df6cf891ff56ef567dc76_zaglebie-lubin-logo-footylogos.webp`,
     "Śląsk Wrocław":     `${WF}/6a5df65cf6d53ebf9e39b1c1_slask-wroclaw-logo-footylogos.png`,
