@@ -178,20 +178,19 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 .hero-title { font-family:'Bebas Neue',sans-serif; font-size:62px; line-height:0.88; color:#fff; letter-spacing:2px; margin-bottom:12px; text-shadow:0 4px 40px rgba(0,0,0,0.8); }
 .hero-blue { color:#60a5fa; filter:drop-shadow(0 0 20px rgba(96,165,250,0.4)); }
 .hero-sub { font-size:15px; font-weight:700; color:rgba(255,255,255,0.88); line-height:1.6; text-shadow:0 2px 12px rgba(0,0,0,0.9); }
-.auth-card { position:relative; z-index:5; margin:0 16px 48px; background:rgba(4,12,24,0.82); border:1px solid rgba(255,255,255,0.1); border-radius:24px; padding:22px; backdrop-filter:blur(30px); box-shadow:0 0 0 1px rgba(0,122,255,0.08),0 24px 60px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.08); }
+.auth-card { position:relative; z-index:5; margin:0 16px 48px; background:rgba(4,12,24,0.82); border:1px solid rgba(255,255,255,0.1); border-radius:24px; padding:22px; backdrop-filter:blur(30px); box-shadow:0 24px 60px rgba(0,0,0,0.5); }
 .card-shine { position:absolute; top:0; left:50%; transform:translateX(-50%); width:60%; height:1px; background:linear-gradient(90deg,transparent,rgba(96,165,250,0.4),transparent); }
 .seg { display:flex; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.07); border-radius:14px; padding:3px; margin-bottom:16px; }
 .seg-btn { flex:1; padding:10px; text-align:center; font-size:14px; font-weight:600; color:rgba(255,255,255,0.35); border-radius:12px; border:none; background:transparent; font-family:'Inter',sans-serif; cursor:pointer; transition:all 0.22s; }
-.seg-btn.on { background:linear-gradient(135deg,#0051cc,#007aff); color:#fff; box-shadow:0 4px 16px rgba(0,122,255,0.3); }
+.seg-btn.on { background:linear-gradient(135deg,#0051cc,#007aff); color:#fff; }
 .afield { position:relative; margin-bottom:10px; }
 .aicon { position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:16px; opacity:0.4; pointer-events:none; }
-.ainput { width:100%; padding:13px 16px 13px 42px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.09); border-radius:13px; color:#fff; font-family:'Inter',sans-serif; font-size:15px; outline:none; transition:all 0.22s; }
+.ainput { width:100%; padding:13px 16px 13px 42px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.09); border-radius:13px; color:#fff; font-family:'Inter',sans-serif; font-size:15px; outline:none; }
 .ainput:focus { background:rgba(255,255,255,0.09); border-color:rgba(0,122,255,0.5); }
 .ainput::placeholder { color:rgba(255,255,255,0.22); }
 .aerr { color:#ff453a; font-size:12px; text-align:center; margin-bottom:8px; font-weight:500; }
-.acta { width:100%; padding:15px; background:linear-gradient(135deg,#0051cc,#007aff); border:none; border-radius:14px; color:#fff; font-family:'Inter',sans-serif; font-size:16px; font-weight:700; cursor:pointer; margin-top:4px; transition:all 0.2s; box-shadow:0 8px 28px rgba(0,122,255,0.35); }
-.acta:hover { transform:translateY(-1px); }
-.acta:disabled { opacity:0.45; cursor:not-allowed; transform:none; }
+.acta { width:100%; padding:15px; background:linear-gradient(135deg,#0051cc,#007aff); border:none; border-radius:14px; color:#fff; font-family:'Inter',sans-serif; font-size:16px; font-weight:700; cursor:pointer; margin-top:4px; box-shadow:0 8px 28px rgba(0,122,255,0.35); }
+.acta:disabled { opacity:0.45; cursor:not-allowed; }
 .forgot-btn { width:100%; padding:10px; background:transparent; border:none; color:rgba(255,255,255,0.35); font-size:13px; cursor:pointer; margin-top:4px; font-family:'Inter',sans-serif; }
 .back-btn { width:100%; padding:12px; background:transparent; border:none; color:rgba(255,255,255,0.35); font-size:13px; cursor:pointer; margin-top:8px; font-family:'Inter',sans-serif; }
 .reset-ok { background:rgba(0,122,255,0.08); border:1px solid rgba(0,122,255,0.2); border-radius:12px; padding:14px 16px; text-align:center; color:#60a5fa; font-size:14px; font-weight:600; line-height:1.5; }
@@ -204,7 +203,7 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 .logo { font-family:'Bebas Neue',sans-serif; font-size:26px; color:#fff; letter-spacing:2px; }
 .logo span { color:#60a5fa; }
 .hdr-r { display:flex; align-items:center; gap:8px; }
-.upill { display:flex; align-items:center; gap:7px; background:rgba(0,0,0,0.45); border:1px solid rgba(0,122,255,0.2); border-radius:20px; padding:5px 12px 5px 6px; cursor:pointer; transition:border-color 0.2s; backdrop-filter:blur(10px); }
+.upill { display:flex; align-items:center; gap:7px; background:rgba(0,0,0,0.45); border:1px solid rgba(0,122,255,0.2); border-radius:20px; padding:5px 12px 5px 6px; cursor:pointer; backdrop-filter:blur(10px); }
 .upill:hover { border-color:rgba(0,122,255,0.5); }
 .uname { font-size:13px; color:rgba(255,255,255,0.85); font-weight:600; }
 .uout { font-size:12px; font-weight:600; color:rgba(255,255,255,0.45); background:none; border:none; cursor:pointer; font-family:inherit; }
@@ -284,9 +283,9 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 .rtxt { font-size:13px; color:rgba(255,255,255,0.65); line-height:1.65; }
 .prow { display:flex; align-items:center; gap:14px; padding:14px 16px; border-bottom:1px solid rgba(255,255,255,0.05); }
 .prow:last-child { border-bottom:none; }
-.pic2 { width:48px; height:48px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:26px; }
-.pnm { font-size:15px; font-weight:600; color:#fff; }
-.pamt { font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:1px; }
+.pic2 { width:48px; height:48px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:26px; flex-shrink:0; }
+.pnm { font-size:14px; font-weight:600; color:#fff; }
+.pamt { font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:1px; flex-shrink:0; }
 .ar { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid rgba(255,255,255,0.05); gap:8px; }
 .ar:last-child { border-bottom:none; }
 .an { font-size:13px; font-weight:700; color:#fff; }
@@ -300,7 +299,7 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 .mst { font-size:13px; color:rgba(255,255,255,0.4); margin-bottom:20px; }
 .rbtn { flex:1; padding:15px 8px; background:rgba(255,255,255,0.04); border:1.5px solid rgba(255,255,255,0.1); border-radius:14px; color:rgba(255,255,255,0.65); cursor:pointer; font-family:inherit; font-size:20px; font-weight:700; transition:all 0.18s; }
 .rbtn:hover { background:rgba(0,122,255,0.12); border-color:#007aff; color:#60a5fa; }
-.mi { width:100%; padding:12px 14px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px; color:#fff; font-family:inherit; font-size:14px; outline:none; transition:border-color 0.2s; margin-bottom:8px; }
+.mi { width:100%; padding:12px 14px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px; color:#fff; font-family:inherit; font-size:14px; outline:none; margin-bottom:8px; }
 .mi:focus { border-color:rgba(0,122,255,0.4); }
 .mi::placeholder { color:rgba(255,255,255,0.25); }
 .mprim { width:100%; padding:14px; background:linear-gradient(135deg,#0051cc,#007aff); border:none; border-radius:14px; color:#fff; font-family:inherit; font-size:15px; font-weight:700; cursor:pointer; }
@@ -851,6 +850,20 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
     return { ...p, points, correct, balance };
   }).sort((a, b) => b.points - a.points);
 
+  // Ranking globalny (wszystkie ligi) i Ekstraklasa osobno — dla regulaminu
+  const allMatchIds = matches.map(m => m.id);
+  const globalLb = profiles.map(p => ({
+    ...p,
+    points: tips.filter(t => t.user_id === p.id && allMatchIds.includes(t.match_id)).reduce((s, t) => s + (t.points || 0), 0),
+  })).sort((a, b) => b.points - a.points);
+
+  const ekstraklasaId = leagues.find(l => l.name === "Ekstraklasa")?.id;
+  const ekstraMatchIds = matches.filter(m => m.league_id === ekstraklasaId).map(m => m.id);
+  const ekstraLb = profiles.map(p => ({
+    ...p,
+    points: tips.filter(t => t.user_id === p.id && ekstraMatchIds.includes(t.match_id)).reduce((s, t) => s + (t.points || 0), 0),
+  })).sort((a, b) => b.points - a.points);
+
   const myPts = lb.find(u => u.id === user.id)?.points || 0;
   const myRank = lb.findIndex(u => u.id === user.id) + 1;
   const myCorrect = tips.filter(t => t.user_id === user.id && leagueMatchIds.includes(t.match_id) && t.points > 0).length;
@@ -1001,90 +1014,38 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
           {tab === "rules" && <>
             <div className="sh">Nagrody</div>
             <div className="rc" style={{ marginBottom: 10 }}>
-              {(() => {
-                const ekstraklasaId = leagues.find(l => l.name === "Ekstraklasa")?.id;
-                const ekstraLb = profiles.map(p => ({
-                  ...p,
-                  points: tips.filter(t => t.user_id === p.id && matches.filter(m => m.league_id === ekstraklasaId).map(m => m.id).includes(t.match_id)).reduce((s, t) => s + (t.points || 0), 0),
-                })).sort((a, b) => b.points - a.points);
-                const activeLgMatchIds = leagueMatchIds;
-                const globalLb = profiles.map(p => ({
-                  ...p,
-                  points: tips.filter(t => t.user_id === p.id && activeLgMatchIds.includes(t.match_id)).reduce((s, t) => s + (t.points || 0), 0),
-                })).sort((a, b) => b.points - a.points);
-
-                const prizes = [
-                  { emoji: "🥇", name: "1. miejsce", amount: "100 zł", color: "#ffd700", bg: "rgba(255,215,0,0.08)", leader: globalLb[0] },
-                  { emoji: "🥈", name: "2. miejsce", amount: "30 zł", color: "#c0c0c0", bg: "rgba(192,192,192,0.08)", leader: globalLb[1] },
-                  { emoji: "🥉", name: "3. miejsce", amount: "20 zł", color: "#cd7f32", bg: "rgba(205,127,50,0.08)", leader: globalLb[2] },
-                  { emoji: "🏆", name: "Klasyfikacja Ekstraklasy — 1. miejsce", amount: "100 zł", color: "#f97316", bg: "rgba(249,115,22,0.08)", leader: ekstraLb[0] },
-                ];
-
-                return prizes.map((r, i, arr) => (
-                  <div key={r.name} className="prow" style={{ borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", flexDirection: "column", alignItems: "flex-start", gap: 8 }}>
-                    <div style={{ display: "flex", alignItems: "center", width: "100%", gap: 12 }}>
-                      <div className="pic2" style={{ background: r.bg }}>{r.emoji}</div>
-                      <div style={{ flex: 1 }}><div className="pnm">{r.name}</div></div>
-                      <div className="pamt" style={{ color: r.color }}>{r.amount}</div>
-                    </div>
-                    {r.leader && r.leader.points > 0 && (
-                      <div style={{ display: "flex", alignItems: "center", gap: 8, paddingLeft: 60, width: "100%" }}>
-                        <ClubAvatar favoriteTeam={r.leader.favorite_team} name={r.leader.name} size={22} />
-                        <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.7)" }}>{r.leader.name}</span>
-                        {r.leader.id === user.id && <span className="lbme">TY</span>}
-                        <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.4)" }}>{r.leader.points.toFixed(2)} pkt</span>
-                      </div>
-                    )}
-                    {(!r.leader || r.leader.points === 0) && (
-                      <div style={{ paddingLeft: 60, fontSize: 12, color: "rgba(255,255,255,0.2)" }}>Brak danych</div>
-                    )}
+              {[
+                { emoji: "🥇", name: "1. miejsce (wszystkie ligi)", amount: "100 zł", color: "#ffd700", bg: "rgba(255,215,0,0.08)", leader: globalLb[0] },
+                { emoji: "🥈", name: "2. miejsce (wszystkie ligi)", amount: "30 zł", color: "#c0c0c0", bg: "rgba(192,192,192,0.08)", leader: globalLb[1] },
+                { emoji: "🥉", name: "3. miejsce (wszystkie ligi)", amount: "20 zł", color: "#cd7f32", bg: "rgba(205,127,50,0.08)", leader: globalLb[2] },
+                { emoji: "🏆", name: "Klasyfikacja Ekstraklasy — 1. miejsce", amount: "100 zł", color: "#f97316", bg: "rgba(249,115,22,0.08)", leader: ekstraLb[0] },
+              ].map((r, i, arr) => (
+                <div key={r.name} className="prow" style={{ borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", flexDirection: "column", alignItems: "flex-start", gap: 8 }}>
+                  <div style={{ display: "flex", alignItems: "center", width: "100%", gap: 12 }}>
+                    <div className="pic2" style={{ background: r.bg }}>{r.emoji}</div>
+                    <div style={{ flex: 1 }}><div className="pnm">{r.name}</div></div>
+                    <div className="pamt" style={{ color: r.color }}>{r.amount}</div>
                   </div>
-                ));
-              })()}
-            </div>
-            <div className="sh" style={{ marginTop: 16 }}>Aktualni liderzy</div>
-            <div className="rc" style={{ marginBottom: 10 }}>
-              {leagues.map((lg, i, arr) => {
-                const lgMatchIds = matches.filter(m => m.league_id === lg.id).map(m => m.id);
-                const lgLb = profiles.map(p => ({
-                  ...p,
-                  points: tips.filter(t => t.user_id === p.id && lgMatchIds.includes(t.match_id)).reduce((s, t) => s + (t.points || 0), 0),
-                })).sort((a, b) => b.points - a.points);
-                const leader = lgLb[0];
-                const lgLogo = LEAGUE_LOGOS[lg.name];
-                return (
-                  <div key={lg.id} className="prow" style={{ borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
-                    <div style={{ width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                      <img src={lgLogo} alt={lg.name} style={{ width: 36, height: 36, objectFit: "contain" }} onError={e => { e.target.style.opacity = "0.3"; }} />
+                  {r.leader && r.leader.points > 0 ? (
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, paddingLeft: 60, width: "100%" }}>
+                      <ClubAvatar favoriteTeam={r.leader.favorite_team} name={r.leader.name} size={22} />
+                      <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.7)" }}>{r.leader.name}</span>
+                      {r.leader.id === user.id && <span className="lbme">TY</span>}
+                      <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.4)" }}>{r.leader.points.toFixed(2)} pkt</span>
                     </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", fontWeight: 600, marginBottom: 3 }}>{lg.flag} {lg.name}</div>
-                      {leader && leader.points > 0 ? (
-                        <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                          <ClubAvatar favoriteTeam={leader.favorite_team} name={leader.name} size={22} />
-                          <span style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{leader.name}</span>
-                          {leader.id === user.id && <span className="lbme">TY</span>}
-                        </div>
-                      ) : (
-                        <span style={{ fontSize: 13, color: "rgba(255,255,255,0.25)" }}>Brak danych</span>
-                      )}
-                    </div>
-                    {leader && leader.points > 0 && (
-                      <div style={{ textAlign: "right" }}>
-                        <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 22, color: "#60a5fa", letterSpacing: 0.5 }}>{leader.points.toFixed(2)}</div>
-                        <div style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", fontWeight: 600 }}>PKT</div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+                  ) : (
+                    <div style={{ paddingLeft: 60, fontSize: 12, color: "rgba(255,255,255,0.2)" }}>Brak danych</div>
+                  )}
+                </div>
+              ))}
             </div>
+
             <div className="sh" style={{ marginTop: 16 }}>Zasady gry</div>
             {[
               { icon: "⏱️", bg: "rgba(0,122,255,0.1)", title: "Typowanie", text: "Wybierasz wynik meczu: 1, X lub 2. Typ możesz zmienić przed godziną startu — po jej upływie typowanie jest zablokowane." },
               { icon: "🎯", bg: "rgba(255,59,48,0.1)", title: "Punktacja", text: "Za trafiony typ dostajesz tyle punktów ile wynosił kurs bukmacherski. Za chybiony typ — 0 punktów." },
               { icon: "⭐", bg: "rgba(251,191,36,0.1)", title: "Gwiazdki za kolejkę", text: "Gracz z najwyższą sumą punktów w danej kolejce zdobywa gwiazdkę ⭐. Przy remisie gwiazdkę dostają wszyscy z najwyższym wynikiem. Licznik gwiazdek widoczny jest w rankingu." },
-              { icon: "🏆", bg: "rgba(0,122,255,0.08)", title: "Klasyfikacja", text: "Wygrywa gracz z największą sumą punktów po zakończeniu sezonu. Każda liga ma osobny ranking. Zwycięzca klasyfikacji Ekstraklasy otrzymuje dodatkową nagrodę 100 zł." },
+              { icon: "🏆", bg: "rgba(0,122,255,0.08)", title: "Klasyfikacja", text: "Wygrywa gracz z największą sumą punktów po zakończeniu sezonu — licząc wszystkie ligi razem. Ekstraklasa ma dodatkowo osobny ranking z nagrodą 100 zł." },
             ].map(s => (
               <div key={s.title} className="rc" style={{ marginBottom: 8 }}>
                 <div className="rrow"><div className="ric" style={{ background: s.bg }}>{s.icon}</div><div><div className="rtit">{s.title}</div><div className="rtxt">{s.text}</div></div></div>
@@ -1110,9 +1071,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
                     <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", marginBottom: 4 }}>{poll.question}</div>
                     <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginBottom: 8 }}>
                       {pollVotes.filter(v => v.poll_id === poll.id).length} głosów ·{" "}
-                      <span style={{ color: poll.status === "active" ? "#34c759" : "#ff9500" }}>
-                        {poll.status === "active" ? "Aktywna" : "Zamknięta"}
-                      </span>
+                      <span style={{ color: poll.status === "active" ? "#34c759" : "#ff9500" }}>{poll.status === "active" ? "Aktywna" : "Zamknięta"}</span>
                     </div>
                     <div style={{ display: "flex", gap: 6 }}>
                       {poll.status === "active" && (
@@ -1138,7 +1097,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
                   const notTipped = profiles.filter(p => !tips.find(t => t.match_id === m.id && t.user_id === p.id));
                   return (
                     <div key={m.id} style={{ borderBottom: i < upcoming.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
-                      <div className="ar" style={{ borderBottom: notTipped.length > 0 ? "none" : undefined }}>
+                      <div className="ar" style={{ borderBottom: "none" }}>
                         <div style={{ flex: 1, minWidth: 0 }}>
                           <div className="an">{m.home} vs {m.away}</div>
                           <div className="at">{m.match_date} · {m.match_time?.slice(0, 5)} · {m.round}</div>
@@ -1148,7 +1107,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
                           <button className="ares-btn" onClick={() => setResultModal(m)}>Wynik</button>
                         </div>
                       </div>
-                      <div style={{ padding: "0 16px 10px" }}>
+                      <div style={{ padding: "0 16px 12px" }}>
                         {notTipped.length === 0 ? (
                           <div style={{ fontSize: 11, color: "#34c759", fontWeight: 600 }}>✓ Wszyscy wytypowali</div>
                         ) : (
@@ -1171,6 +1130,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
                 })}
               </div>
             </>}
+
             {finished.length > 0 && <>
               <div className="sh">Zakończone</div>
               <div className="rc">
@@ -1269,7 +1229,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
                   + Dodaj odpowiedź
                 </button>
               )}
-              <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 4 }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 <button className="mprim" onClick={addPoll}>Dodaj ankietę</button>
                 <button className="msec" onClick={() => setAddPollModal(false)}>Anuluj</button>
               </div>
