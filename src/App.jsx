@@ -17,6 +17,7 @@ const LEAGUE_LOGOS = {
   "Premier League": `${WF}/6a468c1ae8dc10fb1957db15_premier-league-england-logo-footylogos.webp`,
   "La Liga":        `${CDN}/laliga-spain/laliga-spain-logo-footylogos.png`,
   "Serie A":        `${WF}/6a468a21f1682fa05497a4ed_serie-a-italy-logo-footylogos.webp`,
+  "Liga Mistrzów":  `${CDN}/uefa-champions-league/uefa-champions-league-logo-footylogos.png`,
 };
 
 const TEAMS_BY_LEAGUE = {
@@ -333,7 +334,16 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 // ── FORMULARZ MECZU ───────────────────────────────────────────────────────────
 function MatchFormFields({ data, onChange, leagues }) {
   const lgName = leagues.find(l => l.id === data.league_id)?.name || "";
-  const teams = TEAMS_BY_LEAGUE[lgName] ? Object.keys(TEAMS_BY_LEAGUE[lgName]).sort() : Object.keys(TEAM_LOGOS).sort();
+  let teams;
+  if (lgName === "Liga Mistrzów") {
+    teams = [
+      ...Object.keys(TEAMS_BY_LEAGUE["Premier League"]),
+      ...Object.keys(TEAMS_BY_LEAGUE["La Liga"]),
+      ...Object.keys(TEAMS_BY_LEAGUE["Serie A"]),
+    ].sort();
+  } else {
+    teams = TEAMS_BY_LEAGUE[lgName] ? Object.keys(TEAMS_BY_LEAGUE[lgName]).sort() : Object.keys(TEAM_LOGOS).sort();
+  }
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
       <select className="msel" value={data.league_id} onChange={e => onChange({ ...data, league_id: e.target.value, home: "", away: "" })}>
