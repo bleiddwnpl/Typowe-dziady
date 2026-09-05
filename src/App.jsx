@@ -17,7 +17,7 @@ const LEAGUE_LOGOS = {
   "Premier League": `${WF}/6a468c1ae8dc10fb1957db15_premier-league-england-logo-footylogos.webp`,
   "La Liga":        `${CDN}/laliga-spain/laliga-spain-logo-footylogos.png`,
   "Serie A":        `${WF}/6a468a21f1682fa05497a4ed_serie-a-italy-logo-footylogos.webp`,
-  "Liga Mistrzów":  `${CDN}/uefa-champions-league/uefa-champions-league-logo-footylogos.png`,
+  "Liga Mistrzów":  `https://assets.footylogos.com/logos/uefa-champions-league-symbol-white/uefa-champions-league-symbol-white-logo-footylogos.svg`,
 };
 
 const TEAMS_BY_LEAGUE = {
