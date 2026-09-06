@@ -14,7 +14,7 @@ const PICK_NAMES  = { home: "Gospodarz", draw: "Remis", away: "Gość" };
 
 const LEAGUE_LOGOS = {
   "Ekstraklasa":    `${WF}/6a5df45705e50bc41db6072b_ekstraklasa-poland-logo-footylogos.webp`,
-  "Premier League": `${WF}/6a468c1ae8dc10fb1957db15_premier-league-england-logo-footylogos.webp`,
+  "Premier League": `https://assets.footylogos.com/logos/premier-league-england-white-logo-footylogos.svg`,
   "La Liga":        `${CDN}/laliga-spain/laliga-spain-logo-footylogos.png`,
   "Serie A":        `${WF}/6a468a21f1682fa05497a4ed_serie-a-italy-logo-footylogos.webp`,
   "Liga Mistrzów":  `https://assets.footylogos.com/logos/uefa-champions-league-symbol-white/uefa-champions-league-symbol-white-logo-footylogos.svg`,
