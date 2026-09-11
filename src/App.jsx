@@ -6,6 +6,7 @@ const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const STADIUM_URL = "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=1200&auto=format&fit=crop";
+const LEGIA_PHOTO_URL = "https://lutrkrahqwumjlsatzzd.supabase.co/storage/v1/object/public/Legia/L1.jpg";
 const CDN = "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos";
 const WF  = "https://cdn.prod.website-files.com/68f550992570ca0322737dc2";
 
@@ -956,6 +957,56 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
               {upcoming.map(match => {
                 const tip = myTip(match.id);
                 const lck = isMatchLocked(match);
+                const isLegia = match.home === "Legia Warszawa" || match.away === "Legia Warszawa";
+
+                if (isLegia) {
+                  return (
+                    <div key={match.id} style={{ borderRadius: 24, overflow: "hidden", marginBottom: 12, boxShadow: "0 0 0 2px #00963f, 0 12px 40px rgba(0,150,63,0.25)" }}>
+                      <div style={{ position: "relative", height: 190 }}>
+                        <div style={{ position: "absolute", inset: 0, backgroundImage: `url('${LEGIA_PHOTO_URL}')`, backgroundSize: "cover", backgroundPosition: "center", filter: "brightness(0.45) saturate(1.3)" }} />
+                        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,150,63,0.15) 0%, rgba(6,10,15,0.55) 55%, #0a1a10 100%)" }} />
+                        <div style={{ position: "absolute", top: 12, left: 14, display: "flex", gap: 6, alignItems: "center" }}>
+                          <span style={{ background: "#00963f", color: "#fff", fontSize: 10, fontWeight: 800, padding: "4px 10px", borderRadius: 20, letterSpacing: 0.5 }}>⭐ MECZ LEGII</span>
+                        </div>
+                        <div style={{ position: "absolute", top: 12, right: 14 }}>
+                          <span style={{ background: "rgba(0,0,0,0.5)", color: "rgba(255,255,255,0.8)", fontSize: 11, fontWeight: 600, padding: "4px 10px", borderRadius: 20, backdropFilter: "blur(6px)" }}>
+                            {match.round} · {match.match_time?.slice(0, 5)}
+                          </span>
+                        </div>
+                        <div style={{ position: "absolute", bottom: 14, left: 14, right: 14, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <img src={TEAM_LOGOS[match.home]} alt={match.home} style={{ width: match.home === "Legia Warszawa" ? 44 : 40, height: match.home === "Legia Warszawa" ? 44 : 40, objectFit: "contain", filter: match.home === "Legia Warszawa" ? "drop-shadow(0 2px 10px rgba(0,150,63,0.6))" : "drop-shadow(0 2px 6px rgba(0,0,0,0.5))" }} />
+                            <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: match.home === "Legia Warszawa" ? 24 : 20, color: match.home === "Legia Warszawa" ? "#4ade80" : "#fff", letterSpacing: 0.5, textShadow: match.home === "Legia Warszawa" ? "0 0 20px rgba(0,150,63,0.5)" : "none" }}>
+                              {match.home.toUpperCase()}
+                            </span>
+                          </div>
+                          <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 16, color: "rgba(255,255,255,0.4)" }}>VS</span>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, flexDirection: "row-reverse" }}>
+                            <img src={TEAM_LOGOS[match.away]} alt={match.away} style={{ width: match.away === "Legia Warszawa" ? 44 : 40, height: match.away === "Legia Warszawa" ? 44 : 40, objectFit: "contain", filter: match.away === "Legia Warszawa" ? "drop-shadow(0 2px 10px rgba(0,150,63,0.6))" : "drop-shadow(0 2px 6px rgba(0,0,0,0.5))" }} />
+                            <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: match.away === "Legia Warszawa" ? 24 : 20, color: match.away === "Legia Warszawa" ? "#4ade80" : "#fff", letterSpacing: 0.5, textShadow: match.away === "Legia Warszawa" ? "0 0 20px rgba(0,150,63,0.5)" : "none" }}>
+                              {match.away.toUpperCase()}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div style={{ background: "#0a1a10", padding: 14 }}>
+                        <div className="odds">
+                          {["home","draw","away"].map(pick => (
+                            <button key={pick} className={`odd ${tip?.pick === pick && !lck ? "sel" : ""} ${lck && tip?.pick !== pick ? "no" : ""}`} onClick={() => placeTip(match.id, pick)} disabled={lck}
+                              style={tip?.pick === pick && !lck ? { background: "rgba(0,150,63,0.15)", borderColor: "#00963f" } : {}}>
+                              <div className="ol" style={tip?.pick === pick && !lck ? { color: "#4ade80" } : {}}>{PICK_LABELS[pick]}</div>
+                              <div className="ov">{parseFloat(match[`odds_${pick}`]).toFixed(2)}</div>
+                            </button>
+                          ))}
+                        </div>
+                        {lck && <div className="lck">⛔ Typowanie zamknięte</div>}
+                        {!lck && tip && <div style={{ marginTop: 10, background: "rgba(0,150,63,0.1)", border: "1px solid rgba(0,150,63,0.3)", borderRadius: 10, padding: "8px 12px", fontSize: 13, color: "#4ade80", fontWeight: 600 }}>✓ Typ: {PICK_LABELS[tip.pick]} · +{parseFloat(match[`odds_${tip.pick}`]).toFixed(2)} pkt</div>}
+                        <TipDistribution matchId={match.id} tips={tips} />
+                      </div>
+                    </div>
+                  );
+                }
+
                 return (
                   <div key={match.id} className="mc">
                     <div className="mt2">
