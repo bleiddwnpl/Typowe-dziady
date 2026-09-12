@@ -975,16 +975,16 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
                             {match.match_date} · {match.match_time?.slice(0, 5)}
                           </span>
                         </div>
-                        <div style={{ position: "absolute", bottom: 14, left: 14, right: 14, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                        <div style={{ position: "absolute", bottom: 14, left: 14, right: 14, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
                           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                            <img src={TEAM_LOGOS[match.home]} alt={match.home} style={{ width: match.home === "Legia Warszawa" ? 44 : 40, height: match.home === "Legia Warszawa" ? 44 : 40, objectFit: "contain", filter: match.home === "Legia Warszawa" ? "drop-shadow(0 2px 10px rgba(0,150,63,0.6))" : "drop-shadow(0 2px 6px rgba(0,0,0,0.5))" }} />
+                            <img src={TEAM_LOGOS[match.home]} alt={match.home} style={{ width: match.home === "Legia Warszawa" ? 44 : 40, height: match.home === "Legia Warszawa" ? 44 : 40, objectFit: "contain", flexShrink: 0, filter: match.home === "Legia Warszawa" ? "drop-shadow(0 2px 10px rgba(0,150,63,0.6))" : "drop-shadow(0 2px 6px rgba(0,0,0,0.5))" }} />
                             <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: match.home === "Legia Warszawa" ? 24 : 20, color: match.home === "Legia Warszawa" ? "#4ade80" : "#fff", letterSpacing: 0.5, textShadow: match.home === "Legia Warszawa" ? "0 0 20px rgba(0,150,63,0.5)" : "none" }}>
                               {match.home.toUpperCase()}
                             </span>
                           </div>
-                          <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 16, color: "rgba(255,255,255,0.4)" }}>VS</span>
-                          <div style={{ display: "flex", alignItems: "center", gap: 8, flexDirection: "row-reverse" }}>
-                            <img src={TEAM_LOGOS[match.away]} alt={match.away} style={{ width: match.away === "Legia Warszawa" ? 44 : 40, height: match.away === "Legia Warszawa" ? 44 : 40, objectFit: "contain", filter: match.away === "Legia Warszawa" ? "drop-shadow(0 2px 10px rgba(0,150,63,0.6))" : "drop-shadow(0 2px 6px rgba(0,0,0,0.5))" }} />
+                          <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 16, color: "rgba(255,255,255,0.4)", flexShrink: 0 }}>VS</span>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <img src={TEAM_LOGOS[match.away]} alt={match.away} style={{ width: match.away === "Legia Warszawa" ? 44 : 40, height: match.away === "Legia Warszawa" ? 44 : 40, objectFit: "contain", flexShrink: 0, filter: match.away === "Legia Warszawa" ? "drop-shadow(0 2px 10px rgba(0,150,63,0.6))" : "drop-shadow(0 2px 6px rgba(0,0,0,0.5))" }} />
                             <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: match.away === "Legia Warszawa" ? 24 : 20, color: match.away === "Legia Warszawa" ? "#4ade80" : "#fff", letterSpacing: 0.5, textShadow: match.away === "Legia Warszawa" ? "0 0 20px rgba(0,150,63,0.5)" : "none" }}>
                               {match.away.toUpperCase()}
                             </span>
