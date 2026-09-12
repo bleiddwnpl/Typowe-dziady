@@ -965,12 +965,14 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
                       <div style={{ position: "relative", height: 190 }}>
                         <div style={{ position: "absolute", inset: 0, backgroundImage: `url('${LEGIA_PHOTO_URL}')`, backgroundSize: "cover", backgroundPosition: "center", filter: "brightness(0.45) saturate(1.3)" }} />
                         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,150,63,0.15) 0%, rgba(6,10,15,0.55) 55%, #0a1a10 100%)" }} />
-                        <div style={{ position: "absolute", top: 12, left: 14, display: "flex", gap: 6, alignItems: "center" }}>
-                          <span style={{ background: "#00963f", color: "#fff", fontSize: 10, fontWeight: 800, padding: "4px 10px", borderRadius: 20, letterSpacing: 0.5 }}>⭐ MECZ LEGII</span>
+                        <div style={{ position: "absolute", top: 12, left: 14 }}>
+                          <span style={{ background: "rgba(0,0,0,0.5)", color: "rgba(255,255,255,0.85)", fontSize: 11, fontWeight: 700, padding: "4px 10px", borderRadius: 20, backdropFilter: "blur(6px)" }}>
+                            {match.round}
+                          </span>
                         </div>
                         <div style={{ position: "absolute", top: 12, right: 14 }}>
                           <span style={{ background: "rgba(0,0,0,0.5)", color: "rgba(255,255,255,0.8)", fontSize: 11, fontWeight: 600, padding: "4px 10px", borderRadius: 20, backdropFilter: "blur(6px)" }}>
-                            {match.round} · {match.match_time?.slice(0, 5)}
+                            {match.match_date} · {match.match_time?.slice(0, 5)}
                           </span>
                         </div>
                         <div style={{ position: "absolute", bottom: 14, left: 14, right: 14, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
