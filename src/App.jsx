@@ -6,7 +6,22 @@ const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const STADIUM_URL = "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=1200&auto=format&fit=crop";
-const LEGIA_PHOTO_URL = "https://lutrkrahqwumjlsatzzd.supabase.co/storage/v1/object/public/Legia/L1.jpg";
+const FEATURED_TEAMS = {
+  "Legia Warszawa": {
+    photo: "https://lutrkrahqwumjlsatzzd.supabase.co/storage/v1/object/public/Legia/L1.jpg",
+    color: "#00963f",
+    colorRgb: "0,150,63",
+    textColor: "#4ade80",
+    bgDark: "#0a1a10",
+  },
+  "Barcelona": {
+    photo: "https://lutrkrahqwumjlsatzzd.supabase.co/storage/v1/object/public/Legia/B.jpg",
+    color: "#a50044",
+    colorRgb: "165,0,68",
+    textColor: "#fb7185",
+    bgDark: "#1a0a10",
+  },
+};
 const CDN = "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos";
 const WF  = "https://cdn.prod.website-files.com/68f550992570ca0322737dc2";
 
