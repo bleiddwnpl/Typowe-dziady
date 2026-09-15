@@ -21,6 +21,13 @@ const FEATURED_TEAMS = {
     textColor: "#fb7185",
     bgDark: "#1a0a10",
   },
+  "Real Madrid": {
+    photo: "https://lutrkrahqwumjlsatzzd.supabase.co/storage/v1/object/public/Legia/R.jpg",
+    color: "#febe10",
+    colorRgb: "254,190,16",
+    textColor: "#fde047",
+    bgDark: "#1a1608",
+  },
 };
 const CDN = "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos";
 const WF  = "https://cdn.prod.website-files.com/68f550992570ca0322737dc2";
