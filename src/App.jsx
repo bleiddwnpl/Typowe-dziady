@@ -1016,13 +1016,16 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
                       </div>
                       <div style={{ background: ft.bgDark, padding: 14 }}>
                         <div className="odds">
-                          {["home","draw","away"].map(pick => (
-                            <button key={pick} className={`odd ${tip?.pick === pick && !lck ? "sel" : ""} ${lck && tip?.pick !== pick ? "no" : ""}`} onClick={() => placeTip(match.id, pick)} disabled={lck}
-                              style={tip?.pick === pick && !lck ? { background: `rgba(${ft.colorRgb},0.15)`, borderColor: ft.color } : {}}>
-                              <div className="ol" style={tip?.pick === pick && !lck ? { color: ft.textColor } : {}}>{PICK_LABELS[pick]}</div>
-                              <div className="ov">{parseFloat(match[`odds_${pick}`]).toFixed(2)}</div>
-                            </button>
-                          ))}
+                          {["home","draw","away"].map(pick => {
+                            const isSel = tip?.pick === pick && !lck;
+                            return (
+                              <button key={pick} className={`odd ${lck && tip?.pick !== pick ? "no" : ""}`} onClick={() => placeTip(match.id, pick)} disabled={lck}
+                                style={isSel ? { background: `rgba(${ft.colorRgb},0.15)`, borderColor: ft.color } : {}}>
+                                <div className="ol" style={isSel ? { color: ft.textColor } : {}}>{PICK_LABELS[pick]}</div>
+                                <div className="ov" style={isSel ? { color: ft.textColor } : {}}>{parseFloat(match[`odds_${pick}`]).toFixed(2)}</div>
+                              </button>
+                            );
+                          })}
                         </div>
                         {lck && <div className="lck">⛔ Typowanie zamknięte</div>}
                         {!lck && tip && <div style={{ marginTop: 10, background: `rgba(${ft.colorRgb},0.1)`, border: `1px solid rgba(${ft.colorRgb},0.3)`, borderRadius: 10, padding: "8px 12px", fontSize: 13, color: ft.textColor, fontWeight: 600 }}>✓ Typ: {PICK_LABELS[tip.pick]} · +{parseFloat(match[`odds_${tip.pick}`]).toFixed(2)} pkt</div>}
