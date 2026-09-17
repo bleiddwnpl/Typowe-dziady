@@ -223,14 +223,16 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 .hdr-photo { position:absolute; inset:0; background-image:url('${STADIUM_URL}'); background-size:cover; background-position:center 35%; filter:brightness(0.22) saturate(0.7); }
 .hdr-ov { position:absolute; inset:0; background:linear-gradient(180deg,rgba(6,10,15,0.15) 0%,rgba(6,10,15,0.45) 55%,#060a0f 100%); }
 .hdr-ct { position:relative; z-index:2; padding:20px 18px 0; }
-.hdr-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; gap:8px; flex-wrap:wrap; }
+.hdr-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; gap:8px; }
 .logo { font-family:'Bebas Neue',sans-serif; font-size:26px; color:#fff; letter-spacing:2px; flex-shrink:0; }
 .logo span { color:#60a5fa; }
-.hdr-r { display:flex; align-items:center; gap:6px; flex-wrap:wrap; justify-content:flex-end; }
-.upill { display:flex; align-items:center; gap:6px; background:rgba(0,0,0,0.45); border:1px solid rgba(0,122,255,0.2); border-radius:20px; padding:5px 10px 5px 5px; cursor:pointer; backdrop-filter:blur(10px); max-width:130px; min-width:0; }
+.hdr-r { display:flex; align-items:center; gap:6px; min-width:0; }
+.upill { display:flex; align-items:center; gap:7px; background:rgba(0,0,0,0.45); border:1px solid rgba(0,122,255,0.2); border-radius:16px; padding:5px 10px; cursor:pointer; backdrop-filter:blur(10px); min-width:0; }
 .upill:hover { border-color:rgba(0,122,255,0.5); }
-.uname { font-size:12px; color:rgba(255,255,255,0.85); font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; }
-.uout { font-size:11px; font-weight:700; color:rgba(255,255,255,0.5); background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:20px; padding:6px 10px; cursor:pointer; font-family:inherit; flex-shrink:0; white-space:nowrap; }
+.uname { font-size:11px; color:#fff; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:90px; }
+.uonline { font-size:9px; color:#4ade80; font-weight:600; display:flex; align-items:center; gap:3px; }
+.uonline-dot { width:4px; height:4px; border-radius:50%; background:#34c759; flex-shrink:0; }
+.uout { font-size:10px; font-weight:700; color:rgba(255,255,255,0.6); background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:8px 10px; cursor:pointer; font-family:inherit; flex-shrink:0; white-space:nowrap; }
 .uout:hover { color:#fff; background:rgba(255,255,255,0.1); }
 .league-tabs { display:flex; gap:10px; margin-bottom:16px; }
 .league-tab { width:60px; height:60px; border-radius:16px; border:2px solid rgba(255,255,255,0.1); background:rgba(0,0,0,0.4); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s; flex-shrink:0; position:relative; backdrop-filter:blur(8px); }
