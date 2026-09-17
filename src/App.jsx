@@ -989,24 +989,14 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
             <div className="hdr-top">
               <div className="logo">TYPOWE <span>DZIADY</span></div>
               <div className="hdr-r">
-                {onlineUsers.length > 0 && (
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(0,0,0,0.4)", border: "1px solid rgba(52,199,89,0.25)", borderRadius: 20, padding: "5px 10px 5px 6px", backdropFilter: "blur(8px)" }} title={onlineUsers.map(u => u.name).join(", ")}>
-                    <div style={{ display: "flex" }}>
-                      {onlineUsers.slice(0, 3).map((u, i) => {
-                        const av = getAvatar(u.name);
-                        return (
-                          <div key={u.user_id} style={{ width: 18, height: 18, borderRadius: "50%", border: "2px solid #060a0f", marginLeft: i === 0 ? 0 : -6, background: av.gradient, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 8, fontWeight: 700, color: "#fff" }}>
-                            {av.initials}
-                          </div>
-                        );
-                      })}
-                    </div>
-                    <span style={{ fontSize: 10, color: "#4ade80", fontWeight: 700 }}>{onlineUsers.length} online</span>
+                <div className="upill" onClick={() => setShowTeamPicker(true)} title={onlineUsers.map(u => u.name).join(", ")}>
+                  <ClubAvatar favoriteTeam={profile?.favorite_team} name={profile?.name || ""} size={26} />
+                  <div style={{ minWidth: 0 }}>
+                    <div className="uname">{profile?.name || "Ty"}</div>
+                    {onlineUsers.length > 0 && (
+                      <div className="uonline"><span className="uonline-dot" />{onlineUsers.length} online</div>
+                    )}
                   </div>
-                )}
-                <div className="upill" onClick={() => setShowTeamPicker(true)}>
-                  <ClubAvatar favoriteTeam={profile?.favorite_team} name={profile?.name || ""} size={24} />
-                  <span className="uname">{profile?.name || "Ty"}</span>
                 </div>
                 <button className="uout" onClick={onLogout}>Wyloguj</button>
               </div>
