@@ -721,6 +721,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
   const [newPollQ, setNewPollQ] = useState("");
   const [newPollOpts, setNewPollOpts] = useState(["", ""]);
   const [toast, setToast] = useState(null);
+  const [onlineUsers, setOnlineUsers] = useState([]);
   const emptyMatch = { league_id: "", home: "", away: "", match_date: "", match_time: "18:00", round: "Kolejka 1", odds_home: "", odds_draw: "", odds_away: "" };
   const [newMatch, setNewMatch] = useState(emptyMatch);
 
