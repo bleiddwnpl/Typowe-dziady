@@ -760,6 +760,57 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
     if (!initialProfile?.favorite_team) setTimeout(() => setShowTeamPicker(true), 800);
   }, []);
 
+  // Realtime: typy innych graczy na żywo
+  useEffect(() => {
+    const ch = supabase.channel("tips-realtime")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "tips" }, payload => {
+        const newTip = payload.new;
+        setTips(prev => {
+          if (prev.find(t => t.id === newTip.id)) return prev;
+          return [...prev, newTip];
+        });
+        if (newTip.user_id !== user.id) {
+          const p = profiles.find(pr => pr.id === newTip.user_id);
+          const match = matches.find(m => m.id === newTip.match_id);
+          if (p && match) showToast(`${p.name} wytypował(a): ${match.home} vs ${match.away}`);
+        }
+      })
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "tips" }, payload => {
+        setTips(prev => prev.map(t => t.id === payload.new.id ? payload.new : t));
+      })
+      .subscribe();
+    return () => supabase.removeChannel(ch);
+  }, [profiles, matches, user.id]);
+
+  // Realtime: wyniki meczów na żywo
+  useEffect(() => {
+    const ch = supabase.channel("matches-realtime")
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "matches" }, payload => {
+        setMatches(prev => prev.map(m => m.id === payload.new.id ? payload.new : m));
+        if (payload.new.status === "finished" && payload.old.status !== "finished") {
+          showToast(`⚽ Wynik: ${payload.new.home} ${PICK_LABELS[payload.new.result]} ${payload.new.away}`);
+        }
+      })
+      .subscribe();
+    return () => supabase.removeChannel(ch);
+  }, []);
+
+  // Realtime: kto jest online
+  useEffect(() => {
+    const ch = supabase.channel("presence-online", { config: { presence: { key: user.id } } });
+    ch.on("presence", { event: "sync" }, () => {
+      const state = ch.presenceState();
+      const users = Object.values(state).map(arr => arr[0]);
+      setOnlineUsers(users);
+    });
+    ch.subscribe(async status => {
+      if (status === "SUBSCRIBED") {
+        await ch.track({ user_id: user.id, name: profile?.name || "Gracz" });
+      }
+    });
+    return () => supabase.removeChannel(ch);
+  }, [profile?.name]);
+
   const saveTeam = async (teamName) => {
     if (!teamName) return;
     await supabase.from("profiles").update({ favorite_team: teamName }).eq("id", user.id);
