@@ -160,13 +160,12 @@ export function useAppData(user, profile) {
     return true;
   };
 
+  // Wynik + punkty wszystkich graczy zapisywane w bazie naraz (funkcja save_match_result)
   const saveResult = async (matchId, result) => {
-    const match = matches.find(m => m.id === matchId);
-    await supabase.from("matches").update({ status: "finished", result }).eq("id", matchId);
-    for (const t of tips.filter(t => t.match_id === matchId)) {
-      await supabase.from("tips").update({ points: t.pick === result ? parseFloat(match[`odds_${result}`]) : 0 }).eq("id", t.id);
-    }
+    const { error } = await supabase.rpc("save_match_result", { p_match_id: matchId, p_result: result });
+    if (error) { showToast(`⚠️ ${error.message}`); return false; }
     await load(); showToast("Wynik zapisany!");
+    return true;
   };
 
   const addPoll = async (leagueId, question, options) => {
