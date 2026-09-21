@@ -1,981 +1,86 @@
-import { useState, useEffect, useRef } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { useState, useEffect, useMemo } from "react";
+import { supabase, LEAGUE_LOGOS, buildLeaderboard, buildRoundStars } from "./lib";
+import { css } from "./styles";
+import { ClubAvatar, TeamPicker } from "./components";
+import { useAppData } from "./useAppData";
+import AuthScreen from "./AuthScreen";
+import MatchesTab from "./tabs/MatchesTab";
+import LeaderboardTab from "./tabs/LeaderboardTab";
+import ChatTab from "./tabs/ChatTab";
+import RulesTab from "./tabs/RulesTab";
+import AdminTab from "./tabs/AdminTab";
 
-const SUPABASE_URL = "https://lutrkrahqwumjlsatzzd.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1dHJrcmFocXd1bWpsc2F0enpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ1OTM5NTIsImV4cCI6MjEwMDE2OTk1Mn0.qx7b31OQXzBxiOen1I9y9szePuO8fVonQxtEJPJ51Rg";
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-const STADIUM_URL = "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=1200&auto=format&fit=crop";
-const FEATURED_TEAMS = {
-  "Legia Warszawa": {
-    photo: "https://lutrkrahqwumjlsatzzd.supabase.co/storage/v1/object/public/Legia/L1.jpg",
-    color: "#00963f",
-    colorRgb: "0,150,63",
-    textColor: "#4ade80",
-    bgDark: "#0a1a10",
-  },
-  "Barcelona": {
-    photo: "https://lutrkrahqwumjlsatzzd.supabase.co/storage/v1/object/public/Legia/B.jpg",
-    color: "#a50044",
-    colorRgb: "165,0,68",
-    textColor: "#fb7185",
-    bgDark: "#1a0a10",
-  },
-  "Real Madrid": {
-    photo: "https://lutrkrahqwumjlsatzzd.supabase.co/storage/v1/object/public/Legia/R.jpg",
-    color: "#febe10",
-    colorRgb: "254,190,16",
-    textColor: "#fde047",
-    bgDark: "#1a1608",
-  },
-};
-const CDN = "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos";
-const WF  = "https://cdn.prod.website-files.com/68f550992570ca0322737dc2";
-
-const PICK_LABELS = { home: "1", draw: "X", away: "2" };
-const PICK_NAMES  = { home: "Gospodarz", draw: "Remis", away: "Gość" };
-
-const LEAGUE_LOGOS = {
-  "Ekstraklasa":    `${WF}/6a5df45705e50bc41db6072b_ekstraklasa-poland-logo-footylogos.webp`,
-  "Premier League": `https://assets.footylogos.com/logos/premier-league-england-white-logo-footylogos.svg`,
-  "La Liga":        `${CDN}/laliga-spain/laliga-spain-logo-footylogos.png`,
-  "Serie A":        `${WF}/6a468a21f1682fa05497a4ed_serie-a-italy-logo-footylogos.webp`,
-  "Liga Mistrzów":  `https://assets.footylogos.com/logos/uefa-champions-league-symbol-white/uefa-champions-league-symbol-white-logo-footylogos.svg`,
-};
-
-const TEAMS_BY_LEAGUE = {
-  "Ekstraklasa": {
-    "Bruk-Bet Termalica Nieciecza": `${WF}/6a5df3f862117e57608389dd_bruk-bet-termalica-nieciecza-logo-footylogos.webp`,
-    "Cracovia":          `${WF}/6a5df535f6d53ebf9e38f7c3_ks-cracovia-logo-footylogos.webp`,
-    "GKS Katowice":      `${WF}/6a5df4ca8b206768fa155676_gks-katowice-logo-footylogos.webp`,
-    "Górnik Zabrze":     `${WF}/6a5df4da05e50bc41db66cfd_gornik-zabrze-logo-footylogos.webp`,
-    "Jagiellonia Białystok": `${WF}/6a5df523c149ca67381ffbe3_jagiellonia-bialystok-logo-footylogos.webp`,
-    "Korona Kielce":     `${WF}/6a5df5498ba294066bcca15b_korona-kielce-logo-footylogos.webp`,
-    "Lech Poznań":       `${WF}/6a5df557ae7b0d3c31b057d9_lech-poznan-logo-footylogos.webp`,
-    "Lechia Gdańsk":     `${WF}/6a5df55819824fd8ee02f046_lechia-gdansk-logo-footylogos.webp`,
-    "Legia Warszawa":    `${WF}/6a5df559e2fc5acdc52a9ebb_legia-warszawa-logo-footylogos.webp`,
-    "Motor Lublin":      `${WF}/6a5df58a63ed6fd0dfdcd473_motor-lublin-logo-footylogos.webp`,
-    "Piast Gliwice":     `${WF}/6a5df5e71dbe3179dcfad266_piast-gliwice-logo-footylogos.webp`,
-    "Pogoń Szczecin":    `${WF}/6a5df5e95210fea67e706aa2_pogon-szczecin-logo-footylogos.webp`,
-    "Radomiak Radom":    `${WF}/6a5df6044d55dca3a4dba667_radomiak-radom-logo-footylogos.webp`,
-    "Raków Częstochowa": `${WF}/6a5df606fc56c8c9302093d7_rakow-czestochowa-logo-footylogos.webp`,
-    "Stal Mielec":       `${WF}/6a5df676952b0dd6df753502_stal-mielec-logo-footylogos.webp`,
-    "Widzew Łódź":       `${WF}/6a5df6c6c0a6a42dbf5a54d3_widzew-lodz-logo-footylogos.webp`,
-    "Wieczysta Kraków":  `https://media.cms.ekstraklasa.org/images/originals/019f0a5d-acca-760e-85ca-6d11d8f504db.png`,
-    "Wisła Kraków":      `${WF}/6a3012facb55a01041811557_wisla-krakow-footylogos.webp`,
-    "Wisła Płock":       `${WF}/6a5df6c7a5db3796b344a99a_wisla-plock-logo-footylogos.webp`,
-    "Zagłębie Lubin":    `${WF}/6a5df6cf891ff56ef567dc76_zaglebie-lubin-logo-footylogos.webp`,
-    "Śląsk Wrocław":     `${WF}/6a5df65cf6d53ebf9e39b1c1_slask-wroclaw-logo-footylogos.png`,
-    "ŁKS Łódź":         `${WF}/6a5df5501dbe3179dcfa80ed_lks-lodz-logo-footylogos.webp`,
-  },
-  "Premier League": {
-    "AFC Bournemouth":        `${CDN}/afc-bournemouth/afc-bournemouth-logo-footylogos.png`,
-    "Arsenal":                `${CDN}/arsenal/arsenal-logo-footylogos.png`,
-    "Aston Villa":            `${CDN}/aston-villa/aston-villa-logo-footylogos.png`,
-    "Brentford":              `${CDN}/brentford/brentford-logo-footylogos.png`,
-    "Brighton & Hove Albion": `${CDN}/brighton-and-hove-albion/brighton-and-hove-albion-logo-footylogos.png`,
-    "Chelsea":                `${CDN}/chelsea/chelsea-logo-footylogos.png`,
-    "Coventry City":          `${CDN}/coventry-city/coventry-city-logo-footylogos.png`,
-    "Crystal Palace":         `${CDN}/crystal-palace/crystal-palace-logo-footylogos.png`,
-    "Everton":                `${CDN}/everton/everton-logo-footylogos.png`,
-    "Fulham":                 `${CDN}/fulham/fulham-logo-footylogos.png`,
-    "Hull City":              `${CDN}/hull-city/hull-city-logo-footylogos.png`,
-    "Ipswich Town":           `${CDN}/ipswich-town/ipswich-town-logo-footylogos.png`,
-    "Leeds United":           `${CDN}/leeds-united/leeds-united-logo-footylogos.png`,
-    "Liverpool":              `${CDN}/liverpool-fc/liverpool-fc-logo-footylogos.png`,
-    "Manchester City":        `${CDN}/manchester-city/manchester-city-logo-footylogos.png`,
-    "Manchester United":      `${CDN}/manchester-united/manchester-united-logo-footylogos.png`,
-    "Newcastle United":       `${CDN}/newcastle-united/newcastle-united-logo-footylogos.png`,
-    "Nottingham Forest":      `${CDN}/nottingham-forest/nottingham-forest-logo-footylogos.png`,
-    "Sunderland":             `${CDN}/sunderland/sunderland-logo-footylogos.png`,
-    "Tottenham Hotspur":      `${CDN}/tottenham-hotspur/tottenham-hotspur-logo-footylogos.png`,
-  },
-  "La Liga": {
-    "Atlético Madrid":   `${CDN}/atletico-madrid/atletico-madrid-logo-footylogos.png`,
-    "Athletic Bilbao":   `${CDN}/athletic-club-bilbao/athletic-club-bilbao-logo-footylogos.png`,
-    "Barcelona":         `${CDN}/fc-barcelona/fc-barcelona-logo-footylogos.png`,
-    "Celta Vigo":        `${CDN}/celta-vigo/celta-vigo-logo-footylogos.png`,
-    "Deportivo Alavés":  `${CDN}/deportivo-alaves/deportivo-alaves-logo-footylogos.png`,
-    "Deportivo La Coruña": `${CDN}/deportivo-la-coruna/deportivo-la-coruna-logo-footylogos.png`,
-    "Elche":             `${CDN}/elche-cf/elche-cf-logo-footylogos.png`,
-    "Espanyol":          `${CDN}/rcd-espanyol-barcelona/rcd-espanyol-barcelona-logo-footylogos.png`,
-    "Getafe":            `${CDN}/getafe-cf/getafe-cf-logo-footylogos.png`,
-    "Girona":            `${CDN}/girona-fc/girona-fc-logo-footylogos.png`,
-    "Levante":           `${CDN}/levante-ud/levante-ud-logo-footylogos.png`,
-    "Málaga":            `${CDN}/malaga-cf/malaga-cf-logo-footylogos.png`,
-    "Mallorca":          `${CDN}/rcd-mallorca/rcd-mallorca-logo-footylogos.png`,
-    "Osasuna":           `${CDN}/osasuna/osasuna-logo-footylogos.png`,
-    "Racing Santander":  `${WF}/6a5dfeef3bcf8f77ef7a61e7_racing-santander-logo-footylogos.webp`,
-    "Rayo Vallecano":    `${CDN}/rayo-vallecano/rayo-vallecano-logo-footylogos.png`,
-    "Real Betis":        `${CDN}/real-betis-balompie/real-betis-balompie-logo-footylogos.png`,
-    "Real Madrid":       `${CDN}/real-madrid/real-madrid-logo-footylogos.png`,
-    "Real Sociedad":     `${CDN}/real-sociedad/real-sociedad-logo-footylogos.png`,
-    "Sevilla":           `${CDN}/sevilla-fc/sevilla-fc-logo-footylogos.png`,
-    "Valencia":          `${CDN}/valencia-cf/valencia-cf-logo-footylogos.png`,
-    "Villarreal":        `${CDN}/villarreal-cf/villarreal-cf-logo-footylogos.png`,
-    "Valladolid":        `${CDN}/real-valladolid/real-valladolid-logo-footylogos.png`,
-  },
-  "Serie A": {
-    "AC Milan":    `${WF}/6a2dabc3c4421c75c1c638d4_68f59173c54aab3bb289682d_ac-milan-footballlogos-org.webp`,
-    "Atalanta":    `${WF}/6a18dc636c0dc2b32f114cb9_atalanta-footylogos.png`,
-    "Bologna":     `${WF}/68f590332f7e2e5f2f5c3c77_bologna-footballlogos-org.webp`,
-    "Cagliari":    `${WF}/68f58fb0f8b72e10fcca8279_cagliari-footballlogos-org.webp`,
-    "Como":        `${CDN}/como-1907/como-1907-logo-footylogos.png`,
-    "Empoli":      `${CDN}/empoli-fc/empoli-fc-logo-footylogos.png`,
-    "Fiorentina":  `${WF}/6a2dabf259cd193f6f9a9ee8_68f58f8cf8b72e10fcca7f4e_fiorentina-footballlogos-org.webp`,
-    "Frosinone":   `${CDN}/frosinone-calcio/frosinone-calcio-logo-footylogos.png`,
-    "Genoa":       `${WF}/68f590871f0d9bd8bb64af24_genoa-footballlogos-org.webp`,
-    "Inter Milan": `${WF}/6a2dabf8be544df394f36f0b_68f590dc82d343819638a796_inter-milan-footballlogos-org.webp`,
-    "Juventus":    `${WF}/6a2dabfe3f65f5442c3327cf_68f591085f8ea61de0a1cc6a_juventus-footballlogos-org.webp`,
-    "Lazio":       `${WF}/68f591295ba37a0850ada7ff_lazio-footballlogos-org.webp`,
-    "Lecce":       `${WF}/68f591503b74d5a9a7f6435c_lecce-footballlogos-org.webp`,
-    "Monza":       `${CDN}/ac-monza/ac-monza-logo-footylogos.png`,
-    "Napoli":      `${WF}/6a2dac0f635d5e15f396735b_69fb26f9f2009903393e5eff_napoli-footylogos.webp`,
-    "Parma":       `${WF}/68f591c871c3891858936f5c_parma-footballlogos-org.webp`,
-    "AS Roma":     `${WF}/69f685fdf9803881d891451c_roma-footylogos.webp`,
-    "Sassuolo":    `${WF}/68f5923bdfbd72754cd17a3c_sassuolo-footballlogos-org.webp`,
-    "Torino":      `${WF}/68f5926167bb453c3fe7cec0_torino-footballlogos-org.webp`,
-    "Udinese":     `${WF}/68f5928a0decdd9736d3a737_udinese-footballlogos-org.webp`,
-    "Venezia":     `${CDN}/venezia-fc/venezia-fc-logo-footylogos.png`,
-  },
-};
-
-const TEAM_LOGOS = Object.values(TEAMS_BY_LEAGUE).reduce((acc, t) => ({ ...acc, ...t }), {});
-
-const AVATAR_COLORS = [
-  "linear-gradient(135deg,#c8102e,#8b0000)",
-  "linear-gradient(135deg,#ff9500,#ff6b00)",
-  "linear-gradient(135deg,#007aff,#0051cc)",
-  "linear-gradient(135deg,#af52de,#7a3ec2)",
-  "linear-gradient(135deg,#34c759,#1a7a38)",
-  "linear-gradient(135deg,#5ac8fa,#007aff)",
-  "linear-gradient(135deg,#ffcc00,#ff9500)",
-];
-
-const getAvatar = (name = "") => ({
-  initials: name.slice(0, 1).toUpperCase() || "?",
-  gradient: AVATAR_COLORS[name.charCodeAt(0) % AVATAR_COLORS.length],
-});
-
-const isMatchLocked = (m) => {
-  const now = new Intl.DateTimeFormat("sv-SE", {
-    timeZone: "Europe/Warsaw",
-    year: "numeric", month: "2-digit", day: "2-digit",
-    hour: "2-digit", minute: "2-digit", second: "2-digit",
-  }).format(new Date()).replace(" ", "T");
-  return now >= `${m.match_date}T${m.match_time?.slice(0, 5)}`;
-};
-
-function TeamLogo({ name, size = 32 }) {
-  const logo = TEAM_LOGOS[name];
-  const av = getAvatar(name);
-  if (logo) return (
-    <img src={logo} alt={name} style={{ width: size, height: size, objectFit: "contain", flexShrink: 0 }} onError={e => { e.target.style.display = "none"; }} />
-  );
-  return <div style={{ width: size, height: size, borderRadius: "50%", background: av.gradient, display: "flex", alignItems: "center", justifyContent: "center", fontSize: size * 0.38, fontWeight: 700, color: "#fff", flexShrink: 0 }}>{av.initials}</div>;
-}
-
-function ClubAvatar({ favoriteTeam, name, size = 32 }) {
-  const av = getAvatar(name);
-  const logo = favoriteTeam ? TEAM_LOGOS[favoriteTeam] : null;
-  if (logo) return (
-    <div style={{ width: size, height: size, borderRadius: "50%", background: "rgba(0,0,0,0.3)", border: "1.5px solid rgba(0,122,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, overflow: "hidden" }}>
-      <img src={logo} alt={favoriteTeam} style={{ width: size * 0.72, height: size * 0.72, objectFit: "contain" }} onError={e => { e.target.style.display = "none"; }} />
-    </div>
-  );
-  return <div style={{ width: size, height: size, borderRadius: "50%", background: av.gradient, display: "flex", alignItems: "center", justifyContent: "center", fontSize: size * 0.38, fontWeight: 700, color: "#fff", flexShrink: 0 }}>{av.initials}</div>;
-}
-
-const css = `
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap');
-* { box-sizing:border-box; margin:0; padding:0; -webkit-font-smoothing:antialiased; }
-body { background:#060a0f; font-family:'Inter',sans-serif; }
-::-webkit-scrollbar { width:0; }
-.auth-screen { min-height:100vh; position:relative; overflow:hidden; display:flex; flex-direction:column; justify-content:flex-end; }
-.photo-bg { position:fixed; inset:0; background-image:url('${STADIUM_URL}'); background-size:cover; background-position:center 30%; }
-.ov1 { position:fixed; inset:0; background:linear-gradient(180deg,rgba(0,0,0,0.3) 0%,rgba(0,0,0,0.6) 50%,rgba(4,8,15,0.97) 78%,#04080f 100%); }
-.ov2 { position:fixed; bottom:0; left:0; right:0; height:60%; background:radial-gradient(ellipse at 50% 100%,rgba(0,100,255,0.07) 0%,transparent 70%); }
-.auth-hero { position:relative; z-index:5; padding:0 28px; margin-bottom:24px; }
-.eyebrow { display:flex; align-items:center; gap:8px; margin-bottom:12px; }
-.ey-line { width:28px; height:2px; background:#007aff; border-radius:1px; }
-.ey-txt { font-size:10px; font-weight:700; color:#60a5fa; letter-spacing:3px; text-transform:uppercase; }
-.hero-title { font-family:'Bebas Neue',sans-serif; font-size:62px; line-height:0.88; color:#fff; letter-spacing:2px; margin-bottom:12px; text-shadow:0 4px 40px rgba(0,0,0,0.8); }
-.hero-blue { color:#60a5fa; filter:drop-shadow(0 0 20px rgba(96,165,250,0.4)); }
-.hero-sub { font-size:15px; font-weight:700; color:rgba(255,255,255,0.88); line-height:1.6; text-shadow:0 2px 12px rgba(0,0,0,0.9); }
-.auth-card { position:relative; z-index:5; margin:0 16px 48px; background:rgba(4,12,24,0.82); border:1px solid rgba(255,255,255,0.1); border-radius:24px; padding:22px; backdrop-filter:blur(30px); box-shadow:0 24px 60px rgba(0,0,0,0.5); }
-.card-shine { position:absolute; top:0; left:50%; transform:translateX(-50%); width:60%; height:1px; background:linear-gradient(90deg,transparent,rgba(96,165,250,0.4),transparent); }
-.seg { display:flex; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.07); border-radius:14px; padding:3px; margin-bottom:16px; }
-.seg-btn { flex:1; padding:10px; text-align:center; font-size:14px; font-weight:600; color:rgba(255,255,255,0.35); border-radius:12px; border:none; background:transparent; font-family:'Inter',sans-serif; cursor:pointer; transition:all 0.22s; }
-.seg-btn.on { background:linear-gradient(135deg,#0051cc,#007aff); color:#fff; }
-.afield { position:relative; margin-bottom:10px; }
-.aicon { position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:16px; opacity:0.4; pointer-events:none; }
-.ainput { width:100%; padding:13px 16px 13px 42px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.09); border-radius:13px; color:#fff; font-family:'Inter',sans-serif; font-size:15px; outline:none; }
-.ainput:focus { background:rgba(255,255,255,0.09); border-color:rgba(0,122,255,0.5); }
-.ainput::placeholder { color:rgba(255,255,255,0.22); }
-.aerr { color:#ff453a; font-size:12px; text-align:center; margin-bottom:8px; font-weight:500; }
-.acta { width:100%; padding:15px; background:linear-gradient(135deg,#0051cc,#007aff); border:none; border-radius:14px; color:#fff; font-family:'Inter',sans-serif; font-size:16px; font-weight:700; cursor:pointer; margin-top:4px; box-shadow:0 8px 28px rgba(0,122,255,0.35); }
-.acta:disabled { opacity:0.45; cursor:not-allowed; }
-.forgot-btn { width:100%; padding:10px; background:transparent; border:none; color:rgba(255,255,255,0.35); font-size:13px; cursor:pointer; margin-top:4px; font-family:'Inter',sans-serif; }
-.back-btn { width:100%; padding:12px; background:transparent; border:none; color:rgba(255,255,255,0.35); font-size:13px; cursor:pointer; margin-top:8px; font-family:'Inter',sans-serif; }
-.reset-ok { background:rgba(0,122,255,0.08); border:1px solid rgba(0,122,255,0.2); border-radius:12px; padding:14px 16px; text-align:center; color:#60a5fa; font-size:14px; font-weight:600; line-height:1.5; }
-.app { min-height:100vh; background:#060a0f; max-width:480px; margin:0 auto; padding-bottom:100px; font-family:'Inter',sans-serif; }
-.hdr { position:relative; overflow:hidden; padding:0 0 20px; min-height:200px; }
-.hdr-photo { position:absolute; inset:0; background-image:url('${STADIUM_URL}'); background-size:cover; background-position:center 35%; filter:brightness(0.22) saturate(0.7); }
-.hdr-ov { position:absolute; inset:0; background:linear-gradient(180deg,rgba(6,10,15,0.15) 0%,rgba(6,10,15,0.45) 55%,#060a0f 100%); }
-.hdr-ct { position:relative; z-index:2; padding:20px 18px 0; }
-.hdr-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; gap:8px; }
-.logo { font-family:'Bebas Neue',sans-serif; font-size:26px; color:#fff; letter-spacing:2px; flex-shrink:0; }
-.logo span { color:#60a5fa; }
-.hdr-r { display:flex; align-items:center; gap:6px; min-width:0; }
-.upill { display:flex; align-items:center; gap:7px; background:rgba(0,0,0,0.45); border:1px solid rgba(0,122,255,0.2); border-radius:16px; padding:5px 10px; cursor:pointer; backdrop-filter:blur(10px); min-width:0; }
-.upill:hover { border-color:rgba(0,122,255,0.5); }
-.uname { font-size:11px; color:#fff; font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:90px; }
-.uonline { font-size:9px; color:#4ade80; font-weight:600; display:flex; align-items:center; gap:3px; }
-.uonline-dot { width:4px; height:4px; border-radius:50%; background:#34c759; flex-shrink:0; }
-.uout { font-size:10px; font-weight:700; color:rgba(255,255,255,0.6); background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:8px 10px; cursor:pointer; font-family:inherit; flex-shrink:0; white-space:nowrap; }
-.uout:hover { color:#fff; background:rgba(255,255,255,0.1); }
-.league-tabs { display:flex; gap:10px; margin-bottom:16px; }
-.league-tab { width:60px; height:60px; border-radius:16px; border:2px solid rgba(255,255,255,0.1); background:rgba(0,0,0,0.4); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s; flex-shrink:0; position:relative; backdrop-filter:blur(8px); }
-.league-tab:hover { border-color:rgba(0,122,255,0.35); }
-.league-tab.active { border-color:#007aff; background:rgba(0,122,255,0.15); box-shadow:0 0 0 3px rgba(0,122,255,0.12); }
-.league-tab img { width:40px; height:40px; object-fit:contain; }
-.league-tab .ldot { position:absolute; bottom:-8px; left:50%; transform:translateX(-50%); width:4px; height:4px; background:#007aff; border-radius:50%; opacity:0; }
-.league-tab.active .ldot { opacity:1; }
-.stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
-.sbox { background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.1); border-radius:14px; padding:10px 12px; backdrop-filter:blur(10px); }
-.slbl { font-size:10px; font-weight:700; color:rgba(255,255,255,0.45); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:3px; }
-.sval { font-family:'Bebas Neue',sans-serif; font-size:26px; color:#fff; letter-spacing:1px; line-height:1; }
-.sval.b { color:#60a5fa; filter:drop-shadow(0 0 8px rgba(96,165,250,0.4)); }
-.nav { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:480px; background:rgba(6,10,15,0.97); border-top:1px solid rgba(0,122,255,0.1); display:flex; z-index:50; backdrop-filter:blur(20px); padding:10px 0 14px; }
-.ni { flex:1; padding:6px 4px 4px; background:transparent; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:4px; }
-.nic { width:48px; height:34px; display:flex; align-items:center; justify-content:center; border-radius:12px; font-size:24px; transition:background 0.2s; }
-.ni.on .nic { background:rgba(0,122,255,0.12); }
-.nlbl { font-size:11px; font-weight:600; color:rgba(255,255,255,0.4); transition:color 0.2s; }
-.ni.on .nlbl { color:#60a5fa; }
-.ndot { width:4px; height:4px; background:#007aff; border-radius:50%; display:none; }
-.ni.on .ndot { display:block; }
-.ct { padding:14px; }
-.sh { font-size:12px; font-weight:700; color:rgba(255,255,255,0.5); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:10px; padding:0 2px; }
-.mc { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:20px; margin-bottom:10px; overflow:hidden; transition:border-color 0.2s,transform 0.15s; }
-.mc:hover { border-color:rgba(0,122,255,0.25); transform:translateY(-1px); }
-.mt2 { padding:9px 14px; background:rgba(255,255,255,0.02); border-bottom:1px solid rgba(255,255,255,0.06); display:flex; justify-content:space-between; align-items:center; }
-.rbadge { font-size:11px; color:#60a5fa; background:rgba(0,122,255,0.1); border:1px solid rgba(0,122,255,0.2); padding:3px 10px; border-radius:20px; font-weight:700; }
-.mtime { font-size:12px; color:rgba(255,255,255,0.65); font-weight:600; }
-.mb2 { padding:14px; }
-.tms { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; gap:6px; }
-.tm { display:flex; align-items:center; gap:7px; flex:1; min-width:0; }
-.tm.r { flex-direction:row-reverse; }
-.tn { font-size:13px; font-weight:700; color:#fff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.tm.r .tn { text-align:right; }
-.vs-sep { flex-shrink:0; text-align:center; }
-.vs-txt { font-size:10px; color:rgba(255,255,255,0.25); font-weight:700; letter-spacing:1px; }
-.vs-result { font-family:'Bebas Neue',sans-serif; font-size:22px; color:#60a5fa; letter-spacing:1px; }
-.odds { display:flex; gap:8px; }
-.odd { flex:1; border-radius:12px; padding:10px 6px; text-align:center; background:rgba(255,255,255,0.04); border:1.5px solid rgba(255,255,255,0.08); cursor:pointer; transition:all 0.18s; }
-.odd:hover:not(:disabled) { background:rgba(0,122,255,0.1); border-color:rgba(0,122,255,0.4); }
-.odd.sel { background:rgba(0,122,255,0.15); border-color:#007aff; }
-.odd.ok { background:rgba(52,199,89,0.1); border-color:#34c759; }
-.odd.no { opacity:0.3; }
-.odd:disabled { cursor:default; }
-.ol { font-size:11px; color:rgba(255,255,255,0.5); font-weight:600; }
-.odd.sel .ol { color:rgba(96,165,250,0.8); }
-.odd.ok .ol { color:#34c759; }
-.ov { font-family:'Bebas Neue',sans-serif; font-size:22px; color:#fff; letter-spacing:0.5px; margin-top:2px; }
-.odd.sel .ov { color:#60a5fa; }
-.odd.ok .ov { color:#34c759; }
-.tipok { margin-top:10px; background:rgba(0,122,255,0.08); border:1px solid rgba(0,122,255,0.2); border-radius:10px; padding:8px 12px; font-size:13px; color:#60a5fa; font-weight:600; }
-.lck { margin-top:10px; font-size:13px; color:#ff453a; text-align:center; font-weight:600; }
-.res-w { background:rgba(52,199,89,0.15); color:#34c759; font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; }
-.res-l { background:rgba(255,59,48,0.12); color:#ff3b30; font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; }
-.res-n { background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.4); font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px; }
-.lbc { background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.08); border-radius:20px; overflow:hidden; }
-.lbr { display:flex; align-items:center; gap:10px; padding:13px 16px; border-bottom:1px solid rgba(255,255,255,0.05); }
-.lbr:last-child { border-bottom:none; }
-.lbr.me { background:rgba(0,122,255,0.05); border-left:2px solid #007aff; }
-.lbrank { font-size:20px; width:28px; text-align:center; flex-shrink:0; }
-.lbrn { font-family:'Bebas Neue',sans-serif; font-size:17px; color:rgba(255,255,255,0.3); }
-.lbn { font-size:15px; font-weight:600; color:#fff; display:flex; align-items:center; flex-wrap:wrap; gap:4px; }
-.lbme { font-size:9px; color:#60a5fa; background:rgba(0,122,255,0.12); padding:1px 6px; border-radius:6px; font-weight:700; }
-.lbs { font-size:11px; color:rgba(255,255,255,0.4); margin-top:2px; }
-.lbp { font-family:'Bebas Neue',sans-serif; font-size:24px; letter-spacing:0.5px; }
-.lbp.top { color:#60a5fa; filter:drop-shadow(0 0 8px rgba(96,165,250,0.3)); }
-.lbp.nm { color:#fff; }
-.lbpl { font-size:9px; color:rgba(255,255,255,0.3); font-weight:600; text-align:right; }
-.rc { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:20px; overflow:hidden; margin-bottom:10px; }
-.rrow { display:flex; gap:14px; align-items:flex-start; padding:14px 16px; border-bottom:1px solid rgba(255,255,255,0.05); }
-.rrow:last-child { border-bottom:none; }
-.ric { width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
-.rtit { font-size:15px; font-weight:700; color:#fff; margin-bottom:5px; }
-.rtxt { font-size:13px; color:rgba(255,255,255,0.65); line-height:1.65; }
-.prow { display:flex; align-items:center; gap:14px; padding:14px 16px; border-bottom:1px solid rgba(255,255,255,0.05); }
-.prow:last-child { border-bottom:none; }
-.pic2 { width:48px; height:48px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:26px; flex-shrink:0; }
-.pnm { font-size:14px; font-weight:600; color:#fff; }
-.pamt { font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:1px; flex-shrink:0; }
-.ar { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid rgba(255,255,255,0.05); gap:8px; }
-.ar:last-child { border-bottom:none; }
-.an { font-size:13px; font-weight:700; color:#fff; }
-.at { font-size:11px; color:rgba(255,255,255,0.45); margin-top:2px; }
-.aedt { background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.1); color:rgba(255,255,255,0.75); padding:6px 12px; border-radius:10px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; }
-.ares-btn { background:rgba(0,122,255,0.1); border:1px solid rgba(0,122,255,0.25); color:#60a5fa; padding:6px 12px; border-radius:10px; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; }
-.mo { position:fixed; inset:0; background:rgba(0,0,0,0.8); display:flex; align-items:flex-end; justify-content:center; z-index:100; backdrop-filter:blur(20px); }
-.mbox { background:#080e1a; border:1px solid rgba(255,255,255,0.1); border-radius:24px 24px 0 0; padding:28px 22px; width:100%; max-width:480px; max-height:92vh; overflow-y:auto; }
-.mh { width:36px; height:4px; background:rgba(255,255,255,0.15); border-radius:2px; margin:0 auto 20px; }
-.mtt { font-size:18px; font-weight:700; color:#fff; margin-bottom:4px; }
-.mst { font-size:13px; color:rgba(255,255,255,0.4); margin-bottom:20px; }
-.rbtn { flex:1; padding:15px 8px; background:rgba(255,255,255,0.04); border:1.5px solid rgba(255,255,255,0.1); border-radius:14px; color:rgba(255,255,255,0.65); cursor:pointer; font-family:inherit; font-size:20px; font-weight:700; transition:all 0.18s; }
-.rbtn:hover { background:rgba(0,122,255,0.12); border-color:#007aff; color:#60a5fa; }
-.mi { width:100%; padding:12px 14px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px; color:#fff; font-family:inherit; font-size:14px; outline:none; margin-bottom:8px; }
-.mi:focus { border-color:rgba(0,122,255,0.4); }
-.mi::placeholder { color:rgba(255,255,255,0.25); }
-.mprim { width:100%; padding:14px; background:linear-gradient(135deg,#0051cc,#007aff); border:none; border-radius:14px; color:#fff; font-family:inherit; font-size:15px; font-weight:700; cursor:pointer; }
-.msec { width:100%; padding:12px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:14px; color:rgba(255,255,255,0.5); font-family:inherit; font-size:14px; font-weight:500; cursor:pointer; }
-.msel { width:100%; padding:12px 14px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px; color:#fff; font-family:inherit; font-size:14px; outline:none; margin-bottom:8px; }
-.toast { position:fixed; bottom:110px; left:50%; transform:translateX(-50%); background:rgba(6,14,28,0.96); border:1px solid rgba(0,122,255,0.25); color:#fff; padding:10px 20px; border-radius:50px; font-size:14px; font-weight:600; z-index:200; white-space:nowrap; animation:toastIn 0.25s ease; backdrop-filter:blur(20px); }
-@keyframes toastIn { from{opacity:0;transform:translateX(-50%) translateY(8px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
-.chat-wrap { display:flex; flex-direction:column; height:calc(100vh - 200px); }
-.chat-msgs { flex:1; overflow-y:auto; padding:0 0 8px; }
-.cdt { text-align:center; margin:14px 0 10px; }
-.cdt span { font-size:11px; color:rgba(255,255,255,0.35); background:rgba(255,255,255,0.05); padding:3px 12px; border-radius:20px; }
-.cbw { display:flex; flex-direction:column; margin-bottom:2px; }
-.crow { display:flex; align-items:flex-end; gap:6px; }
-.crow.me { flex-direction:row-reverse; }
-.cb { padding:9px 13px; border-radius:18px; max-width:76%; word-break:break-word; font-size:15px; line-height:1.4; }
-.cb.mine { background:linear-gradient(135deg,#0051cc,#007aff); color:#fff; font-weight:500; border-bottom-right-radius:4px; }
-.cb.theirs { background:rgba(255,255,255,0.08); color:#fff; border-bottom-left-radius:4px; }
-.csnd { font-size:10px; color:rgba(255,255,255,0.35); margin-left:38px; margin-top:2px; }
-.ctm { font-size:10px; color:rgba(255,255,255,0.25); margin-top:2px; text-align:right; }
-.chat-bar { padding:8px 0 16px; display:flex; gap:8px; align-items:center; border-top:1px solid rgba(255,255,255,0.07); }
-.cin { flex:1; padding:11px 16px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.09); border-radius:22px; color:#fff; font-family:inherit; font-size:15px; outline:none; }
-.cin:focus { border-color:rgba(0,122,255,0.3); }
-.cin::placeholder { color:rgba(255,255,255,0.25); }
-.csend { width:38px; height:38px; background:linear-gradient(135deg,#0051cc,#007aff); border:none; border-radius:50%; color:#fff; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0; }
-.csend:disabled { background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.2); }
-.empty { text-align:center; padding:50px 0; color:rgba(255,255,255,0.3); }
-.ei { font-size:40px; margin-bottom:10px; }
-.et { font-size:16px; font-weight:600; color:rgba(255,255,255,0.45); }
-.es { font-size:13px; margin-top:4px; }
-`;
-// ── FORMULARZ MECZU ───────────────────────────────────────────────────────────
-function MatchFormFields({ data, onChange, leagues }) {
-  const lgName = leagues.find(l => l.id === data.league_id)?.name || "";
-  let teams;
-  if (lgName === "Liga Mistrzów") {
-    teams = [
-      ...Object.keys(TEAMS_BY_LEAGUE["Premier League"]),
-      ...Object.keys(TEAMS_BY_LEAGUE["La Liga"]),
-      ...Object.keys(TEAMS_BY_LEAGUE["Serie A"]),
-    ].sort();
-  } else {
-    teams = TEAMS_BY_LEAGUE[lgName] ? Object.keys(TEAMS_BY_LEAGUE[lgName]).sort() : Object.keys(TEAM_LOGOS).sort();
-  }
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-      <select className="msel" value={data.league_id} onChange={e => onChange({ ...data, league_id: e.target.value, home: "", away: "" })}>
-        <option value="">Wybierz ligę</option>
-        {leagues.map(l => <option key={l.id} value={l.id}>{l.flag} {l.name}</option>)}
-      </select>
-      <div style={{ display: "flex", gap: 8 }}>
-        <select className="msel" style={{ marginBottom: 0 }} value={data.home} onChange={e => onChange({ ...data, home: e.target.value })}>
-          <option value="">Gospodarz</option>
-          {teams.map(t => <option key={t} value={t}>{t}</option>)}
-        </select>
-        <select className="msel" style={{ marginBottom: 0 }} value={data.away} onChange={e => onChange({ ...data, away: e.target.value })}>
-          <option value="">Gość</option>
-          {teams.map(t => <option key={t} value={t}>{t}</option>)}
-        </select>
-      </div>
-      <div style={{ display: "flex", gap: 8 }}>
-        <input className="mi" style={{ marginBottom: 0 }} type="date" value={data.match_date} onChange={e => onChange({ ...data, match_date: e.target.value })} />
-        <input className="mi" style={{ marginBottom: 0 }} type="time" value={data.match_time} onChange={e => onChange({ ...data, match_time: e.target.value })} />
-      </div>
-      <input className="mi" style={{ marginBottom: 0 }} placeholder="Kolejka (np. Kolejka 1)" value={data.round} onChange={e => onChange({ ...data, round: e.target.value })} />
-      <div style={{ display: "flex", gap: 8 }}>
-        <input className="mi" style={{ marginBottom: 0 }} type="number" step="0.01" min="1" placeholder="Kurs 1" value={data.odds_home} onChange={e => onChange({ ...data, odds_home: e.target.value })} />
-        <input className="mi" style={{ marginBottom: 0 }} type="number" step="0.01" min="1" placeholder="Kurs X" value={data.odds_draw} onChange={e => onChange({ ...data, odds_draw: e.target.value })} />
-        <input className="mi" style={{ marginBottom: 0 }} type="number" step="0.01" min="1" placeholder="Kurs 2" value={data.odds_away} onChange={e => onChange({ ...data, odds_away: e.target.value })} />
-      </div>
-    </div>
-  );
-}
-
-// ── TEAM PICKER ───────────────────────────────────────────────────────────────
-function TeamPicker({ onSave, onSkip }) {
-  const [sel, setSel] = useState(null);
-  return (
-    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.88)", zIndex: 200, display: "flex", alignItems: "flex-end", justifyContent: "center", backdropFilter: "blur(20px)" }}>
-      <div style={{ background: "#080e1a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "28px 28px 0 0", padding: "28px 20px 48px", width: "100%", maxWidth: 480, maxHeight: "90vh", display: "flex", flexDirection: "column" }}>
-        <div style={{ width: 36, height: 4, background: "rgba(255,255,255,0.15)", borderRadius: 2, margin: "0 auto 20px" }} />
-        <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 24, color: "#fff", letterSpacing: 2, textAlign: "center", marginBottom: 4 }}>TWÓJ ULUBIONY KLUB</div>
-        <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", textAlign: "center", marginBottom: 18 }}>Logo pojawi się przy Twoim nicku w rankingu i czacie</div>
-        <div style={{ overflowY: "auto", flex: 1 }}>
-          {Object.entries(TEAMS_BY_LEAGUE).map(([lgName, teams]) => (
-            <div key={lgName}>
-              <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.3)", letterSpacing: 2, textTransform: "uppercase", padding: "10px 4px 6px" }}>{lgName}</div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8, marginBottom: 8 }}>
-                {Object.entries(teams).map(([name, logo]) => (
-                  <div key={name} onClick={() => setSel(name)}
-                    style={{ background: sel === name ? "rgba(0,122,255,0.15)" : "rgba(255,255,255,0.04)", border: `1.5px solid ${sel === name ? "#007aff" : "rgba(255,255,255,0.08)"}`, borderRadius: 12, padding: "10px 6px", textAlign: "center", cursor: "pointer", transition: "all 0.18s" }}>
-                    <img src={logo} alt={name} style={{ width: 36, height: 36, objectFit: "contain", display: "block", margin: "0 auto 5px" }} onError={e => { e.target.style.opacity = "0.2"; }} />
-                    <div style={{ fontSize: 8, color: sel === name ? "#60a5fa" : "rgba(255,255,255,0.5)", fontWeight: 600, lineHeight: 1.2 }}>{name}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-        <button onClick={() => onSave(sel)} disabled={!sel} style={{ width: "100%", padding: 14, background: "linear-gradient(135deg,#0051cc,#007aff)", border: "none", borderRadius: 14, color: "#fff", fontFamily: "inherit", fontSize: 15, fontWeight: 700, cursor: sel ? "pointer" : "not-allowed", marginTop: 14, opacity: sel ? 1 : 0.35 }}>Zapisz wybór →</button>
-        <button onClick={onSkip} style={{ width: "100%", padding: 10, background: "transparent", border: "none", color: "rgba(255,255,255,0.3)", fontFamily: "inherit", fontSize: 13, cursor: "pointer", marginTop: 6 }}>Pomiń na razie</button>
-      </div>
-    </div>
-  );
-}
-
-// ── TIP DISTRIBUTION ─────────────────────────────────────────────────────────
-function TipDistribution({ matchId, tips }) {
-  const mt = tips.filter(t => t.match_id === matchId);
-  const total = mt.length;
-  if (total === 0) return null;
-  const h = Math.round((mt.filter(t => t.pick === "home").length / total) * 100);
-  const d = Math.round((mt.filter(t => t.pick === "draw").length / total) * 100);
-  const a = 100 - h - d;
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 5, marginTop: 10 }}>
-      <div style={{ display: "flex", height: 8, borderRadius: 8, overflow: "hidden", gap: 2 }}>
-        <div style={{ width: `${h}%`, background: "#34c759", borderRadius: "8px 0 0 8px", transition: "width 0.4s" }} />
-        <div style={{ width: `${d}%`, background: "rgba(255,255,255,0.25)", transition: "width 0.4s" }} />
-        <div style={{ width: `${a}%`, background: "#ff3b30", borderRadius: "0 8px 8px 0", transition: "width 0.4s" }} />
-      </div>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        {[["#34c759","Gosp.",h],["rgba(255,255,255,0.5)","Remis",d],["#ff3b30","Gość",a]].map(([color,label,pct]) => (
-          <div key={label} style={{ display: "flex", alignItems: "center", gap: 4 }}>
-            <div style={{ width: 7, height: 7, borderRadius: "50%", background: color, flexShrink: 0 }} />
-            <span style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", fontWeight: 700 }}>{label}</span>
-            <span style={{ fontSize: 11, fontWeight: 800, color }}>&nbsp;{pct}%</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ── POLL CARD ─────────────────────────────────────────────────────────────────
-function PollCard({ poll, options, votes, userId, onVote }) {
-  const myVote = votes.find(v => v.poll_id === poll.id && v.user_id === userId);
-  const totalVotes = votes.filter(v => v.poll_id === poll.id).length;
-  const closed = poll.status === "closed";
-  return (
-    <div style={{ background: "rgba(167,139,250,0.04)", border: "1px solid rgba(167,139,250,0.15)", borderRadius: 20, marginBottom: 12, overflow: "hidden" }}>
-      <div style={{ padding: "10px 14px", background: "rgba(167,139,250,0.06)", borderBottom: "1px solid rgba(167,139,250,0.1)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <span style={{ fontSize: 11, fontWeight: 700, color: "#a78bfa", background: "rgba(167,139,250,0.1)", border: "1px solid rgba(167,139,250,0.2)", padding: "3px 10px", borderRadius: 20 }}>🗳️ ANKIETA</span>
-        <span style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", fontWeight: 600 }}>{totalVotes} głosów{closed ? " · Zamknięta" : ""}</span>
-      </div>
-      <div style={{ padding: "14px 14px 12px" }}>
-        <div style={{ fontSize: 15, fontWeight: 700, color: "#fff", marginBottom: 12, lineHeight: 1.4 }}>{poll.question}</div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {options.filter(o => o.poll_id === poll.id).map(opt => {
-            const optVotes = votes.filter(v => v.poll_id === poll.id && v.option_id === opt.id).length;
-            const pct = totalVotes > 0 ? Math.round((optVotes / totalVotes) * 100) : 0;
-            const isMyVote = myVote?.option_id === opt.id;
-            const showBar = !!myVote || closed;
-            return (
-              <button key={opt.id} onClick={() => !myVote && !closed && onVote(poll.id, opt.id)} disabled={!!myVote || closed}
-                style={{ width: "100%", padding: "10px 14px", background: isMyVote ? "rgba(167,139,250,0.12)" : "rgba(255,255,255,0.04)", border: `1.5px solid ${isMyVote ? "#a78bfa" : "rgba(255,255,255,0.1)"}`, borderRadius: 12, cursor: myVote || closed ? "default" : "pointer", position: "relative", overflow: "hidden", textAlign: "left", fontFamily: "inherit", transition: "all 0.2s" }}>
-                {showBar && <div style={{ position: "absolute", inset: 0, background: isMyVote ? "rgba(167,139,250,0.08)" : "rgba(255,255,255,0.03)", width: `${pct}%`, transition: "width 0.5s ease" }} />}
-                <div style={{ position: "relative", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontSize: 14, fontWeight: isMyVote ? 700 : 500, color: isMyVote ? "#c4b5fd" : "#fff" }}>{isMyVote && "✓ "}{opt.label}</span>
-                  {showBar && <span style={{ fontSize: 12, fontWeight: 700, color: isMyVote ? "#a78bfa" : "rgba(255,255,255,0.4)" }}>{pct}%</span>}
-                </div>
-              </button>
-            );
-          })}
-        </div>
-        <div style={{ marginTop: 10, fontSize: 12, color: myVote ? "#a78bfa" : "rgba(255,255,255,0.3)", fontWeight: myVote ? 600 : 400, textAlign: "center" }}>
-          {myVote ? "Twoja opinia została zapisana ✓" : !closed ? "Zagłosuj — wyniki pojawią się po oddaniu głosu" : "Ankieta zamknięta"}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ── FINISHED MATCHES ──────────────────────────────────────────────────────────
-function FinishedMatches({ matches, myTip }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div style={{ marginTop: 8 }}>
-      <button onClick={() => setOpen(p => !p)}
-        style={{ width: "100%", padding: "12px 16px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, color: "rgba(255,255,255,0.45)", fontFamily: "inherit", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", transition: "all 0.2s" }}>
-        <span>📁 Zakończone mecze ({matches.length})</span>
-        <span style={{ fontSize: 11, opacity: 0.6 }}>{open ? "▲ Ukryj" : "▼ Pokaż"}</span>
-      </button>
-      {open && (
-        <div style={{ marginTop: 8 }}>
-          {matches.map(match => {
-            const tip = myTip(match.id);
-            const isCor = tip?.pick === match.result;
-            return (
-              <div key={match.id} className="mc" style={{ opacity: 0.85 }}>
-                <div className="mt2">
-                  <span style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", fontWeight: 600 }}>{match.round}</span>
-                  <span className={isCor && tip ? "res-w" : tip ? "res-l" : "res-n"}>
-                    {tip ? (isCor ? `+${parseFloat(match[`odds_${tip.pick}`]).toFixed(2)} pkt ✓` : "0 pkt ✗") : "Brak typu"}
-                  </span>
-                </div>
-                <div className="mb2">
-                  <div className="tms">
-                    <div className="tm"><TeamLogo name={match.home} size={28} /><span className="tn">{match.home}</span></div>
-                    <div className="vs-sep">
-                      <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: 1, textAlign: "center" }}>Wynik</div>
-                      <div className="vs-result">{PICK_LABELS[match.result]}</div>
-                    </div>
-                    <div className="tm r"><TeamLogo name={match.away} size={28} /><span className="tn">{match.away}</span></div>
-                  </div>
-                  <div className="odds">
-                    {["home","draw","away"].map(pick => (
-                      <button key={pick} className={`odd ${pick === match.result ? "ok" : tip?.pick === pick ? "no" : ""}`} disabled>
-                        <div className="ol">{PICK_LABELS[pick]}</div>
-                        <div className="ov" style={{ color: pick === match.result ? "#34c759" : "rgba(255,255,255,0.3)" }}>{parseFloat(match[`odds_${pick}`]).toFixed(2)}</div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ── AUTH ──────────────────────────────────────────────────────────────────────
-function AuthScreen({ onAuth }) {
-  const [mode, setMode] = useState("login");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [resetMode, setResetMode] = useState(false);
-  const [resetEmail, setResetEmail] = useState("");
-  const [resetSent, setResetSent] = useState(false);
-
-  const handleReset = async () => {
-    if (!resetEmail.trim()) { setError("Wpisz swój adres e-mail"); return; }
-    setLoading(true); setError("");
-    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, { redirectTo: window.location.origin });
-    setLoading(false);
-    if (error) { setError("Nie znaleziono konta z tym adresem"); return; }
-    setResetSent(true);
-  };
-
-  const handleSubmit = async () => {
-    setError(""); setLoading(true);
-    if (mode === "login") {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) { setError("Nieprawidłowy e-mail lub hasło"); setLoading(false); return; }
-      onAuth(data.user);
-    } else {
-      if (!name.trim()) { setError("Wpisz swoje imię lub pseudonim"); setLoading(false); return; }
-      const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { name: name.trim() } } });
-      if (error) { setError(error.message); setLoading(false); return; }
-      if (data.user) {
-        await supabase.from("profiles").upsert({ id: data.user.id, name: name.trim(), is_admin: false });
-        onAuth(data.user);
-      }
-    }
-    setLoading(false);
-  };
-
+function Splash({ label }) {
   return (
     <>
       <style>{css}</style>
-      <div className="auth-screen">
-        <div className="photo-bg" /><div className="ov1" /><div className="ov2" />
-        <div className="auth-hero">
-          <div className="eyebrow"><div className="ey-line" /><span className="ey-txt">Typowanie meczów</span></div>
-          <div className="hero-title">TYPOWE<br /><span className="hero-blue">DZIADY</span></div>
-          <div className="hero-sub">Typuj mecze ligowe ze znajomymi.<br />Kursy bukmacherskie. Prawdziwa rywalizacja.</div>
-        </div>
-        <div className="auth-card">
-          <div className="card-shine" />
-          {resetMode ? (
-            <>
-              <div style={{ textAlign: "center", marginBottom: 16 }}>
-                <div style={{ fontSize: 32, marginBottom: 8 }}>🔒</div>
-                <div style={{ fontSize: 17, fontWeight: 700, color: "#fff", marginBottom: 6 }}>Resetuj hasło</div>
-                <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", lineHeight: 1.6 }}>{resetSent ? "Sprawdź skrzynkę e-mail." : "Podaj e-mail — wyślemy link."}</div>
-              </div>
-              {!resetSent && <>
-                <div className="afield"><span className="aicon">✉️</span><input className="ainput" type="email" placeholder="Adres e-mail" value={resetEmail} onChange={e => setResetEmail(e.target.value)} onKeyDown={e => e.key === "Enter" && handleReset()} /></div>
-                {error && <div className="aerr">{error}</div>}
-                <button className="acta" onClick={handleReset} disabled={loading}>{loading ? "Wysyłanie..." : "Wyślij link →"}</button>
-              </>}
-              {resetSent && <div className="reset-ok">✓ Link wysłany! Sprawdź skrzynkę.</div>}
-              <button className="back-btn" onClick={() => { setResetMode(false); setResetSent(false); setError(""); }}>← Wróć do logowania</button>
-            </>
-          ) : (
-            <>
-              <div className="seg">
-                {["login","register"].map(m => (
-                  <button key={m} className={`seg-btn ${mode === m ? "on" : ""}`} onClick={() => setMode(m)}>{m === "login" ? "Logowanie" : "Rejestracja"}</button>
-                ))}
-              </div>
-              {mode === "register" && <div className="afield"><span className="aicon">👤</span><input className="ainput" placeholder="Imię lub pseudonim" value={name} onChange={e => setName(e.target.value)} /></div>}
-              <div className="afield"><span className="aicon">✉️</span><input className="ainput" type="email" placeholder="Adres e-mail" value={email} onChange={e => setEmail(e.target.value)} /></div>
-              <div className="afield"><span className="aicon">🔒</span><input className="ainput" type="password" placeholder="Hasło" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={e => e.key === "Enter" && handleSubmit()} /></div>
-              {error && <div className="aerr">{error}</div>}
-              <button className="acta" onClick={handleSubmit} disabled={loading}>{loading ? "Ładowanie..." : mode === "login" ? "Zaloguj się →" : "Zarejestruj się →"}</button>
-              {mode === "login" && <button className="forgot-btn" onClick={() => { setResetMode(true); setError(""); }}>Nie pamiętam hasła</button>}
-            </>
-          )}
-        </div>
+      <div style={{ minHeight: "100vh", background: "#060a0f", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 12 }}>
+        <div style={{ width: 52, height: 52, background: "linear-gradient(135deg,#0051cc,#007aff)", borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26 }}>⚽</div>
+        {label && <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 14, color: "rgba(96,165,250,0.6)", letterSpacing: 3 }}>{label}</div>}
       </div>
     </>
   );
 }
 
-// ── CHAT ──────────────────────────────────────────────────────────────────────
-function ChatTab({ user, profile, profiles }) {
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState("");
-  const [sending, setSending] = useState(false);
-  const bottomRef = useRef(null);
-
-  useEffect(() => {
-    supabase.from("messages").select("*").order("created_at").then(({ data }) => {
-      setMessages(data || []);
-      setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
-    });
-    const ch = supabase.channel("messages")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, p => {
-        setMessages(prev => [...prev, p.new]);
-        setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
-      }).subscribe();
-    return () => supabase.removeChannel(ch);
-  }, []);
-
-  const send = async () => {
-    const c = input.trim(); if (!c || sending) return;
-    setSending(true); setInput("");
-    await supabase.from("messages").insert({ user_id: user.id, user_name: profile?.name || user.email, content: c });
-    setSending(false);
-  };
-
-  const fmt = ts => new Date(ts).toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Warsaw" });
-  const fmtD = ts => new Date(ts).toLocaleDateString("pl-PL", { day: "numeric", month: "long", timeZone: "Europe/Warsaw" });
-  const grouped = messages.reduce((acc, m) => { const d = fmtD(m.created_at); if (!acc[d]) acc[d] = []; acc[d].push(m); return acc; }, {});
-  const getSP = uid => profiles.find(p => p.id === uid);
-
-  return (
-    <div className="chat-wrap">
-      <div className="chat-msgs">
-        {messages.length === 0 && <div className="empty"><div className="ei">💬</div><div className="et">Brak wiadomości</div><div className="es">Zacznij rozmowę</div></div>}
-        {Object.entries(grouped).map(([date, msgs]) => (
-          <div key={date}>
-            <div className="cdt"><span>{date}</span></div>
-            {msgs.map((msg, i) => {
-              const isMe = msg.user_id === user.id;
-              const sp = getSP(msg.user_id);
-              const showName = !msgs[i + 1] || msgs[i + 1].user_id !== msg.user_id;
-              return (
-                <div key={msg.id} className="cbw" style={{ alignItems: isMe ? "flex-end" : "flex-start" }}>
-                  <div className={`crow ${isMe ? "me" : ""}`}>
-                    {!isMe && showName && <ClubAvatar favoriteTeam={sp?.favorite_team} name={msg.user_name} size={28} />}
-                    {!isMe && !showName && <div style={{ width: 28, flexShrink: 0 }} />}
-                    <div className={`cb ${isMe ? "mine" : "theirs"}`}>{msg.content}</div>
-                  </div>
-                  {showName && !isMe && <div className="csnd">{msg.user_name}</div>}
-                  {showName && isMe && <div className="ctm">{fmt(msg.created_at)}</div>}
-                </div>
-              );
-            })}
-          </div>
-        ))}
-        <div ref={bottomRef} />
-      </div>
-      <div className="chat-bar">
-        <input className="cin" placeholder="Wiadomość..." value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && send()} maxLength={500} />
-        <button className="csend" onClick={send} disabled={!input.trim() || sending}>↑</button>
-      </div>
-    </div>
-  );
-}
-// ── MAIN APP ──────────────────────────────────────────────────────────────────
+// ── GŁÓWNA APLIKACJA ──────────────────────────────────────────────────────────
 function MainApp({ user, profile: initialProfile, onLogout }) {
   const [profile, setProfile] = useState(initialProfile);
   const [tab, setTab] = useState("matches");
-  const [leagues, setLeagues] = useState([]);
   const [activeLeague, setActiveLeague] = useState(null);
-  const [matches, setMatches] = useState([]);
-  const [tips, setTips] = useState([]);
-  const [profiles, setProfiles] = useState([]);
-  const [polls, setPolls] = useState([]);
-  const [pollOptions, setPollOptions] = useState([]);
-  const [pollVotes, setPollVotes] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [showTeamPicker, setShowTeamPicker] = useState(false);
-  const [resultModal, setResultModal] = useState(null);
-  const [addModal, setAddModal] = useState(false);
-  const [editModal, setEditModal] = useState(null);
-  const [editData, setEditData] = useState({});
-  const [addPollModal, setAddPollModal] = useState(false);
-  const [newPollQ, setNewPollQ] = useState("");
-  const [newPollOpts, setNewPollOpts] = useState(["", ""]);
-  const [toast, setToast] = useState(null);
-  const [onlineUsers, setOnlineUsers] = useState([]);
-  const emptyMatch = { league_id: "", home: "", away: "", match_date: "", match_time: "18:00", round: "Kolejka 1", odds_home: "", odds_draw: "", odds_away: "" };
-  const [newMatch, setNewMatch] = useState(emptyMatch);
 
-  const showToast = msg => { setToast(msg); setTimeout(() => setToast(null), 2500); };
+  const data = useAppData(user, profile);
+  const { leagues, matches, tips, profiles, polls, pollOptions, pollVotes, loading, toast, onlineUsers, actions } = data;
 
-  const load = async () => {
-    const [{ data: lg }, { data: m }, { data: p }, { data: pl }, { data: po }, { data: pv }] = await Promise.all([
-      supabase.from("leagues").select("*").order("name"),
-      supabase.from("matches").select("*").order("match_date").order("match_time"),
-      supabase.from("profiles").select("*"),
-      supabase.from("polls").select("*").order("created_at", { ascending: false }),
-      supabase.from("poll_options").select("*"),
-      supabase.from("poll_votes").select("*"),
-    ]);
-    let allTips = [], from = 0;
-    while (true) {
-      const { data: page, error } = await supabase.from("tips").select("*").range(from, from + 999);
-      if (error || !page || page.length === 0) break;
-      allTips = [...allTips, ...page];
-      if (page.length < 1000) break;
-      from += 1000;
-    }
-    setLeagues(lg || []);
-    setMatches(m || []);
-    setTips(allTips);
-    setProfiles(p || []);
-    setPolls(pl || []);
-    setPollOptions(po || []);
-    setPollVotes(pv || []);
-    if (lg && lg.length > 0 && !activeLeague) setActiveLeague(lg[0].id);
-    setLoading(false);
-  };
-
+  // Domyślnie pierwsza liga
   useEffect(() => {
-    load();
-    if (!initialProfile?.favorite_team) setTimeout(() => setShowTeamPicker(true), 800);
+    if (!activeLeague && leagues.length > 0) setActiveLeague(leagues[0].id);
+  }, [leagues, activeLeague]);
+
+  // Nowy gracz bez klubu → wybór klubu
+  useEffect(() => {
+    if (initialProfile?.favorite_team) return;
+    const t = setTimeout(() => setShowTeamPicker(true), 800);
+    return () => clearTimeout(t);
   }, []);
 
-  // Realtime: typy innych graczy na żywo
-  useEffect(() => {
-    const ch = supabase.channel("tips-realtime")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "tips" }, payload => {
-        const newTip = payload.new;
-        setTips(prev => {
-          if (prev.find(t => t.id === newTip.id)) return prev;
-          return [...prev, newTip];
-        });
-        if (newTip.user_id !== user.id) {
-          const p = profiles.find(pr => pr.id === newTip.user_id);
-          const match = matches.find(m => m.id === newTip.match_id);
-          if (p && match) showToast(`${p.name} wytypował(a): ${match.home} vs ${match.away}`);
-        }
-      })
-      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "tips" }, payload => {
-        setTips(prev => prev.map(t => t.id === payload.new.id ? payload.new : t));
-      })
-      .subscribe();
-    return () => supabase.removeChannel(ch);
-  }, [profiles, matches, user.id]);
+  const { upcoming, finished, leagueMatchIds } = useMemo(() => {
+    const lm = matches.filter(m => m.league_id === activeLeague);
+    return {
+      upcoming: lm.filter(m => m.status === "upcoming"),
+      finished: lm.filter(m => m.status === "finished"),
+      leagueMatchIds: lm.map(m => m.id),
+    };
+  }, [matches, activeLeague]);
 
-  // Realtime: wyniki meczów na żywo
-  useEffect(() => {
-    const ch = supabase.channel("matches-realtime")
-      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "matches" }, payload => {
-        setMatches(prev => prev.map(m => m.id === payload.new.id ? payload.new : m));
-        if (payload.new.status === "finished" && payload.old.status !== "finished") {
-          showToast(`⚽ Wynik: ${payload.new.home} ${PICK_LABELS[payload.new.result]} ${payload.new.away}`);
-        }
-      })
-      .subscribe();
-    return () => supabase.removeChannel(ch);
-  }, []);
+  const leaguePolls = useMemo(() => polls.filter(p => p.league_id === activeLeague), [polls, activeLeague]);
+  const lb = useMemo(() => buildLeaderboard(profiles, tips, matches, leagueMatchIds), [profiles, tips, matches, leagueMatchIds]);
+  const roundStars = useMemo(() => buildRoundStars(profiles, tips, finished), [profiles, tips, finished]);
 
-  // Realtime: kto jest online
-  useEffect(() => {
-    const ch = supabase.channel("presence-online", { config: { presence: { key: user.id } } });
-    ch.on("presence", { event: "sync" }, () => {
-      const state = ch.presenceState();
-      const users = Object.values(state).map(arr => arr[0]);
-      setOnlineUsers(users);
-    });
-    ch.subscribe(async status => {
-      if (status === "SUBSCRIBED") {
-        await ch.track({ user_id: user.id, name: profile?.name || "Gracz" });
-      }
-    });
-    return () => supabase.removeChannel(ch);
-  }, [profile?.name]);
-
-  const saveTeam = async (teamName) => {
-    if (!teamName) return;
-    await supabase.from("profiles").update({ favorite_team: teamName }).eq("id", user.id);
-    setProfile(prev => ({ ...prev, favorite_team: teamName }));
-    setShowTeamPicker(false);
-    showToast(`Kibicujesz: ${teamName}!`);
-    await load();
-  };
-
-  const castVote = async (pollId, optionId) => {
-    const { data, error } = await supabase.from("poll_votes")
-      .insert({ poll_id: pollId, option_id: optionId, user_id: user.id })
-      .select().single();
-    if (error) { showToast("⚠️ Błąd zapisu głosu"); return; }
-    setPollVotes(prev => [...prev, data]);
-    showToast("🗳️ Głos oddany!");
-  };
-
-  const addPoll = async () => {
-    if (!newPollQ.trim()) { showToast("Wpisz pytanie"); return; }
-    const validOpts = newPollOpts.filter(o => o.trim());
-    if (validOpts.length < 2) { showToast("Dodaj co najmniej 2 odpowiedzi"); return; }
-    const { data: poll, error } = await supabase.from("polls")
-      .insert({ league_id: activeLeague, question: newPollQ.trim(), status: "active", closes_at: null })
-      .select().single();
-    if (error) { showToast("⚠️ Błąd tworzenia ankiety"); return; }
-    for (const label of validOpts) {
-      await supabase.from("poll_options").insert({ poll_id: poll.id, label: label.trim() });
-    }
-    setNewPollQ(""); setNewPollOpts(["", ""]); setAddPollModal(false);
-    await load(); showToast("✓ Ankieta dodana!");
-  };
-
-  const deletePoll = async (pollId) => {
-    await supabase.from("poll_votes").delete().eq("poll_id", pollId);
-    await supabase.from("poll_options").delete().eq("poll_id", pollId);
-    await supabase.from("polls").delete().eq("id", pollId);
-    await load(); showToast("Ankieta usunięta");
-  };
-
-  const closePoll = async (pollId) => {
-    await supabase.from("polls").update({ status: "closed" }).eq("id", pollId);
-    await load(); showToast("Ankieta zamknięta");
-  };
-
+  const me = lb.find(u => u.id === user.id);
+  const myRank = lb.findIndex(u => u.id === user.id) + 1;
+  const activeLg = leagues.find(l => l.id === activeLeague);
   const myTip = id => tips.find(t => t.user_id === user.id && t.match_id === id);
 
-  const placeTip = async (matchId, pick) => {
-    const match = matches.find(m => m.id === matchId);
-    if (!match || isMatchLocked(match)) { showToast("⛔ Typowanie zamknięte"); return; }
-    const { data, error } = await supabase.from("tips")
-      .upsert({ user_id: user.id, match_id: matchId, pick, points: 0 }, { onConflict: "user_id,match_id" })
-      .select().single();
-    if (error) { showToast("⚠️ Błąd zapisu"); return; }
-    setTips(prev => {
-      const idx = prev.findIndex(t => t.user_id === user.id && t.match_id === matchId);
-      if (idx >= 0) { const u = [...prev]; u[idx] = data; return u; }
-      return [...prev, data];
-    });
-    showToast(`Typ: ${PICK_LABELS[pick]} · +${parseFloat(match[`odds_${pick}`]).toFixed(2)} pkt`);
-  };
+  const isAdmin = profile?.is_admin || (profile?.admin_leagues && activeLeague && profile.admin_leagues.includes(activeLeague));
 
-  const saveResult = async (matchId, result) => {
-    const match = matches.find(m => m.id === matchId);
-    await supabase.from("matches").update({ status: "finished", result }).eq("id", matchId);
-    for (const t of tips.filter(t => t.match_id === matchId)) {
-      await supabase.from("tips").update({ points: t.pick === result ? parseFloat(match[`odds_${result}`]) : 0 }).eq("id", t.id);
+  const saveTeam = async team => {
+    if (!team) return;
+    if (await actions.saveFavoriteTeam(team)) {
+      setProfile(prev => ({ ...prev, favorite_team: team }));
+      setShowTeamPicker(false);
     }
-    await load(); setResultModal(null); showToast("Wynik zapisany!");
   };
-
-  const openEdit = match => {
-    setEditData({ league_id: match.league_id, home: match.home, away: match.away, match_date: match.match_date, match_time: match.match_time?.slice(0, 5), round: match.round, odds_home: parseFloat(match.odds_home).toFixed(2), odds_draw: parseFloat(match.odds_draw).toFixed(2), odds_away: parseFloat(match.odds_away).toFixed(2) });
-    setEditModal(match);
-  };
-
-  const saveEdit = async () => {
-    const { league_id, home, away, match_date, match_time, round, odds_home, odds_draw, odds_away } = editData;
-    if (!home || !away || !match_date) { showToast("Wypełnij wszystkie pola"); return; }
-    await supabase.from("matches").update({ league_id, home, away, home_logo: TEAM_LOGOS[home] || null, away_logo: TEAM_LOGOS[away] || null, match_date, match_time, round, odds_home: parseFloat(odds_home), odds_draw: parseFloat(odds_draw), odds_away: parseFloat(odds_away) }).eq("id", editModal.id);
-    await load(); setEditModal(null); showToast("Zaktualizowano!");
-  };
-
-  const addMatch = async () => {
-    const { league_id, home, away, match_date, match_time, round, odds_home, odds_draw, odds_away } = newMatch;
-    if (!league_id || !home || !away || !match_date || !odds_home) { showToast("Wypełnij wszystkie pola"); return; }
-    await supabase.from("matches").insert({ league_id, home, away, home_logo: TEAM_LOGOS[home] || null, away_logo: TEAM_LOGOS[away] || null, match_date, match_time, round, odds_home: parseFloat(odds_home), odds_draw: parseFloat(odds_draw), odds_away: parseFloat(odds_away), status: "upcoming", result: null });
-    await load(); setAddModal(false); setNewMatch(emptyMatch); showToast("Mecz dodany!");
-  };
-
-  const leagueMatches = matches.filter(m => m.league_id === activeLeague);
-  const upcoming = leagueMatches.filter(m => m.status === "upcoming");
-  const finished = leagueMatches.filter(m => m.status === "finished");
-  const leagueMatchIds = leagueMatches.map(m => m.id);
-  const leaguePolls = polls.filter(p => p.league_id === activeLeague);
-
-  // Gwiazdki za kolejkę
-  const roundStars = {};
-  const rounds = [...new Set(finished.map(m => m.round))];
-  rounds.forEach(round => {
-    const roundMatchIds = finished.filter(m => m.round === round).map(m => m.id);
-    const scores = profiles.map(p => ({
-      id: p.id,
-      pts: tips.filter(t => t.user_id === p.id && roundMatchIds.includes(t.match_id)).reduce((s, t) => s + (t.points || 0), 0),
-    })).filter(p => p.pts > 0);
-    if (scores.length === 0) return;
-    const maxPts = Math.max(...scores.map(s => s.pts));
-    scores.filter(s => s.pts === maxPts).forEach(s => {
-      roundStars[s.id] = (roundStars[s.id] || 0) + 1;
-    });
-  });
-
-  const lb = profiles.map(p => {
-    const myTips = tips.filter(t => t.user_id === p.id && leagueMatchIds.includes(t.match_id));
-    const points = myTips.reduce((s, t) => s + (t.points || 0), 0);
-    const correct = myTips.filter(t => t.points > 0).length;
-    const balance = myTips.reduce((s, t) => {
-      const match = matches.find(m => m.id === t.match_id);
-      if (!match || match.status !== "finished") return s;
-      return t.points > 0 ? s + (parseFloat(match[`odds_${match.result}`]) * 100) - 100 : s - 100;
-    }, 0);
-    return { ...p, points, correct, balance };
-  }).sort((a, b) => b.points - a.points);
-
-  // Ranking globalny (wszystkie ligi) i Ekstraklasa osobno — dla regulaminu
-  const allMatchIds = matches.map(m => m.id);
-  const globalLb = profiles.map(p => ({
-    ...p,
-    points: tips.filter(t => t.user_id === p.id && allMatchIds.includes(t.match_id)).reduce((s, t) => s + (t.points || 0), 0),
-  })).sort((a, b) => b.points - a.points);
-
-  const ekstraklasaId = leagues.find(l => l.name === "Ekstraklasa")?.id;
-  const ekstraMatchIds = matches.filter(m => m.league_id === ekstraklasaId).map(m => m.id);
-  const ekstraLb = profiles.map(p => ({
-    ...p,
-    points: tips.filter(t => t.user_id === p.id && ekstraMatchIds.includes(t.match_id)).reduce((s, t) => s + (t.points || 0), 0),
-  })).sort((a, b) => b.points - a.points);
-
-  const myPts = lb.find(u => u.id === user.id)?.points || 0;
-  const myRank = lb.findIndex(u => u.id === user.id) + 1;
-  const myCorrect = tips.filter(t => t.user_id === user.id && leagueMatchIds.includes(t.match_id) && t.points > 0).length;
-  const activeLg = leagues.find(l => l.id === activeLeague);
-
-  const isAdminOfActiveLeague = profile?.is_admin ||
-    (profile?.admin_leagues && activeLeague && profile.admin_leagues.includes(activeLeague));
 
   const tabs = [
     { key: "matches", icon: "⚽", label: "Mecze" },
     { key: "leaderboard", icon: "🏆", label: "Tabela" },
     { key: "chat", icon: "💬", label: "Czat" },
     { key: "rules", icon: "📋", label: "Regulamin" },
-    ...(isAdminOfActiveLeague ? [{ key: "admin", icon: "⚙️", label: "Admin" }] : []),
+    ...(isAdmin ? [{ key: "admin", icon: "⚙️", label: "Admin" }] : []),
   ];
 
-  if (loading) return (
-    <>
-      <style>{css}</style>
-      <div style={{ minHeight: "100vh", background: "#060a0f", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 12 }}>
-        <div style={{ width: 52, height: 52, background: "linear-gradient(135deg,#0051cc,#007aff)", borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26 }}>⚽</div>
-        <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 14, color: "rgba(96,165,250,0.6)", letterSpacing: 3 }}>ŁADOWANIE</div>
-      </div>
-    </>
-  );
+  if (loading) return <Splash label="ŁADOWANIE" />;
 
   return (
     <>
@@ -983,6 +88,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
       <div className="app">
         {showTeamPicker && <TeamPicker onSave={saveTeam} onSkip={() => setShowTeamPicker(false)} />}
 
+        {/* NAGŁÓWEK */}
         <div className="hdr">
           <div className="hdr-photo" /><div className="hdr-ov" />
           <div className="hdr-ct">
@@ -993,14 +99,13 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
                   <ClubAvatar favoriteTeam={profile?.favorite_team} name={profile?.name || ""} size={26} />
                   <div style={{ minWidth: 0 }}>
                     <div className="uname">{profile?.name || "Ty"}</div>
-                    {onlineUsers.length > 0 && (
-                      <div className="uonline"><span className="uonline-dot" />{onlineUsers.length} online</div>
-                    )}
+                    {onlineUsers.length > 0 && <div className="uonline"><span className="uonline-dot" />{onlineUsers.length} online</div>}
                   </div>
                 </div>
                 <button className="uout" onClick={onLogout}>Wyloguj</button>
               </div>
             </div>
+
             <div className="league-tabs">
               {leagues.map(l => (
                 <button key={l.id} className={`league-tab ${activeLeague === l.id ? "active" : ""}`} onClick={() => setActiveLeague(l.id)} title={l.name}>
@@ -1009,8 +114,13 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
                 </button>
               ))}
             </div>
+
             <div className="stats">
-              {[{ label: "Punkty", value: myPts.toFixed(2), b: true }, { label: "Pozycja", value: `#${myRank}`, b: false }, { label: "Trafione", value: myCorrect, b: false }].map(s => (
+              {[
+                { label: "Punkty", value: (me?.points || 0).toFixed(2), b: true },
+                { label: "Pozycja", value: `#${myRank}` },
+                { label: "Trafione", value: me?.correct || 0 },
+              ].map(s => (
                 <div key={s.label} className="sbox">
                   <div className="slbl">{s.label}</div>
                   <div className={`sval ${s.b ? "b" : ""}`}>{s.value}</div>
@@ -1020,285 +130,23 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
           </div>
         </div>
 
+        {/* ZAKŁADKI */}
         <div className="ct">
+          {tab === "matches" && (
+            <MatchesTab activeLg={activeLg} leaguePolls={leaguePolls} pollOptions={pollOptions} pollVotes={pollVotes}
+              userId={user.id} onVote={actions.castVote} upcoming={upcoming} finished={finished}
+              tips={tips} myTip={myTip} onTip={actions.placeTip} />
+          )}
+          {tab === "leaderboard" && <LeaderboardTab lb={lb} roundStars={roundStars} userId={user.id} activeLg={activeLg} />}
           {tab === "chat" && <ChatTab user={user} profile={profile} profiles={profiles} />}
-
-          {tab === "matches" && <>
-            {leaguePolls.length > 0 && <>
-              <div className="sh">Ankiety</div>
-              {leaguePolls.map(poll => (
-                <PollCard key={poll.id} poll={poll} options={pollOptions} votes={pollVotes} userId={user.id} onVote={castVote} />
-              ))}
-            </>}
-            {upcoming.length === 0 && finished.length === 0 && leaguePolls.length === 0 && (
-              <div className="empty"><div className="ei">📅</div><div className="et">Brak meczów</div><div className="es">{activeLg ? `Admin doda mecze ${activeLg.name}` : "Wybierz ligę"}</div></div>
-            )}
-            {upcoming.length > 0 && <>
-              <div className="sh">Nadchodzące</div>
-              {upcoming.map(match => {
-                const tip = myTip(match.id);
-                const lck = isMatchLocked(match);
-                const featuredTeam = FEATURED_TEAMS[match.home] ? match.home : FEATURED_TEAMS[match.away] ? match.away : null;
-                const ft = featuredTeam ? FEATURED_TEAMS[featuredTeam] : null;
-
-                if (ft) {
-                  return (
-                    <div key={match.id} style={{ borderRadius: 24, overflow: "hidden", marginBottom: 12, boxShadow: `0 0 0 2px ${ft.color}, 0 12px 40px rgba(${ft.colorRgb},0.25)` }}>
-                      <div style={{ position: "relative", height: 190 }}>
-                        <div style={{ position: "absolute", inset: 0, backgroundImage: `url('${ft.photo}')`, backgroundSize: "cover", backgroundPosition: "center", filter: "brightness(0.45) saturate(1.3)" }} />
-                        <div style={{ position: "absolute", inset: 0, background: `linear-gradient(180deg, rgba(${ft.colorRgb},0.15) 0%, rgba(6,10,15,0.55) 55%, ${ft.bgDark} 100%)` }} />
-                        <div style={{ position: "absolute", top: 12, left: 14 }}>
-                          <span style={{ background: "rgba(0,0,0,0.5)", color: "rgba(255,255,255,0.85)", fontSize: 11, fontWeight: 700, padding: "4px 10px", borderRadius: 20, backdropFilter: "blur(6px)" }}>
-                            {match.round}
-                          </span>
-                        </div>
-                        <div style={{ position: "absolute", top: 12, right: 14 }}>
-                          <span style={{ background: "rgba(0,0,0,0.5)", color: "rgba(255,255,255,0.8)", fontSize: 11, fontWeight: 600, padding: "4px 10px", borderRadius: 20, backdropFilter: "blur(6px)" }}>
-                            {match.match_date} · {match.match_time?.slice(0, 5)}
-                          </span>
-                        </div>
-                        <div style={{ position: "absolute", bottom: 14, left: 14, right: 14, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                            <img src={TEAM_LOGOS[match.home]} alt={match.home} style={{ width: match.home === featuredTeam ? 44 : 40, height: match.home === featuredTeam ? 44 : 40, objectFit: "contain", flexShrink: 0, filter: match.home === featuredTeam ? `drop-shadow(0 2px 10px rgba(${ft.colorRgb},0.6))` : "drop-shadow(0 2px 6px rgba(0,0,0,0.5))" }} />
-                            <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: match.home === featuredTeam ? 24 : 20, color: match.home === featuredTeam ? ft.textColor : "#fff", letterSpacing: 0.5, textShadow: match.home === featuredTeam ? `0 0 20px rgba(${ft.colorRgb},0.5)` : "none" }}>
-                              {match.home.toUpperCase()}
-                            </span>
-                          </div>
-                          <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 16, color: "rgba(255,255,255,0.4)", flexShrink: 0 }}>VS</span>
-                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                            <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: match.away === featuredTeam ? 24 : 20, color: match.away === featuredTeam ? ft.textColor : "#fff", letterSpacing: 0.5, textShadow: match.away === featuredTeam ? `0 0 20px rgba(${ft.colorRgb},0.5)` : "none", textAlign: "right" }}>
-                              {match.away.toUpperCase()}
-                            </span>
-                            <img src={TEAM_LOGOS[match.away]} alt={match.away} style={{ width: match.away === featuredTeam ? 44 : 40, height: match.away === featuredTeam ? 44 : 40, objectFit: "contain", flexShrink: 0, filter: match.away === featuredTeam ? `drop-shadow(0 2px 10px rgba(${ft.colorRgb},0.6))` : "drop-shadow(0 2px 6px rgba(0,0,0,0.5))" }} />
-                          </div>
-                        </div>
-                      </div>
-                      <div style={{ background: ft.bgDark, padding: 14 }}>
-                        <div className="odds">
-                          {["home","draw","away"].map(pick => {
-                            const isSel = tip?.pick === pick && !lck;
-                            return (
-                              <button key={pick} className={`odd ${lck && tip?.pick !== pick ? "no" : ""}`} onClick={() => placeTip(match.id, pick)} disabled={lck}
-                                style={isSel ? { background: `rgba(${ft.colorRgb},0.15)`, borderColor: ft.color } : {}}>
-                                <div className="ol" style={isSel ? { color: ft.textColor } : {}}>{PICK_LABELS[pick]}</div>
-                                <div className="ov" style={isSel ? { color: ft.textColor } : {}}>{parseFloat(match[`odds_${pick}`]).toFixed(2)}</div>
-                              </button>
-                            );
-                          })}
-                        </div>
-                        {lck && <div className="lck">⛔ Typowanie zamknięte</div>}
-                        {!lck && tip && <div style={{ marginTop: 10, background: `rgba(${ft.colorRgb},0.1)`, border: `1px solid rgba(${ft.colorRgb},0.3)`, borderRadius: 10, padding: "8px 12px", fontSize: 13, color: ft.textColor, fontWeight: 600 }}>✓ Typ: {PICK_LABELS[tip.pick]} · +{parseFloat(match[`odds_${tip.pick}`]).toFixed(2)} pkt</div>}
-                        <TipDistribution matchId={match.id} tips={tips} />
-                      </div>
-                    </div>
-                  );
-                }
-
-                return (
-                  <div key={match.id} className="mc">
-                    <div className="mt2">
-                      <span className="rbadge">{match.round}</span>
-                      <span className="mtime">{match.match_date} · {match.match_time?.slice(0, 5)}</span>
-                    </div>
-                    <div className="mb2">
-                      <div className="tms">
-                        <div className="tm"><TeamLogo name={match.home} size={30} /><span className="tn">{match.home}</span></div>
-                        <div className="vs-sep"><span className="vs-txt">VS</span></div>
-                        <div className="tm r"><TeamLogo name={match.away} size={30} /><span className="tn">{match.away}</span></div>
-                      </div>
-                      <div className="odds">
-                        {["home","draw","away"].map(pick => (
-                          <button key={pick} className={`odd ${tip?.pick === pick && !lck ? "sel" : ""} ${lck && tip?.pick !== pick ? "no" : ""}`} onClick={() => placeTip(match.id, pick)} disabled={lck}>
-                            <div className="ol">{PICK_LABELS[pick]}</div>
-                            <div className="ov">{parseFloat(match[`odds_${pick}`]).toFixed(2)}</div>
-                          </button>
-                        ))}
-                      </div>
-                      {lck && <div className="lck">⛔ Typowanie zamknięte</div>}
-                      {!lck && tip && <div className="tipok">✓ Typ: {PICK_LABELS[tip.pick]} · +{parseFloat(match[`odds_${tip.pick}`]).toFixed(2)} pkt</div>}
-                      <TipDistribution matchId={match.id} tips={tips} />
-                    </div>
-                  </div>
-                );
-              })}
-            </>}
-            {finished.length > 0 && <FinishedMatches matches={finished} myTip={myTip} />}
-          </>}
-
-          {tab === "leaderboard" && <>
-            <div className="sh">Klasyfikacja — {activeLg?.flag} {activeLg?.name}</div>
-            {lb.length === 0 && <div className="empty"><div className="ei">🏆</div><div className="et">Brak uczestników</div></div>}
-            <div className="lbc">
-              {lb.map((u, i) => (
-                <div key={u.id} className={`lbr ${u.id === user.id ? "me" : ""}`}>
-                  <div className="lbrank">{i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : <span className="lbrn">#{i + 1}</span>}</div>
-                  <ClubAvatar favoriteTeam={u.favorite_team} name={u.name} size={36} />
-                  <div style={{ flex: 1 }}>
-                    <div className="lbn">
-                      {u.name}
-                      {u.id === user.id && <span className="lbme">TY</span>}
-                      {roundStars[u.id] > 0 && (
-                        <span style={{ fontSize: 11, fontWeight: 700, color: "#fbbf24", background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.2)", padding: "1px 7px", borderRadius: 20 }}>
-                          ⭐ ×{roundStars[u.id]}
-                        </span>
-                      )}
-                    </div>
-                    <div className="lbs">
-                      {u.correct} trafione ·{" "}
-                      <span style={{ color: u.balance >= 0 ? "#34c759" : "#ff3b30", fontWeight: 700 }}>
-                        {u.balance >= 0 ? "+" : ""}{u.balance.toFixed(0)} zł
-                      </span>
-                    </div>
-                  </div>
-                  <div style={{ textAlign: "right" }}>
-                    <div className={`lbp ${i === 0 ? "top" : "nm"}`}>{u.points.toFixed(2)}</div>
-                    <div className="lbpl">PKT</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </>}
-
-          {tab === "rules" && <>
-            <div className="sh">Nagrody</div>
-            <div className="rc" style={{ marginBottom: 10 }}>
-              {[
-                { emoji: "🥇", name: "1. miejsce (wszystkie ligi)", amount: "100 zł", color: "#ffd700", bg: "rgba(255,215,0,0.08)", leader: globalLb[0] },
-                { emoji: "🥈", name: "2. miejsce (wszystkie ligi)", amount: "30 zł", color: "#c0c0c0", bg: "rgba(192,192,192,0.08)", leader: globalLb[1] },
-                { emoji: "🥉", name: "3. miejsce (wszystkie ligi)", amount: "20 zł", color: "#cd7f32", bg: "rgba(205,127,50,0.08)", leader: globalLb[2] },
-                { emoji: "🏆", name: "Klasyfikacja Ekstraklasy — 1. miejsce", amount: "100 zł", color: "#f97316", bg: "rgba(249,115,22,0.08)", leader: ekstraLb[0] },
-              ].map((r, i, arr) => (
-                <div key={r.name} className="prow" style={{ borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", flexDirection: "column", alignItems: "flex-start", gap: 8 }}>
-                  <div style={{ display: "flex", alignItems: "center", width: "100%", gap: 12 }}>
-                    <div className="pic2" style={{ background: r.bg }}>{r.emoji}</div>
-                    <div style={{ flex: 1 }}><div className="pnm">{r.name}</div></div>
-                    <div className="pamt" style={{ color: r.color }}>{r.amount}</div>
-                  </div>
-                  {r.leader && r.leader.points > 0 ? (
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, paddingLeft: 60, width: "100%" }}>
-                      <ClubAvatar favoriteTeam={r.leader.favorite_team} name={r.leader.name} size={22} />
-                      <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.7)" }}>{r.leader.name}</span>
-                      {r.leader.id === user.id && <span className="lbme">TY</span>}
-                      <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.4)" }}>{r.leader.points.toFixed(2)} pkt</span>
-                    </div>
-                  ) : (
-                    <div style={{ paddingLeft: 60, fontSize: 12, color: "rgba(255,255,255,0.2)" }}>Brak danych</div>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            <div className="sh" style={{ marginTop: 16 }}>Zasady gry</div>
-            {[
-              { icon: "⏱️", bg: "rgba(0,122,255,0.1)", title: "Typowanie", text: "Wybierasz wynik meczu: 1, X lub 2. Typ możesz zmienić przed godziną startu — po jej upływie typowanie jest zablokowane." },
-              { icon: "🎯", bg: "rgba(255,59,48,0.1)", title: "Punktacja", text: "Za trafiony typ dostajesz tyle punktów ile wynosił kurs bukmacherski. Za chybiony typ — 0 punktów." },
-              { icon: "⭐", bg: "rgba(251,191,36,0.1)", title: "Gwiazdki za kolejkę", text: "Gracz z najwyższą sumą punktów w danej kolejce zdobywa gwiazdkę ⭐. Przy remisie gwiazdkę dostają wszyscy z najwyższym wynikiem. Licznik gwiazdek widoczny jest w rankingu." },
-              { icon: "🏆", bg: "rgba(0,122,255,0.08)", title: "Klasyfikacja", text: "Wygrywa gracz z największą sumą punktów po zakończeniu sezonu — licząc wszystkie ligi razem. Ekstraklasa ma dodatkowo osobny ranking z nagrodą 100 zł." },
-            ].map(s => (
-              <div key={s.title} className="rc" style={{ marginBottom: 8 }}>
-                <div className="rrow"><div className="ric" style={{ background: s.bg }}>{s.icon}</div><div><div className="rtit">{s.title}</div><div className="rtxt">{s.text}</div></div></div>
-              </div>
-            ))}
-          </>}
-
-          {tab === "admin" && isAdminOfActiveLeague && <>
-            <div className="sh">Panel — {activeLg?.name}</div>
-            <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
-              <button className="mprim" style={{ flex: 1 }} onClick={() => setAddModal(true)}>+ Mecz</button>
-              <button onClick={() => setAddPollModal(true)}
-                style={{ flex: 1, padding: 14, background: "rgba(167,139,250,0.1)", border: "1px solid rgba(167,139,250,0.25)", borderRadius: 14, color: "#a78bfa", fontFamily: "inherit", fontSize: 15, fontWeight: 700, cursor: "pointer" }}>
-                + Ankieta
-              </button>
-            </div>
-
-            {leaguePolls.length > 0 && <>
-              <div className="sh">Ankiety</div>
-              <div className="rc" style={{ marginBottom: 16 }}>
-                {leaguePolls.map((poll, i, arr) => (
-                  <div key={poll.id} style={{ padding: "12px 16px", borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "#fff", marginBottom: 4 }}>{poll.question}</div>
-                    <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginBottom: 8 }}>
-                      {pollVotes.filter(v => v.poll_id === poll.id).length} głosów ·{" "}
-                      <span style={{ color: poll.status === "active" ? "#34c759" : "#ff9500" }}>{poll.status === "active" ? "Aktywna" : "Zamknięta"}</span>
-                    </div>
-                    <div style={{ display: "flex", gap: 6 }}>
-                      {poll.status === "active" && (
-                        <button onClick={() => closePoll(poll.id)}
-                          style={{ padding: "5px 12px", background: "rgba(255,149,0,0.1)", border: "1px solid rgba(255,149,0,0.25)", color: "#ff9500", borderRadius: 10, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
-                          Zamknij
-                        </button>
-                      )}
-                      <button onClick={() => deletePoll(poll.id)}
-                        style={{ padding: "5px 12px", background: "rgba(255,59,48,0.08)", border: "1px solid rgba(255,59,48,0.2)", color: "#ff3b30", borderRadius: 10, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
-                        Usuń
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </>}
-
-            {upcoming.length > 0 && <>
-              <div className="sh">Nadchodzące</div>
-              <div className="rc" style={{ marginBottom: 10 }}>
-                {upcoming.map((m, i) => {
-                  const notTipped = profiles.filter(p => !tips.find(t => t.match_id === m.id && t.user_id === p.id));
-                  return (
-                    <div key={m.id} style={{ borderBottom: i < upcoming.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
-                      <div className="ar" style={{ borderBottom: "none" }}>
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div className="an">{m.home} vs {m.away}</div>
-                          <div className="at">{m.match_date} · {m.match_time?.slice(0, 5)} · {m.round}</div>
-                        </div>
-                        <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
-                          <button className="aedt" onClick={() => openEdit(m)}>Edytuj</button>
-                          <button className="ares-btn" onClick={() => setResultModal(m)}>Wynik</button>
-                        </div>
-                      </div>
-                      <div style={{ padding: "0 16px 12px" }}>
-                        {notTipped.length === 0 ? (
-                          <div style={{ fontSize: 11, color: "#34c759", fontWeight: 600 }}>✓ Wszyscy wytypowali</div>
-                        ) : (
-                          <>
-                            <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(255,255,255,0.3)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 5 }}>
-                              Brak typu ({notTipped.length}):
-                            </div>
-                            <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-                              {notTipped.map(p => (
-                                <span key={p.id} style={{ fontSize: 11, fontWeight: 600, color: "#ff9500", background: "rgba(255,149,0,0.08)", border: "1px solid rgba(255,149,0,0.2)", padding: "2px 9px", borderRadius: 20 }}>
-                                  {p.name}
-                                </span>
-                              ))}
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </>}
-
-            {finished.length > 0 && <>
-              <div className="sh">Zakończone</div>
-              <div className="rc">
-                {finished.map((m, i) => (
-                  <div key={m.id} className="ar" style={{ borderBottom: i < finished.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div className="an">{m.home} vs {m.away}</div>
-                      <div className="at" style={{ color: "#60a5fa" }}>Wynik: {PICK_LABELS[m.result]}</div>
-                    </div>
-                    <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
-                      <button className="aedt" onClick={() => openEdit(m)}>Edytuj</button>
-                      <button className="ares-btn" onClick={() => setResultModal(m)}>Popraw</button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </>}
-          </>}
+          {tab === "rules" && <RulesTab profiles={profiles} tips={tips} matches={matches} leagues={leagues} userId={user.id} />}
+          {tab === "admin" && isAdmin && (
+            <AdminTab activeLeague={activeLeague} activeLg={activeLg} leagues={leagues} upcoming={upcoming} finished={finished}
+              leaguePolls={leaguePolls} pollVotes={pollVotes} profiles={profiles} tips={tips} actions={actions} />
+          )}
         </div>
 
+        {/* NAWIGACJA */}
         <div className="nav">
           {tabs.map(t => (
             <button key={t.key} className={`ni ${tab === t.key ? "on" : ""}`} onClick={() => setTab(t.key)}>
@@ -1309,89 +157,13 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
           ))}
         </div>
 
-        {resultModal && (
-          <div className="mo" onClick={() => setResultModal(null)}>
-            <div className="mbox" onClick={e => e.stopPropagation()}>
-              <div className="mh" />
-              <div className="mtt">{resultModal.home} vs {resultModal.away}</div>
-              <div className="mst">Wybierz wynik meczu</div>
-              <div style={{ display: "flex", gap: 10 }}>
-                {["home","draw","away"].map(pick => (
-                  <button key={pick} className="rbtn" onClick={() => saveResult(resultModal.id, pick)}>
-                    <div style={{ fontSize: 22, fontWeight: 700 }}>{PICK_LABELS[pick]}</div>
-                    <div style={{ fontSize: 11, marginTop: 4, color: "rgba(255,255,255,0.4)" }}>{PICK_NAMES[pick]}</div>
-                  </button>
-                ))}
-              </div>
-              <button className="msec" style={{ marginTop: 12 }} onClick={() => setResultModal(null)}>Anuluj</button>
-            </div>
-          </div>
-        )}
-
-        {addModal && (
-          <div className="mo" onClick={() => setAddModal(false)}>
-            <div className="mbox" onClick={e => e.stopPropagation()}>
-              <div className="mh" /><div className="mtt">Dodaj mecz ⚽</div><div className="mst">Wypełnij dane meczu</div>
-              <MatchFormFields data={newMatch} onChange={setNewMatch} leagues={leagues} />
-              <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 16 }}>
-                <button className="mprim" onClick={addMatch}>Dodaj mecz</button>
-                <button className="msec" onClick={() => setAddModal(false)}>Anuluj</button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {editModal && (
-          <div className="mo" onClick={() => setEditModal(null)}>
-            <div className="mbox" onClick={e => e.stopPropagation()}>
-              <div className="mh" /><div className="mtt">Edytuj mecz ✏️</div><div className="mst">Zmień dane meczu</div>
-              <MatchFormFields data={editData} onChange={setEditData} leagues={leagues} />
-              <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 16 }}>
-                <button className="mprim" onClick={saveEdit}>Zapisz zmiany</button>
-                <button className="msec" onClick={() => setEditModal(null)}>Anuluj</button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {addPollModal && (
-          <div className="mo" onClick={() => setAddPollModal(false)}>
-            <div className="mbox" onClick={e => e.stopPropagation()}>
-              <div className="mh" />
-              <div className="mtt">🗳️ Dodaj ankietę</div>
-              <div className="mst">Zbierz opinie od uczestników</div>
-              <input className="mi" placeholder="Pytanie (np. Który trener odejdzie pierwszy?)" value={newPollQ} onChange={e => setNewPollQ(e.target.value)} />
-              <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.4)", letterSpacing: 1, textTransform: "uppercase", margin: "4px 0 8px" }}>Odpowiedzi</div>
-              {newPollOpts.map((opt, i) => (
-                <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-                  <input className="mi" style={{ marginBottom: 0, flex: 1 }} placeholder={`Odpowiedź ${i + 1}`} value={opt} onChange={e => { const o = [...newPollOpts]; o[i] = e.target.value; setNewPollOpts(o); }} />
-                  {newPollOpts.length > 2 && (
-                    <button onClick={() => setNewPollOpts(prev => prev.filter((_, j) => j !== i))}
-                      style={{ padding: "0 14px", background: "rgba(255,59,48,0.08)", border: "1px solid rgba(255,59,48,0.2)", color: "#ff3b30", borderRadius: 12, cursor: "pointer", fontFamily: "inherit", fontSize: 18, flexShrink: 0 }}>✕</button>
-                  )}
-                </div>
-              ))}
-              {newPollOpts.length < 6 && (
-                <button onClick={() => setNewPollOpts(prev => [...prev, ""])}
-                  style={{ width: "100%", padding: "10px", background: "rgba(167,139,250,0.06)", border: "1px dashed rgba(167,139,250,0.25)", borderRadius: 12, color: "#a78bfa", fontFamily: "inherit", fontSize: 13, fontWeight: 600, cursor: "pointer", marginBottom: 16 }}>
-                  + Dodaj odpowiedź
-                </button>
-              )}
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                <button className="mprim" onClick={addPoll}>Dodaj ankietę</button>
-                <button className="msec" onClick={() => setAddPollModal(false)}>Anuluj</button>
-              </div>
-            </div>
-          </div>
-        )}
-
         {toast && <div className="toast">{toast}</div>}
       </div>
     </>
   );
 }
 
-// ── ROOT ──────────────────────────────────────────────────────────────────────
+// ── LOGOWANIE / SESJA ─────────────────────────────────────────────────────────
 export default function App() {
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
@@ -1414,14 +186,7 @@ export default function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  if (checking) return (
-    <>
-      <style>{css}</style>
-      <div style={{ minHeight: "100vh", background: "#060a0f", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ width: 52, height: 52, background: "linear-gradient(135deg,#0051cc,#007aff)", borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26 }}>⚽</div>
-      </div>
-    </>
-  );
+  if (checking) return <Splash />;
 
   return user
     ? <MainApp user={user} profile={profile} onLogout={() => supabase.auth.signOut()} />
