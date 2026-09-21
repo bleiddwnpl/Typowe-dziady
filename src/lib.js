@@ -206,3 +206,56 @@ export function buildRoundStars(profiles, tips, finishedMatches) {
   });
   return stars;
 }
+
+// ── PODSUMOWANIE KOLEJKI ──────────────────────────────────────────────────────
+const kickoffKey = m => `${m.match_date}T${m.match_time?.slice(0, 5)}`;
+
+export const pickLabel = (m, pick) =>
+  pick === "draw" ? `Remis ${m.home} – ${m.away}` : `Wygrana ${pick === "home" ? m.home : m.away} (${m.home} – ${m.away})`;
+
+// Ostatnia w pełni rozegrana kolejka ligi. Zwraca null, gdy nie ma czego pokazać
+// albo gdy wystartował już pierwszy mecz kolejnej kolejki.
+export function buildRoundSummary(leagueMatches, tips, profiles) {
+  const byRound = {};
+  leagueMatches.forEach(m => { (byRound[m.round] = byRound[m.round] || []).push(m); });
+  const completed = Object.entries(byRound)
+    .filter(([, ms]) => ms.every(m => m.status === "finished"))
+    .map(([round, ms]) => ({ round, ms, last: ms.map(kickoffKey).sort()[ms.length - 1] }))
+    .sort((a, b) => a.last.localeCompare(b.last));
+  const latest = completed[completed.length - 1];
+  if (!latest) return null;
+
+  const nextStarted = leagueMatches.some(m =>
+    m.round !== latest.round && kickoffKey(m) > latest.last && (m.status === "finished" || isMatchLocked(m)));
+  if (nextStarted) return null;
+
+  const ids = new Set(latest.ms.map(m => m.id));
+  const byId = new Map(latest.ms.map(m => [m.id, m]));
+  const roundTips = tips.filter(t => ids.has(t.match_id));
+
+  const players = profiles.map(p => {
+    const mine = roundTips.filter(t => t.user_id === p.id);
+    return { profile: p, tipped: mine.length, pts: mine.reduce((s, t) => s + (t.points || 0), 0), correct: mine.filter(t => t.points > 0).length };
+  }).filter(x => x.tipped > 0).sort((a, b) => b.pts - a.pts || b.correct - a.correct);
+  if (players.length === 0) return null;
+
+  // Miejsca z remisami: ten sam wynik = to samo miejsce
+  const ranked = players.map(x => ({ ...x, pos: 1 + players.filter(y => y.pts > x.pts).length }));
+
+  const maxOdds = Math.max(0, ...roundTips.map(t => t.points || 0));
+  const bestTips = maxOdds > 0 ? roundTips.filter(t => t.points === maxOdds) : [];
+  const bestNames = [...new Set(bestTips.map(t => profiles.find(p => p.id === t.user_id)?.name).filter(Boolean))];
+  const best = bestTips.length ? { odds: maxOdds, names: bestNames, detail: pickLabel(byId.get(bestTips[0].match_id), bestTips[0].pick) } : null;
+
+  const worst = players[players.length - 1];
+  const flop = players.length > 1 && worst.pts < players[0].pts ? worst : null;
+
+  return {
+    round: latest.round,
+    matchCount: latest.ms.length,
+    playerCount: players.length,
+    top: ranked.filter(x => x.pos <= 3).slice(0, 5),
+    best,
+    flop,
+  };
+}
