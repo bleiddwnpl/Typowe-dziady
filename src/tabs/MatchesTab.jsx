@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { PICK_LABELS } from "../lib";
-import { TeamLogo, PollCard, MatchCard } from "../components";
+import { TeamLogo, PollCard, MatchCard, PickReveal } from "../components";
 
 // ── FINISHED MATCHES ──────────────────────────────────────────────────────────
-function FinishedMatches({ matches, myTip }) {
+function FinishedMatches({ matches, myTip, tips, profiles, userId }) {
   const [open, setOpen] = useState(false);
   return (
     <div style={{ marginTop: 8 }}>
@@ -42,6 +42,7 @@ function FinishedMatches({ matches, myTip }) {
                       </button>
                     ))}
                   </div>
+                  <PickReveal match={match} tips={tips} profiles={profiles} userId={userId} />
                 </div>
               </div>
             );
@@ -53,7 +54,7 @@ function FinishedMatches({ matches, myTip }) {
 }
 
 // ── ZAKŁADKA MECZE ────────────────────────────────────────────────────────────
-export default function MatchesTab({ activeLg, leaguePolls, pollOptions, pollVotes, userId, onVote, upcoming, finished, tips, myTip, onTip }) {
+export default function MatchesTab({ activeLg, leaguePolls, pollOptions, pollVotes, userId, onVote, upcoming, finished, tips, tipStats, profiles, myTip, onTip, onLocked, missingCount }) {
   return (
     <>
       {leaguePolls.length > 0 && <>
@@ -72,13 +73,17 @@ export default function MatchesTab({ activeLg, leaguePolls, pollOptions, pollVot
       )}
 
       {upcoming.length > 0 && <>
-        <div className="sh">Nadchodzące</div>
+        <div className="sh" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span>Nadchodzące</span>
+          {missingCount > 0 && <span style={{ color: "#ff9500", letterSpacing: 0, textTransform: "none", fontSize: 12 }}>{missingCount} bez typu</span>}
+        </div>
         {upcoming.map(match => (
-          <MatchCard key={match.id} match={match} tip={myTip(match.id)} tips={tips} onTip={onTip} />
+          <MatchCard key={match.id} match={match} tip={myTip(match.id)} stats={tipStats[match.id]} tips={tips}
+            profiles={profiles} userId={userId} onTip={onTip} onLocked={onLocked} />
         ))}
       </>}
 
-      {finished.length > 0 && <FinishedMatches matches={finished} myTip={myTip} />}
+      {finished.length > 0 && <FinishedMatches matches={finished} myTip={myTip} tips={tips} profiles={profiles} userId={userId} />}
     </>
   );
 }
