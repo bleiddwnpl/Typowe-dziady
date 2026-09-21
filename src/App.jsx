@@ -9,6 +9,7 @@ import MatchesTab from "./tabs/MatchesTab";
 import LeaderboardTab from "./tabs/LeaderboardTab";
 import ChatTab from "./tabs/ChatTab";
 import RulesTab from "./tabs/RulesTab";
+import StatsTab from "./tabs/StatsTab";
 import AdminTab from "./tabs/AdminTab";
 
 function Splash({ label }) {
@@ -86,6 +87,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
   const tabs = [
     { key: "matches", icon: "⚽", label: "Mecze" },
     { key: "leaderboard", icon: "🏆", label: "Tabela" },
+    { key: "stats", icon: "📊", label: "Statystyki" },
     { key: "chat", icon: "💬", label: "Czat" },
     { key: "rules", icon: "📋", label: "Regulamin" },
     ...(isAdmin ? [{ key: "admin", icon: "⚙️", label: "Admin" }] : []),
@@ -151,7 +153,8 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
               tips={tips} tipStats={tipStats} profiles={profiles} myTip={myTip} onTip={actions.placeTip}
               onLocked={actions.refreshMatchTips} missingCount={missingByLeague[activeLeague] || 0} />
           )}
-          {tab === "leaderboard" && <LeaderboardTab lb={lb} roundStars={roundStars} userId={user.id} activeLg={activeLg} />}
+          {tab === "leaderboard" && <LeaderboardTab lb={lb} roundStars={roundStars} userId={user.id} activeLg={activeLg} finished={finished} tips={tips} />}
+          {tab === "stats" && <StatsTab profiles={profiles} tips={tips} matches={matches} leagues={leagues} userId={user.id} />}
           {tab === "chat" && <ChatTab user={user} profile={profile} profiles={profiles} />}
           {tab === "rules" && <RulesTab profiles={profiles} tips={tips} matches={matches} leagues={leagues} userId={user.id} />}
           {tab === "admin" && isAdmin && (
