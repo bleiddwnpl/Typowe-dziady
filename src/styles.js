@@ -172,8 +172,7 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 .es { font-size:13px; margin-top:4px; }
 
 .league-tab .lbadge { position:absolute; top:-6px; right:-6px; min-width:20px; height:20px; padding:0 5px; border-radius:10px; background:#ff3b30; color:#fff; font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center; border:2px solid #060a0f; }
-.mc.missing { border-color:rgba(255,149,0,0.45); }
-.miss-chip { font-size:11px; color:#ff9500; background:rgba(255,149,0,0.1); border:1px solid rgba(255,149,0,0.3); padding:3px 10px; border-radius:20px; font-weight:700; }
+.mc.missing { border-color:rgba(255,59,48,0.65); }
 .picks-hidden { margin-top:12px; padding:10px 12px; border-radius:12px; background:rgba(255,255,255,0.03); border:1px dashed rgba(255,255,255,0.12); font-size:12px; color:rgba(255,255,255,0.45); text-align:center; }
 .picks { margin-top:12px; display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
 .pcol { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:8px 6px; min-width:0; }
