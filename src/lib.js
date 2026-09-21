@@ -1,3 +1,4 @@
+
 import { createClient } from "@supabase/supabase-js";
 
 // ── SUPABASE ──────────────────────────────────────────────────────────────────
@@ -215,14 +216,18 @@ export const pickLabel = (m, pick) =>
 
 // Ostatnia w pełni rozegrana kolejka ligi. Zwraca null, gdy nie ma czego pokazać
 // albo gdy wystartował już pierwszy mecz kolejnej kolejki.
-export function buildRoundSummary(leagueMatches, tips, profiles) {
+function latestCompletedRound(leagueMatches) {
   const byRound = {};
   leagueMatches.forEach(m => { (byRound[m.round] = byRound[m.round] || []).push(m); });
   const completed = Object.entries(byRound)
     .filter(([, ms]) => ms.every(m => m.status === "finished"))
     .map(([round, ms]) => ({ round, ms, last: ms.map(kickoffKey).sort()[ms.length - 1] }))
     .sort((a, b) => a.last.localeCompare(b.last));
-  const latest = completed[completed.length - 1];
+  return completed[completed.length - 1] || null;
+}
+
+export function buildRoundSummary(leagueMatches, tips, profiles) {
+  const latest = latestCompletedRound(leagueMatches);
   if (!latest) return null;
 
   const nextStarted = leagueMatches.some(m =>
@@ -311,4 +316,30 @@ export function buildGroupRecords(profiles, statsById) {
     ["Najwyższy trafiony kurs", top(s => s.bestOdds?.odds ?? null), v => v.toFixed(2), ""],
   ];
   return recs.filter(([, r]) => r).map(([label, r, fmt, hint]) => ({ label, value: fmt(r.value), people: r.people, hint }));
+}
+
+// ── ZMIANY POZYCJI W TABELI ───────────────────────────────────────────────────
+// Miejsce przed ostatnią w pełni rozegraną kolejką kontra miejsce teraz.
+// Ten sam wynik = to samo miejsce. Zwraca null po pierwszej kolejce sezonu.
+export function buildRankChanges(profiles, tips, leagueMatches) {
+  const latest = latestCompletedRound(leagueMatches);
+  if (!latest) return null;
+  const finishedIds = leagueMatches.filter(m => m.status === "finished").map(m => m.id);
+  const roundIds = new Set(latest.ms.map(m => m.id));
+  const beforeIds = finishedIds.filter(id => !roundIds.has(id));
+  if (beforeIds.length === 0) return null;
+
+  const positions = ids => {
+    const set = new Set(ids);
+    const pts = Object.fromEntries(profiles.map(p => [p.id,
+      tips.filter(t => t.user_id === p.id && set.has(t.match_id)).reduce((s, t) => s + (t.points || 0), 0)]));
+    const vals = Object.values(pts);
+    return Object.fromEntries(profiles.map(p => [p.id, 1 + vals.filter(v => v > pts[p.id]).length]));
+  };
+  const before = positions(beforeIds);
+  const now = positions(finishedIds);
+  return {
+    round: latest.round,
+    changes: Object.fromEntries(profiles.map(p => [p.id, before[p.id] - now[p.id]])),
+  };
 }
