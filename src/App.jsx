@@ -1,5 +1,6 @@
+
 import { useState, useEffect, useMemo } from "react";
-import { supabase, LEAGUE_LOGOS, buildLeaderboard, buildRoundStars, isMatchLocked } from "./lib";
+import { supabase, LEAGUE_LOGOS, buildLeaderboard, buildRoundStars, buildRankChanges, isMatchLocked } from "./lib";
 import { css } from "./styles";
 import { ClubAvatar, TeamPicker } from "./components";
 import { useAppData } from "./useAppData";
@@ -58,6 +59,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
   const leaguePolls = useMemo(() => polls.filter(p => p.league_id === activeLeague), [polls, activeLeague]);
   const lb = useMemo(() => buildLeaderboard(profiles, tips, matches, leagueMatchIds), [profiles, tips, matches, leagueMatchIds]);
   const roundStars = useMemo(() => buildRoundStars(profiles, tips, finished), [profiles, tips, finished]);
+  const rankChanges = useMemo(() => buildRankChanges(profiles, tips, [...upcoming, ...finished]), [profiles, tips, upcoming, finished]);
 
   // Ile nadchodzących meczów bez mojego typu w każdej lidze (odświeża się co minutę razem z rozkładem typów)
   const missingByLeague = useMemo(() => {
@@ -153,7 +155,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
               tips={tips} tipStats={tipStats} profiles={profiles} myTip={myTip} onTip={actions.placeTip}
               onLocked={actions.refreshMatchTips} missingCount={missingByLeague[activeLeague] || 0} />
           )}
-          {tab === "leaderboard" && <LeaderboardTab lb={lb} roundStars={roundStars} userId={user.id} activeLg={activeLg} finished={finished} tips={tips} />}
+          {tab === "leaderboard" && <LeaderboardTab lb={lb} roundStars={roundStars} rankChanges={rankChanges} userId={user.id} activeLg={activeLg} finished={finished} tips={tips} />}
           {tab === "stats" && <StatsTab profiles={profiles} tips={tips} matches={matches} leagues={leagues} userId={user.id} />}
           {tab === "chat" && <ChatTab user={user} profile={profile} profiles={profiles} />}
           {tab === "rules" && <RulesTab profiles={profiles} tips={tips} matches={matches} leagues={leagues} userId={user.id} />}
