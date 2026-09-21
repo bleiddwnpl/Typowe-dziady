@@ -184,4 +184,18 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 .pwho.me span { color:#60a5fa; font-weight:800; }
 .pnone { font-size:10px; color:rgba(255,255,255,0.25); text-align:center; padding:4px 0; }
 .pmissing { margin-top:8px; font-size:11px; color:rgba(255,149,0,0.85); font-weight:600; }
+
+.rs { border-radius:22px; overflow:hidden; border:1px solid rgba(251,191,36,0.3); background:linear-gradient(160deg, rgba(251,191,36,0.10), rgba(255,255,255,0.02) 55%); margin-bottom:14px; }
+.rs-top { padding:12px 14px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.06); }
+.rs-title { font-family:'Bebas Neue',sans-serif; font-size:20px; color:#fff; letter-spacing:1px; }
+.rs-sub { font-size:11px; color:rgba(255,255,255,0.45); font-weight:600; }
+.rs-x { width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,0.06); border:none; color:rgba(255,255,255,0.5); font-size:13px; cursor:pointer; flex-shrink:0; }
+.rs-sec { font-size:10px; font-weight:700; color:rgba(255,255,255,0.45); text-transform:uppercase; letter-spacing:0.8px; padding:10px 14px 2px; }
+.rs-row { display:flex; align-items:center; gap:10px; padding:8px 14px; }
+.rs-pos { width:22px; text-align:center; font-family:'Bebas Neue',sans-serif; font-size:18px; color:rgba(255,255,255,0.5); flex-shrink:0; }
+.rs-name { font-size:14px; font-weight:700; color:#fff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.rs-det { font-size:11px; color:rgba(255,255,255,0.45); margin-top:1px; }
+.rs-val { margin-left:auto; font-family:'Bebas Neue',sans-serif; font-size:22px; text-align:right; flex-shrink:0; }
+.rs-hl { display:flex; align-items:center; gap:10px; padding:11px 14px; border-top:1px solid rgba(255,255,255,0.06); }
+.rs-ic { width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:17px; flex-shrink:0; }
 `;
