@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { supabase, LEAGUE_LOGOS, buildLeaderboard, buildRoundStars } from "./lib";
+import { supabase, LEAGUE_LOGOS, buildLeaderboard, buildRoundStars, isMatchLocked } from "./lib";
 import { css } from "./styles";
 import { ClubAvatar, TeamPicker } from "./components";
 import { useAppData } from "./useAppData";
@@ -31,7 +31,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
   const [showTeamPicker, setShowTeamPicker] = useState(false);
 
   const data = useAppData(user, profile);
-  const { leagues, matches, tips, profiles, polls, pollOptions, pollVotes, loading, toast, onlineUsers, actions } = data;
+  const { leagues, matches, tips, tipStats, profiles, polls, pollOptions, pollVotes, loading, toast, onlineUsers, actions } = data;
 
   // Domyślnie pierwsza liga
   useEffect(() => {
@@ -57,6 +57,16 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
   const leaguePolls = useMemo(() => polls.filter(p => p.league_id === activeLeague), [polls, activeLeague]);
   const lb = useMemo(() => buildLeaderboard(profiles, tips, matches, leagueMatchIds), [profiles, tips, matches, leagueMatchIds]);
   const roundStars = useMemo(() => buildRoundStars(profiles, tips, finished), [profiles, tips, finished]);
+
+  // Ile nadchodzących meczów bez mojego typu w każdej lidze (odświeża się co minutę razem z rozkładem typów)
+  const missingByLeague = useMemo(() => {
+    const mine = new Set(tips.filter(t => t.user_id === user.id).map(t => t.match_id));
+    const out = {};
+    matches.forEach(m => {
+      if (m.status === "upcoming" && !isMatchLocked(m) && !mine.has(m.id)) out[m.league_id] = (out[m.league_id] || 0) + 1;
+    });
+    return out;
+  }, [matches, tips, tipStats, user.id]); // eslint-disable-line
 
   const me = lb.find(u => u.id === user.id);
   const myRank = lb.findIndex(u => u.id === user.id) + 1;
@@ -111,6 +121,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
               {leagues.map(l => (
                 <button key={l.id} className={`league-tab ${activeLeague === l.id ? "active" : ""}`} onClick={() => setActiveLeague(l.id)} title={l.name}>
                   <img src={LEAGUE_LOGOS[l.name]} alt={l.name} onError={e => { e.target.style.opacity = "0.2"; }} />
+                  {missingByLeague[l.id] > 0 && <div className="lbadge">{missingByLeague[l.id]}</div>}
                   <div className="ldot" />
                 </button>
               ))}
@@ -137,14 +148,15 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
           {tab === "matches" && (
             <MatchesTab activeLg={activeLg} leaguePolls={leaguePolls} pollOptions={pollOptions} pollVotes={pollVotes}
               userId={user.id} onVote={actions.castVote} upcoming={upcoming} finished={finished}
-              tips={tips} myTip={myTip} onTip={actions.placeTip} />
+              tips={tips} tipStats={tipStats} profiles={profiles} myTip={myTip} onTip={actions.placeTip}
+              onLocked={actions.refreshMatchTips} missingCount={missingByLeague[activeLeague] || 0} />
           )}
           {tab === "leaderboard" && <LeaderboardTab lb={lb} roundStars={roundStars} userId={user.id} activeLg={activeLg} />}
           {tab === "chat" && <ChatTab user={user} profile={profile} profiles={profiles} />}
           {tab === "rules" && <RulesTab profiles={profiles} tips={tips} matches={matches} leagues={leagues} userId={user.id} />}
           {tab === "admin" && isAdmin && (
             <AdminTab activeLeague={activeLeague} activeLg={activeLg} leagues={leagues} upcoming={upcoming} finished={finished}
-              leaguePolls={leaguePolls} pollVotes={pollVotes} profiles={profiles} tips={tips} actions={actions} />
+              leaguePolls={leaguePolls} pollVotes={pollVotes} profiles={profiles} tipStats={tipStats} actions={actions} />
           )}
           </ErrorBoundary>
         </div>
