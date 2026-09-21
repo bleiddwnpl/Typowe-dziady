@@ -94,7 +94,8 @@ export function useAppData(user, profile) {
         setTips(prev => prev.some(x => x.id === t.id) ? prev : [...prev, t]);
       })
       .on("postgres_changes", { event: "UPDATE", schema: "public", table: "tips" }, ({ new: t }) => {
-        setTips(prev => prev.map(x => x.id === t.id ? t : x));
+        // Po wpisaniu wyniku przychodzą też typy innych graczy, których jeszcze nie mamy
+        setTips(prev => prev.some(x => x.id === t.id) ? prev.map(x => x.id === t.id ? t : x) : [...prev, t]);
       })
       .subscribe();
     return () => { supabase.removeChannel(ch); };
