@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { PICK_LABELS } from "../lib";
-import { TeamLogo, PollCard, MatchCard, PickReveal } from "../components";
+import { useState, useMemo } from "react";
+import { PICK_LABELS, buildRoundSummary } from "../lib";
+import { TeamLogo, ClubAvatar, PollCard, MatchCard, PickReveal } from "../components";
 
 // ── FINISHED MATCHES ──────────────────────────────────────────────────────────
 function FinishedMatches({ matches, myTip, tips, profiles, userId }) {
@@ -53,10 +53,91 @@ function FinishedMatches({ matches, myTip, tips, profiles, userId }) {
   );
 }
 
+// ── PODSUMOWANIE KOLEJKI ──────────────────────────────────────────────────────
+const plural = (n, one, few, many) => {
+  if (n === 1) return one;
+  const d = n % 10, dd = n % 100;
+  return d >= 2 && d <= 4 && (dd < 12 || dd > 14) ? few : many;
+};
+
+function RoundSummary({ summary, leagueId, userId }) {
+  const storageKey = `rs-hidden-${leagueId}-${summary.round}`;
+  const [hidden, setHidden] = useState(() => {
+    try { return localStorage.getItem(storageKey) === "1"; } catch { return false; }
+  });
+  if (hidden) return null;
+
+  const hide = () => {
+    try { localStorage.setItem(storageKey, "1"); } catch { /* brak dostępu do pamięci przeglądarki */ }
+    setHidden(true);
+  };
+  const { matchCount, playerCount } = summary;
+
+  return (
+    <div className="rs">
+      <div className="rs-top">
+        <div>
+          <div className="rs-title">{summary.round} zakończona</div>
+          <div className="rs-sub">
+            {matchCount} {plural(matchCount, "mecz", "mecze", "meczów")} · {playerCount} {plural(playerCount, "gracz", "graczy", "graczy")}
+          </div>
+        </div>
+        <button className="rs-x" onClick={hide} aria-label="Schowaj podsumowanie">✕</button>
+      </div>
+
+      <div className="rs-sec">Walka o gwiazdkę</div>
+      {summary.top.map(x => (
+        <div key={x.profile.id} className="rs-row">
+          <div className="rs-pos">{x.pos === 1 ? "⭐" : x.pos}</div>
+          <ClubAvatar favoriteTeam={x.profile.favorite_team} name={x.profile.name} size={30} />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div className="rs-name">{x.profile.name}{x.profile.id === userId && <span className="lbme" style={{ marginLeft: 6 }}>TY</span>}</div>
+            <div className="rs-det">{x.correct} z {matchCount} trafionych</div>
+          </div>
+          <div className="rs-val" style={{ color: x.pos === 1 ? "#fbbf24" : "#fff" }}>{x.pts.toFixed(2)}</div>
+        </div>
+      ))}
+
+      {summary.best && (
+        <div className="rs-hl">
+          <div className="rs-ic" style={{ background: "rgba(52,199,89,0.15)" }}>🎯</div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div className="rs-det" style={{ marginTop: 0, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.8, fontSize: 10 }}>Najwyższy trafiony kurs</div>
+            <div className="rs-name">{summary.best.names.join(", ")}</div>
+            <div className="rs-det">{summary.best.detail}</div>
+          </div>
+          <div className="rs-val" style={{ color: "#34c759" }}>{summary.best.odds.toFixed(2)}</div>
+        </div>
+      )}
+
+      {summary.flop && (
+        <div className="rs-hl">
+          <div className="rs-ic" style={{ background: "rgba(255,59,48,0.15)" }}>🙈</div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div className="rs-det" style={{ marginTop: 0, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.8, fontSize: 10 }}>Wpadka kolejki</div>
+            <div className="rs-name">{summary.flop.profile.name}</div>
+            <div className="rs-det">{summary.flop.correct} z {matchCount} trafionych</div>
+          </div>
+          <div className="rs-val" style={{ color: "#ff6b60" }}>{summary.flop.pts.toFixed(2)}</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── ZAKŁADKA MECZE ────────────────────────────────────────────────────────────
 export default function MatchesTab({ activeLg, leaguePolls, pollOptions, pollVotes, userId, onVote, upcoming, finished, tips, tipStats, profiles, myTip, onTip, onLocked, missingCount }) {
+  const summary = useMemo(
+    () => buildRoundSummary([...upcoming, ...finished], tips, profiles),
+    [upcoming, finished, tips, profiles]
+  );
+
   return (
     <>
+      {summary && activeLg && (
+        <RoundSummary key={`${activeLg.id}-${summary.round}`} summary={summary} leagueId={activeLg.id} userId={userId} />
+      )}
+
       {leaguePolls.length > 0 && <>
         <div className="sh">Ankiety</div>
         {leaguePolls.map(poll => (
