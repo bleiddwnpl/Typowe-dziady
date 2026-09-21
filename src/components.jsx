@@ -304,3 +304,21 @@ function FeaturedMatchCard({ match, tip, onTip, lck, featured, missing, bottom }
     </div>
   );
 }
+
+// ── IKONY DOLNEGO MENU ────────────────────────────────────────────────────────
+const NAV_PATHS = {
+  matches: <><circle cx="12" cy="12" r="9.5" /><path d="M12 7.2l3.3 2.4-1.25 3.9h-4.1L8.7 9.6z" /><path d="M12 7.2V2.8M15.3 9.6l4.1-1.4M14.05 13.5l2.6 3.6M9.95 13.5l-2.6 3.6M8.7 9.6L4.6 8.2" /></>,
+  leaderboard: <><path d="M18 2H6v7a6 6 0 0 0 12 0V2z" /><path d="M6 4H4.5a2.5 2.5 0 0 0 0 5H6M18 4h1.5a2.5 2.5 0 0 1 0 5H18M12 15v4M8 22h8M10 19h4" /></>,
+  stats: <><rect x="4" y="12" width="4" height="8" rx="1" /><rect x="10" y="5" width="4" height="15" rx="1" /><rect x="16" y="9" width="4" height="11" rx="1" /></>,
+  chat: <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z" />,
+  rules: <><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z" /><path d="M14 2v5h5M8 13h8M8 17h8M8 9h2" /></>,
+  admin: <><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></>,
+};
+
+export function NavIcon({ name }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {NAV_PATHS[name]}
+    </svg>
+  );
+}
