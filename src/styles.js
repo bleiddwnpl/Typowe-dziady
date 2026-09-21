@@ -230,4 +230,7 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 .cmp .v.win { color:#34c759; }
 .cmp .v.lose { color:rgba(255,255,255,0.4); }
 .cmp .m { text-align:center; font-size:11px; color:rgba(255,255,255,0.5); font-weight:600; }
+
+.lbrank.col { display:flex; flex-direction:column; align-items:center; gap:2px; }
+.rdelta { font-size:10px; font-weight:800; line-height:1; }
 `;
