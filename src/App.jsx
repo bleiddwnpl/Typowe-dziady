@@ -4,6 +4,7 @@ import { css } from "./styles";
 import { ClubAvatar, TeamPicker } from "./components";
 import { useAppData } from "./useAppData";
 import AuthScreen from "./AuthScreen";
+import ErrorBoundary from "./ErrorBoundary";
 import MatchesTab from "./tabs/MatchesTab";
 import LeaderboardTab from "./tabs/LeaderboardTab";
 import ChatTab from "./tabs/ChatTab";
@@ -130,8 +131,9 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
           </div>
         </div>
 
-        {/* ZAKŁADKI */}
+        {/* ZAKŁADKI — błąd w jednej zakładce nie wyłącza reszty aplikacji */}
         <div className="ct">
+          <ErrorBoundary inline key={`${tab}-${activeLeague}`}>
           {tab === "matches" && (
             <MatchesTab activeLg={activeLg} leaguePolls={leaguePolls} pollOptions={pollOptions} pollVotes={pollVotes}
               userId={user.id} onVote={actions.castVote} upcoming={upcoming} finished={finished}
@@ -144,6 +146,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
             <AdminTab activeLeague={activeLeague} activeLg={activeLg} leagues={leagues} upcoming={upcoming} finished={finished}
               leaguePolls={leaguePolls} pollVotes={pollVotes} profiles={profiles} tips={tips} actions={actions} />
           )}
+          </ErrorBoundary>
         </div>
 
         {/* NAWIGACJA */}
@@ -188,7 +191,11 @@ export default function App() {
 
   if (checking) return <Splash />;
 
-  return user
-    ? <MainApp user={user} profile={profile} onLogout={() => supabase.auth.signOut()} />
-    : <AuthScreen onAuth={u => loadProfile(u)} />;
+  return (
+    <ErrorBoundary>
+      {user
+        ? <MainApp user={user} profile={profile} onLogout={() => supabase.auth.signOut()} />
+        : <AuthScreen onAuth={u => loadProfile(u)} />}
+    </ErrorBoundary>
+  );
 }
