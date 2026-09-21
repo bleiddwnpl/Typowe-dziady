@@ -43,7 +43,7 @@ export default function AdminTab({ activeLeague, activeLg, leagues, upcoming, fi
     setEditModal(m);
   };
 
-  const handleSaveResult = async pick => { await actions.saveResult(resultModal.id, pick); setResultModal(null); };
+  const handleSaveResult = async pick => { if (await actions.saveResult(resultModal.id, pick)) setResultModal(null); };
   const handleAddMatch = async () => { if (await actions.addMatch(newMatch)) { setAddModal(false); setNewMatch(EMPTY_MATCH); } };
   const handleSaveEdit = async () => { if (await actions.updateMatch(editModal.id, editData)) setEditModal(null); };
   const handleAddPoll = async () => {
