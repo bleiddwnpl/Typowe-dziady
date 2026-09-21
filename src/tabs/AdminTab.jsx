@@ -24,7 +24,7 @@ function Sheet({ title, subtitle, onClose, children }) {
 }
 
 // ── ZAKŁADKA ADMIN ────────────────────────────────────────────────────────────
-export default function AdminTab({ activeLeague, activeLg, leagues, upcoming, finished, leaguePolls, pollVotes, profiles, tips, actions }) {
+export default function AdminTab({ activeLeague, activeLg, leagues, upcoming, finished, leaguePolls, pollVotes, profiles, tipStats, actions }) {
   const [resultModal, setResultModal] = useState(null);
   const [addModal, setAddModal] = useState(false);
   const [newMatch, setNewMatch] = useState(EMPTY_MATCH);
@@ -88,7 +88,8 @@ export default function AdminTab({ activeLeague, activeLg, leagues, upcoming, fi
         <div className="sh">Nadchodzące</div>
         <div className="rc" style={{ marginBottom: 10 }}>
           {upcoming.map((m, i) => {
-            const notTipped = profiles.filter(p => !tips.some(t => t.match_id === m.id && t.user_id === p.id));
+            const tipped = new Set(tipStats[m.id]?.tipped || []);
+            const notTipped = profiles.filter(p => !tipped.has(p.id));
             return (
               <div key={m.id} style={{ borderBottom: i < upcoming.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none" }}>
                 <div className="ar" style={{ borderBottom: "none" }}>
