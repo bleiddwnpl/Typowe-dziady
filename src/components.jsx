@@ -225,10 +225,7 @@ export function MatchCard({ match, tip, stats, tips, profiles, userId, onTip, on
   return (
     <div className={`mc ${missing ? "missing" : ""}`}>
       <div className="mt2">
-        <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-          <span className="rbadge">{match.round}</span>
-          {missing && <span className="miss-chip">Brak typu</span>}
-        </div>
+        <span className="rbadge">{match.round}</span>
         <span className="mtime">{match.match_date} · {match.match_time?.slice(0, 5)}</span>
       </div>
       <div className="mb2">
@@ -272,14 +269,11 @@ function FeaturedMatchCard({ match, tip, onTip, lck, featured, missing, bottom }
   const ft = FEATURED_TEAMS[featured];
   const chip = { background: "rgba(0,0,0,0.5)", color: "rgba(255,255,255,0.85)", fontSize: 11, fontWeight: 700, padding: "4px 10px", borderRadius: 20, backdropFilter: "blur(6px)" };
   return (
-    <div style={{ borderRadius: 24, overflow: "hidden", marginBottom: 12, boxShadow: `0 0 0 2px ${missing ? "#ff9500" : ft.color}, 0 12px 40px rgba(${ft.colorRgb},0.25)` }}>
+    <div style={{ borderRadius: 24, overflow: "hidden", marginBottom: 12, boxShadow: `0 0 0 2px ${missing ? "#ff3b30" : ft.color}, 0 12px 40px rgba(${ft.colorRgb},0.25)` }}>
       <div style={{ position: "relative", height: 190 }}>
         <div style={{ position: "absolute", inset: 0, backgroundImage: `url('${ft.photo}')`, backgroundSize: "cover", backgroundPosition: "center", filter: "brightness(0.45) saturate(1.3)" }} />
         <div style={{ position: "absolute", inset: 0, background: `linear-gradient(180deg, rgba(${ft.colorRgb},0.15) 0%, rgba(6,10,15,0.55) 55%, ${ft.bgDark} 100%)` }} />
-        <div style={{ position: "absolute", top: 12, left: 14, display: "flex", gap: 6 }}>
-          <span style={chip}>{match.round}</span>
-          {missing && <span className="miss-chip" style={{ background: "rgba(0,0,0,0.55)" }}>Brak typu</span>}
-        </div>
+        <div style={{ position: "absolute", top: 12, left: 14 }}><span style={chip}>{match.round}</span></div>
         <div style={{ position: "absolute", top: 12, right: 14 }}><span style={{ ...chip, fontWeight: 600 }}>{match.match_date} · {match.match_time?.slice(0, 5)}</span></div>
         <div style={{ position: "absolute", bottom: 14, left: 14, right: 14, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
           <FeaturedSide team={match.home} featured={featured} ft={ft} />
