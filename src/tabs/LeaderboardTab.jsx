@@ -80,7 +80,14 @@ function CompareSheet({ other, me, finished, tips, onClose }) {
 }
 
 // ── ZAKŁADKA TABELA ───────────────────────────────────────────────────────────
-export default function LeaderboardTab({ lb, roundStars, userId, activeLg, finished, tips }) {
+// Strzałka zmiany miejsca pod numerem pozycji
+function RankDelta({ d }) {
+  if (d > 0) return <div className="rdelta" style={{ color: "#34c759" }}>▲{d}</div>;
+  if (d < 0) return <div className="rdelta" style={{ color: "#ff453a" }}>▼{-d}</div>;
+  return <div className="rdelta" style={{ color: "rgba(255,255,255,0.25)" }}>–</div>;
+}
+
+export default function LeaderboardTab({ lb, roundStars, rankChanges, userId, activeLg, finished, tips }) {
   const [selected, setSelected] = useState(null);
   const me = lb.find(u => u.id === userId);
 
@@ -88,11 +95,18 @@ export default function LeaderboardTab({ lb, roundStars, userId, activeLg, finis
     <>
       <div className="sh">Klasyfikacja — {activeLg?.flag} {activeLg?.name}</div>
       {lb.length === 0 && <div className="empty"><div className="ei">🏆</div><div className="et">Brak uczestników</div></div>}
-      {lb.length > 0 && <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", margin: "-4px 2px 8px" }}>Dotknij gracza, żeby porównać się z nim</div>}
+      {lb.length > 0 && (
+        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", margin: "-4px 2px 8px" }}>
+          {rankChanges ? `Zmiany pozycji po: ${rankChanges.round} · ` : ""}Dotknij gracza, żeby porównać się z nim
+        </div>
+      )}
       <div className="lbc">
         {lb.map((u, i) => (
           <div key={u.id} className={`lbr click ${u.id === userId ? "me" : ""}`} onClick={() => setSelected(u)}>
-            <div className="lbrank">{i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : <span className="lbrn">#{i + 1}</span>}</div>
+            <div className={`lbrank ${rankChanges ? "col" : ""}`}>
+              <div>{i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : <span className="lbrn">#{i + 1}</span>}</div>
+              {rankChanges && <RankDelta d={rankChanges.changes[u.id]} />}
+            </div>
             <ClubAvatar favoriteTeam={u.favorite_team} name={u.name} size={36} />
             <div style={{ flex: 1 }}>
               <div className="lbn">
