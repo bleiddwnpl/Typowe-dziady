@@ -170,4 +170,19 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 .ei { font-size:40px; margin-bottom:10px; }
 .et { font-size:16px; font-weight:600; color:rgba(255,255,255,0.45); }
 .es { font-size:13px; margin-top:4px; }
+
+.league-tab .lbadge { position:absolute; top:-6px; right:-6px; min-width:20px; height:20px; padding:0 5px; border-radius:10px; background:#ff3b30; color:#fff; font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center; border:2px solid #060a0f; }
+.mc.missing { border-color:rgba(255,149,0,0.45); }
+.miss-chip { font-size:11px; color:#ff9500; background:rgba(255,149,0,0.1); border:1px solid rgba(255,149,0,0.3); padding:3px 10px; border-radius:20px; font-weight:700; }
+.picks-hidden { margin-top:12px; padding:10px 12px; border-radius:12px; background:rgba(255,255,255,0.03); border:1px dashed rgba(255,255,255,0.12); font-size:12px; color:rgba(255,255,255,0.45); text-align:center; }
+.picks { margin-top:12px; display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+.pcol { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:8px 6px; min-width:0; }
+.pcol.win { border-color:rgba(52,199,89,0.5); background:rgba(52,199,89,0.07); }
+.pcol.lose { opacity:0.55; }
+.pcol h4 { font-size:10px; font-weight:800; text-align:center; margin:0 0 6px; letter-spacing:0.5px; }
+.pwho { display:flex; align-items:center; gap:5px; padding:3px 2px; min-width:0; }
+.pwho span { font-size:11px; color:rgba(255,255,255,0.8); font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pwho.me span { color:#60a5fa; font-weight:800; }
+.pnone { font-size:10px; color:rgba(255,255,255,0.25); text-align:center; padding:4px 0; }
+.pmissing { margin-top:8px; font-size:11px; color:rgba(255,149,0,0.85); font-weight:600; }
 `;
