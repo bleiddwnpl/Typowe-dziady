@@ -1,8 +1,7 @@
-
 import { useState, useEffect, useMemo } from "react";
 import { supabase, LEAGUE_LOGOS, buildLeaderboard, buildRoundStars, buildRankChanges, isMatchLocked } from "./lib";
 import { css } from "./styles";
-import { ClubAvatar, TeamPicker } from "./components";
+import { ClubAvatar, TeamPicker, NavIcon } from "./components";
 import { useAppData } from "./useAppData";
 import AuthScreen from "./AuthScreen";
 import ErrorBoundary from "./ErrorBoundary";
@@ -87,12 +86,12 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
   };
 
   const tabs = [
-    { key: "matches", icon: "⚽", label: "Mecze" },
-    { key: "leaderboard", icon: "🏆", label: "Tabela" },
-    { key: "stats", icon: "📊", label: "Statystyki" },
-    { key: "chat", icon: "💬", label: "Czat" },
-    { key: "rules", icon: "📋", label: "Regulamin" },
-    ...(isAdmin ? [{ key: "admin", icon: "⚙️", label: "Admin" }] : []),
+    { key: "matches", label: "Mecze" },
+    { key: "leaderboard", label: "Tabela" },
+    { key: "stats", label: "Statystyki" },
+    { key: "chat", label: "Czat" },
+    { key: "rules", label: "Regulamin" },
+    ...(isAdmin ? [{ key: "admin", label: "Admin" }] : []),
   ];
 
   if (loading) return <Splash label="ŁADOWANIE" />;
@@ -170,7 +169,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
         <div className="nav">
           {tabs.map(t => (
             <button key={t.key} className={`ni ${tab === t.key ? "on" : ""}`} onClick={() => setTab(t.key)}>
-              <div className="nic">{t.icon}</div>
+              <div className="nic"><NavIcon name={t.key} /></div>
               <div className="nlbl">{t.label}</div>
               <div className="ndot" />
             </button>
