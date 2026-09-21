@@ -259,3 +259,56 @@ export function buildRoundSummary(leagueMatches, tips, profiles) {
     flop,
   };
 }
+
+// ── STATYSTYKI GRACZA ─────────────────────────────────────────────────────────
+// Liczą się tylko zakończone mecze. Faworyt = wynik z najniższym kursem w meczu.
+// Seria: kolejne trafienia według godziny meczu; niewytypowany mecz serii nie przerywa.
+export function buildPlayerStats(userId, tips, finishedMatches) {
+  const byId = new Map(finishedMatches.map(m => [m.id, m]));
+  const mine = tips
+    .filter(t => t.user_id === userId && byId.has(t.match_id))
+    .map(t => ({ t, m: byId.get(t.match_id) }))
+    .sort((a, b) => kickoffKey(a.m).localeCompare(kickoffKey(b.m)));
+
+  let correct = 0, favT = 0, favC = 0, upsT = 0, upsC = 0, run = 0, longest = 0, oddsSum = 0, best = null;
+  mine.forEach(({ t, m }) => {
+    const odds = { home: parseFloat(m.odds_home), draw: parseFloat(m.odds_draw), away: parseFloat(m.odds_away) };
+    const isFav = odds[t.pick] === Math.min(odds.home, odds.draw, odds.away);
+    const hit = t.pick === m.result;
+    if (hit) {
+      correct++; run++; longest = Math.max(longest, run); oddsSum += odds[t.pick];
+      if (!best || odds[t.pick] > best.odds) best = { odds: odds[t.pick], detail: pickLabel(m, t.pick) };
+    } else {
+      run = 0;
+    }
+    if (isFav) { favT++; if (hit) favC++; } else { upsT++; if (hit) upsC++; }
+  });
+
+  const pct = (a, b) => (b > 0 ? Math.round((a / b) * 100) : null);
+  const settled = mine.length;
+  return {
+    settled, correct, pct: pct(correct, settled),
+    favTotal: favT, favCorrect: favC, favPct: pct(favC, favT),
+    upsTotal: upsT, upsCorrect: upsC, upsPct: pct(upsC, upsT),
+    longestStreak: settled ? longest : null, currentStreak: settled ? run : null,
+    bestOdds: best, avgOdds: correct ? oddsSum / correct : null,
+  };
+}
+
+// Rekordy grupy. Progi chronią przed „100% z jednego typu”.
+export function buildGroupRecords(profiles, statsById) {
+  const rows = profiles.map(p => ({ p, s: statsById[p.id] })).filter(x => x.s && x.s.settled > 0);
+  const top = (fn, filter = () => true) => {
+    const c = rows.filter(filter).map(x => ({ p: x.p, v: fn(x.s) })).filter(x => x.v != null && x.v > 0);
+    if (c.length === 0) return null;
+    const max = Math.max(...c.map(x => x.v));
+    return { value: max, people: c.filter(x => x.v === max).map(x => x.p) };
+  };
+  const recs = [
+    ["Najlepsza skuteczność", top(s => s.pct, x => x.s.settled >= 5), v => `${v}%`, "min. 5 typów"],
+    ["Najdłuższa seria", top(s => s.longestStreak), v => `${v}`, "trafień z rzędu"],
+    ["Król niespodzianek", top(s => s.upsPct, x => x.s.upsTotal >= 3), v => `${v}%`, "min. 3 typy na niespodziankę"],
+    ["Najwyższy trafiony kurs", top(s => s.bestOdds?.odds ?? null), v => v.toFixed(2), ""],
+  ];
+  return recs.filter(([, r]) => r).map(([label, r, fmt, hint]) => ({ label, value: fmt(r.value), people: r.people, hint }));
+}
