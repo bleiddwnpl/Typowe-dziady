@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TEAM_LOGOS, TEAMS_BY_LEAGUE, FEATURED_TEAMS, PICK_LABELS, getAvatar, getTeamsForLeague, getFeaturedTeam, isMatchLocked } from "./lib";
 
 // Wspólne elementy interfejsu używane przez kilka zakładek
@@ -91,12 +91,12 @@ export function TeamPicker({ onSave, onSkip }) {
 }
 
 // ── TIP DISTRIBUTION ─────────────────────────────────────────────────────────
-export function TipDistribution({ matchId, tips }) {
-  const mt = tips.filter(t => t.match_id === matchId);
-  const total = mt.length;
+// stats = { home, draw, away } — same liczby z bazy, bez informacji kto co wybrał
+export function TipDistribution({ stats }) {
+  const total = stats ? stats.home + stats.draw + stats.away : 0;
   if (total === 0) return null;
-  const h = Math.round((mt.filter(t => t.pick === "home").length / total) * 100);
-  const d = Math.round((mt.filter(t => t.pick === "draw").length / total) * 100);
+  const h = Math.round((stats.home / total) * 100);
+  const d = Math.round((stats.draw / total) * 100);
   const a = 100 - h - d;
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 5, marginTop: 10 }}>
@@ -157,17 +157,78 @@ export function PollCard({ poll, options, votes, userId, onVote }) {
   );
 }
 
-// ── KARTA NADCHODZĄCEGO MECZU ─────────────────────────────────────────────────
-// Sama wybiera wygląd: zwykła karta albo duża karta wyróżnionego klubu
-export function MatchCard({ match, tip, tips, onTip }) {
-  const lck = isMatchLocked(match);
-  const featured = getFeaturedTeam(match);
-  if (featured) return <FeaturedMatchCard match={match} tip={tip} tips={tips} onTip={onTip} lck={lck} featured={featured} />;
+// ── ODSŁONIĘTE TYPY (po rozpoczęciu meczu) ────────────────────────────────────
+export function PickReveal({ match, tips, profiles, userId }) {
+  const matchTips = tips.filter(t => t.match_id === match.id);
+  const byPick = { home: [], draw: [], away: [] };
+  matchTips.forEach(t => {
+    const p = profiles.find(pr => pr.id === t.user_id);
+    if (p && byPick[t.pick]) byPick[t.pick].push(p);
+  });
+  const tipped = new Set(matchTips.map(t => t.user_id));
+  const missing = profiles.filter(p => !tipped.has(p.id));
+  const finished = match.status === "finished";
+  const cols = [["home", "#34c759"], ["draw", "rgba(255,255,255,0.6)"], ["away", "#ff3b30"]];
 
   return (
-    <div className="mc">
+    <>
+      <div className="picks">
+        {cols.map(([pick, color]) => {
+          const list = byPick[pick];
+          const isWin = finished && pick === match.result;
+          return (
+            <div key={pick} className={`pcol ${finished ? (isWin ? "win" : "lose") : ""}`}>
+              <h4 style={{ color }}>{PICK_LABELS[pick]}{isWin ? " ✓" : ""} · {list.length}</h4>
+              {list.length === 0 ? <div className="pnone">—</div> : list.map(p => (
+                <div key={p.id} className={`pwho ${p.id === userId ? "me" : ""}`}>
+                  <ClubAvatar favoriteTeam={p.favorite_team} name={p.name} size={18} />
+                  <span>{p.name}</span>
+                </div>
+              ))}
+            </div>
+          );
+        })}
+      </div>
+      {!finished && missing.length > 0 && <div className="pmissing">Bez typu: {missing.map(p => p.name).join(", ")}</div>}
+    </>
+  );
+}
+
+// Informacja przed meczem, kiedy typy się odsłonią
+function PicksHidden({ match }) {
+  const today = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Warsaw" }).format(new Date());
+  const time = match.match_time?.slice(0, 5);
+  const when = match.match_date === today ? `o ${time}` : `${match.match_date} o ${time}`;
+  return <div className="picks-hidden">🔒 Typy graczy odsłonią się {when}</div>;
+}
+
+// ── KARTA NADCHODZĄCEGO MECZU ─────────────────────────────────────────────────
+// Sama wybiera wygląd: zwykła karta albo duża karta wyróżnionego klubu
+export function MatchCard({ match, tip, stats, tips, profiles, userId, onTip, onLocked }) {
+  const lck = isMatchLocked(match);
+  const featured = getFeaturedTeam(match);
+
+  // Po gwizdku dociągamy typy wszystkich graczy tego meczu
+  useEffect(() => { if (lck) onLocked?.(match.id); }, [lck, match.id]); // eslint-disable-line
+
+  const missing = !tip && !lck;
+  const bottom = (
+    <>
+      {lck && <div className="lck">⛔ Typowanie zamknięte</div>}
+      <TipDistribution stats={stats} />
+      {lck ? <PickReveal match={match} tips={tips} profiles={profiles} userId={userId} /> : <PicksHidden match={match} />}
+    </>
+  );
+
+  if (featured) return <FeaturedMatchCard match={match} tip={tip} onTip={onTip} lck={lck} featured={featured} missing={missing} bottom={bottom} />;
+
+  return (
+    <div className={`mc ${missing ? "missing" : ""}`}>
       <div className="mt2">
-        <span className="rbadge">{match.round}</span>
+        <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+          <span className="rbadge">{match.round}</span>
+          {missing && <span className="miss-chip">Brak typu</span>}
+        </div>
         <span className="mtime">{match.match_date} · {match.match_time?.slice(0, 5)}</span>
       </div>
       <div className="mb2">
@@ -184,9 +245,8 @@ export function MatchCard({ match, tip, tips, onTip }) {
             </button>
           ))}
         </div>
-        {lck && <div className="lck">⛔ Typowanie zamknięte</div>}
         {!lck && tip && <div className="tipok">✓ Typ: {PICK_LABELS[tip.pick]} · +{parseFloat(match[`odds_${tip.pick}`]).toFixed(2)} pkt</div>}
-        <TipDistribution matchId={match.id} tips={tips} />
+        {bottom}
       </div>
     </div>
   );
@@ -208,15 +268,18 @@ function FeaturedSide({ team, featured, ft, nameFirst }) {
   return <div style={{ display: "flex", alignItems: "center", gap: 8 }}>{nameFirst ? <>{name}{logo}</> : <>{logo}{name}</>}</div>;
 }
 
-function FeaturedMatchCard({ match, tip, tips, onTip, lck, featured }) {
+function FeaturedMatchCard({ match, tip, onTip, lck, featured, missing, bottom }) {
   const ft = FEATURED_TEAMS[featured];
   const chip = { background: "rgba(0,0,0,0.5)", color: "rgba(255,255,255,0.85)", fontSize: 11, fontWeight: 700, padding: "4px 10px", borderRadius: 20, backdropFilter: "blur(6px)" };
   return (
-    <div style={{ borderRadius: 24, overflow: "hidden", marginBottom: 12, boxShadow: `0 0 0 2px ${ft.color}, 0 12px 40px rgba(${ft.colorRgb},0.25)` }}>
+    <div style={{ borderRadius: 24, overflow: "hidden", marginBottom: 12, boxShadow: `0 0 0 2px ${missing ? "#ff9500" : ft.color}, 0 12px 40px rgba(${ft.colorRgb},0.25)` }}>
       <div style={{ position: "relative", height: 190 }}>
         <div style={{ position: "absolute", inset: 0, backgroundImage: `url('${ft.photo}')`, backgroundSize: "cover", backgroundPosition: "center", filter: "brightness(0.45) saturate(1.3)" }} />
         <div style={{ position: "absolute", inset: 0, background: `linear-gradient(180deg, rgba(${ft.colorRgb},0.15) 0%, rgba(6,10,15,0.55) 55%, ${ft.bgDark} 100%)` }} />
-        <div style={{ position: "absolute", top: 12, left: 14 }}><span style={chip}>{match.round}</span></div>
+        <div style={{ position: "absolute", top: 12, left: 14, display: "flex", gap: 6 }}>
+          <span style={chip}>{match.round}</span>
+          {missing && <span className="miss-chip" style={{ background: "rgba(0,0,0,0.55)" }}>Brak typu</span>}
+        </div>
         <div style={{ position: "absolute", top: 12, right: 14 }}><span style={{ ...chip, fontWeight: 600 }}>{match.match_date} · {match.match_time?.slice(0, 5)}</span></div>
         <div style={{ position: "absolute", bottom: 14, left: 14, right: 14, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
           <FeaturedSide team={match.home} featured={featured} ft={ft} />
@@ -237,13 +300,12 @@ function FeaturedMatchCard({ match, tip, tips, onTip, lck, featured }) {
             );
           })}
         </div>
-        {lck && <div className="lck">⛔ Typowanie zamknięte</div>}
         {!lck && tip && (
           <div style={{ marginTop: 10, background: `rgba(${ft.colorRgb},0.1)`, border: `1px solid rgba(${ft.colorRgb},0.3)`, borderRadius: 10, padding: "8px 12px", fontSize: 13, color: ft.textColor, fontWeight: 600 }}>
             ✓ Typ: {PICK_LABELS[tip.pick]} · +{parseFloat(match[`odds_${tip.pick}`]).toFixed(2)} pkt
           </div>
         )}
-        <TipDistribution matchId={match.id} tips={tips} />
+        {bottom}
       </div>
     </div>
   );
