@@ -14,11 +14,10 @@ export function useAppData(user, profile) {
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState(null);
   const [onlineUsers, setOnlineUsers] = useState([]);
+  const [tipStats, setTipStats] = useState({}); // { match_id: { home, draw, away, tipped: [user_id] } }
 
-  // Aktualne dane dla subskrypcji realtime (bez ponownego łączenia przy każdej zmianie)
-  const profilesRef = useRef([]);
+  // Aktualne mecze dla subskrypcji realtime (bez ponownego łączenia przy każdej zmianie)
   const matchesRef = useRef([]);
-  profilesRef.current = profiles;
   matchesRef.current = matches;
 
   const toastTimer = useRef(null);
@@ -29,6 +28,22 @@ export function useAppData(user, profile) {
   }, []);
 
   // ── ŁADOWANIE ───────────────────────────────────────────────────────────────
+  // Rozkład typów przed meczem: tylko liczby i kto typował — bez zdradzania wyborów
+  const loadStats = useCallback(async () => {
+    const { data, error } = await supabase.rpc("match_tip_stats");
+    if (error || !data) return;
+    const map = {};
+    data.forEach(r => { map[r.match_id] = { home: r.home_count, draw: r.draw_count, away: r.away_count, tipped: r.tipped_user_ids || [] }; });
+    setTipStats(map);
+  }, []);
+
+  // Po rozpoczęciu meczu baza odsłania typy — dociągamy je dla tego meczu
+  const refreshMatchTips = useCallback(async matchId => {
+    const { data } = await supabase.from("tips").select("*").eq("match_id", matchId);
+    if (!data) return;
+    setTips(prev => [...prev.filter(t => t.match_id !== matchId), ...data]);
+  }, []);
+
   const load = useCallback(async () => {
     const [{ data: lg }, { data: m }, { data: p }, { data: pl }, { data: po }, { data: pv }] = await Promise.all([
       supabase.from("leagues").select("*").order("name"),
@@ -54,28 +69,36 @@ export function useAppData(user, profile) {
     setPolls(pl || []);
     setPollOptions(po || []);
     setPollVotes(pv || []);
+    await loadStats();
     setLoading(false);
-  }, []);
+  }, [loadStats]);
 
   useEffect(() => { load(); }, [load]);
+
+  // Rozkład typów na żywo: po każdym typie gracz wysyła wszystkim sygnał „zmiana” (bez treści typu),
+  // a każdy telefon pobiera wtedy świeże liczby z bazy
+  const statsChannelRef = useRef(null);
+  useEffect(() => {
+    const ch = supabase.channel("tip-stats")
+      .on("broadcast", { event: "changed" }, () => { loadStats(); })
+      .subscribe();
+    statsChannelRef.current = ch;
+    const i = setInterval(loadStats, 60000); // zapas, gdyby jakiś sygnał nie dotarł
+    return () => { clearInterval(i); supabase.removeChannel(ch); statsChannelRef.current = null; };
+  }, [loadStats]);
 
   // ── REALTIME: typy innych graczy ────────────────────────────────────────────
   useEffect(() => {
     const ch = supabase.channel("tips-realtime")
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "tips" }, ({ new: t }) => {
         setTips(prev => prev.some(x => x.id === t.id) ? prev : [...prev, t]);
-        if (t.user_id !== user.id) {
-          const p = profilesRef.current.find(pr => pr.id === t.user_id);
-          const m = matchesRef.current.find(mm => mm.id === t.match_id);
-          if (p && m) showToast(`${p.name} wytypował(a): ${m.home} vs ${m.away}`);
-        }
       })
       .on("postgres_changes", { event: "UPDATE", schema: "public", table: "tips" }, ({ new: t }) => {
         setTips(prev => prev.map(x => x.id === t.id ? t : x));
       })
       .subscribe();
     return () => { supabase.removeChannel(ch); };
-  }, [user.id, showToast]);
+  }, []);
 
   // ── REALTIME: wyniki meczów ─────────────────────────────────────────────────
   useEffect(() => {
@@ -125,6 +148,8 @@ export function useAppData(user, profile) {
       return [...prev, data];
     });
     showToast(`Typ: ${PICK_LABELS[pick]} · +${parseFloat(match[`odds_${pick}`]).toFixed(2)} pkt`);
+    loadStats();
+    statsChannelRef.current?.send({ type: "broadcast", event: "changed", payload: {} });
   };
 
   const castVote = async (pollId, optionId) => {
@@ -196,7 +221,7 @@ export function useAppData(user, profile) {
   };
 
   return {
-    leagues, matches, tips, profiles, polls, pollOptions, pollVotes, loading, toast, onlineUsers,
-    actions: { saveFavoriteTeam, placeTip, castVote, addMatch, updateMatch, saveResult, addPoll, closePoll, deletePoll },
+    leagues, matches, tips, tipStats, profiles, polls, pollOptions, pollVotes, loading, toast, onlineUsers,
+    actions: { saveFavoriteTeam, placeTip, castVote, refreshMatchTips, addMatch, updateMatch, saveResult, addPoll, closePoll, deletePoll },
   };
 }
