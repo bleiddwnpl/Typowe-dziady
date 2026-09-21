@@ -75,7 +75,7 @@ export default function MatchesTab({ activeLg, leaguePolls, pollOptions, pollVot
       {upcoming.length > 0 && <>
         <div className="sh" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <span>Nadchodzące</span>
-          {missingCount > 0 && <span style={{ color: "#ff9500", letterSpacing: 0, textTransform: "none", fontSize: 12 }}>{missingCount} bez typu</span>}
+          {missingCount > 0 && <span style={{ color: "#ff3b30", letterSpacing: 0, textTransform: "none", fontSize: 12 }}>{missingCount} bez typu</span>}
         </div>
         {upcoming.map(match => (
           <MatchCard key={match.id} match={match} tip={myTip(match.id)} stats={tipStats[match.id]} tips={tips}
