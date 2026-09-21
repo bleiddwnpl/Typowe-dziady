@@ -233,4 +233,8 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 
 .lbrank.col { display:flex; flex-direction:column; align-items:center; gap:2px; }
 .rdelta { font-size:10px; font-weight:800; line-height:1; }
+
+.nic { color:rgba(255,255,255,0.4); transition:color 0.2s; }
+.nic svg { width:22px; height:22px; }
+.ni.on .nic { color:#60a5fa; }
 `;
