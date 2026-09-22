@@ -1,4 +1,3 @@
-
 import { createClient } from "@supabase/supabase-js";
 
 // ── SUPABASE ──────────────────────────────────────────────────────────────────
@@ -120,17 +119,23 @@ export const TEAMS_BY_LEAGUE = {
     "Udinese":     `${WF}/68f5928a0decdd9736d3a737_udinese-footballlogos-org.webp`,
     "Venezia":     `${CDN}/venezia-fc/venezia-fc-logo-footylogos.png`,
   },
+  // Kluby spoza naszych lig — tylko do Ligi Mistrzów
+  "Inne kluby": {
+    "Bayern Monachium": `https://assets.footylogos.com/logos/bayern-munich/bayern-munich-logo-footylogos.svg`,
+    "Paris Saint-Germain": `https://assets.footylogos.com/previews/paris-saint-germain-psg/paris-saint-germain-psg-logo-footylogos-320.webp`,
+  },
 };
 
 export const TEAM_LOGOS = Object.values(TEAMS_BY_LEAGUE).reduce((acc, t) => ({ ...acc, ...t }), {});
 
-// Liga Mistrzów = drużyny z Premier League, La Liga i Serie A
+// Liga Mistrzów = drużyny z Premier League, La Liga, Serie A i „Inne kluby”
 export const getTeamsForLeague = (lgName) => {
   if (lgName === "Liga Mistrzów") {
     return [
       ...Object.keys(TEAMS_BY_LEAGUE["Premier League"]),
       ...Object.keys(TEAMS_BY_LEAGUE["La Liga"]),
       ...Object.keys(TEAMS_BY_LEAGUE["Serie A"]),
+      ...Object.keys(TEAMS_BY_LEAGUE["Inne kluby"]),
     ].sort();
   }
   return TEAMS_BY_LEAGUE[lgName] ? Object.keys(TEAMS_BY_LEAGUE[lgName]).sort() : Object.keys(TEAM_LOGOS).sort();
