@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
-import { PICK_LABELS, buildRoundSummary } from "../lib";
-import { TeamLogo, ClubAvatar, PollCard, MatchCard, PickReveal } from "../components";
+import { PICK_LABELS, buildRoundSummary, isMatchLocked } from "../lib";
+import { TeamLogo, ClubAvatar, PollCard, MatchRow, PickReveal } from "../components";
 
 // ── FINISHED MATCHES ──────────────────────────────────────────────────────────
 function FinishedMatches({ matches, myTip, tips, profiles, userId }) {
@@ -125,15 +125,80 @@ function RoundSummary({ summary, leagueId, userId }) {
   );
 }
 
+// ── KUPON KOLEJKI ─────────────────────────────────────────────────────────────
+const kick = m => `${m.match_date}T${m.match_time?.slice(0, 5)}`;
+
+function Kupon({ upcoming, myTip, myPoints, myRank, leagueName }) {
+  const sorted = [...upcoming].sort((a, b) => kick(a).localeCompare(kick(b)));
+  const round = sorted[0]?.round;
+  if (!round) return null;
+  const ms = sorted.filter(m => m.round === round);
+  const missing = ms.filter(m => !myTip(m.id) && !isMatchLocked(m)).length;
+
+  return (
+    <div className="kupon">
+      <div className="k-head">
+        <div style={{ minWidth: 0 }}>
+          <div className="k-title">Kupon — {round.toLowerCase()}</div>
+          <div className="k-sub">Twoje typy: {leagueName}</div>
+        </div>
+        <div className="k-score">
+          <div className="v">{myPoints.toFixed(2)}</div>
+          <div className="l">pkt{myRank > 0 ? `, ${myRank}. miejsce` : ""}</div>
+        </div>
+      </div>
+      <div className="k-perf" />
+      <div className="k-rows">
+        {ms.map(m => {
+          const t = myTip(m.id);
+          const lck = isMatchLocked(m);
+          return (
+            <div key={m.id} className={`k-row ${!t && !lck ? "none" : ""}`}>
+              <span className="m">{m.home} – {m.away}</span>
+              <span className="p">{t ? `${PICK_LABELS[t.pick]} @ ${parseFloat(m[`odds_${t.pick}`]).toFixed(2)}` : lck ? "—" : "brak"}</span>
+            </div>
+          );
+        })}
+      </div>
+      <div className="k-foot">
+        {missing > 0 ? <span className="stamp">{missing} do obstawienia</span> : <span className="stamp ok">Komplet</span>}
+      </div>
+    </div>
+  );
+}
+
+// Nagłówki dni: „Dziś”, „Jutro” albo nazwa dnia tygodnia
+const warsawDate = offsetDays => new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Warsaw" }).format(new Date(Date.now() + offsetDays * 86400000));
+const dayLabel = date => {
+  const d = new Date(`${date}T12:00:00`);
+  const long = d.toLocaleDateString("pl-PL", { day: "numeric", month: "long" });
+  const weekday = d.toLocaleDateString("pl-PL", { weekday: "long" });
+  if (date === warsawDate(0)) return { title: "Dziś", sub: `${weekday}, ${long}` };
+  if (date === warsawDate(1)) return { title: "Jutro", sub: `${weekday}, ${long}` };
+  return { title: weekday.charAt(0).toUpperCase() + weekday.slice(1), sub: long };
+};
+
 // ── ZAKŁADKA MECZE ────────────────────────────────────────────────────────────
-export default function MatchesTab({ activeLg, leaguePolls, pollOptions, pollVotes, userId, onVote, upcoming, finished, tips, tipStats, profiles, myTip, onTip, onLocked, missingCount }) {
+export default function MatchesTab({ activeLg, leaguePolls, pollOptions, pollVotes, userId, onVote, upcoming, finished, tips, tipStats, profiles, myTip, onTip, onLocked, myPoints = 0, myRank = 0 }) {
   const summary = useMemo(
     () => buildRoundSummary([...upcoming, ...finished], tips, profiles),
     [upcoming, finished, tips, profiles]
   );
 
+  const days = useMemo(() => {
+    const out = [];
+    [...upcoming].sort((a, b) => kick(a).localeCompare(kick(b))).forEach(m => {
+      const last = out[out.length - 1];
+      if (last && last.date === m.match_date) last.matches.push(m);
+      else out.push({ date: m.match_date, matches: [m] });
+    });
+    return out;
+  }, [upcoming]);
+
   return (
     <>
+      <Kupon upcoming={upcoming} myTip={myTip} myPoints={myPoints} myRank={myRank} leagueName={activeLg?.name || ""} />
+
       {summary && activeLg && (
         <RoundSummary key={`${activeLg.id}-${summary.round}`} summary={summary} leagueId={activeLg.id} userId={userId} />
       )}
@@ -153,16 +218,18 @@ export default function MatchesTab({ activeLg, leaguePolls, pollOptions, pollVot
         </div>
       )}
 
-      {upcoming.length > 0 && <>
-        <div className="sh" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span>Nadchodzące</span>
-          {missingCount > 0 && <span style={{ color: "#ff3b30", letterSpacing: 0, textTransform: "none", fontSize: 12 }}>{missingCount} bez typu</span>}
-        </div>
-        {upcoming.map(match => (
-          <MatchCard key={match.id} match={match} tip={myTip(match.id)} stats={tipStats[match.id]} tips={tips}
-            profiles={profiles} userId={userId} onTip={onTip} onLocked={onLocked} />
-        ))}
-      </>}
+      {days.map(day => {
+        const { title, sub } = dayLabel(day.date);
+        return (
+          <div key={day.date}>
+            <div className="rd-day">{title}<span>{sub}</span></div>
+            {day.matches.map(match => (
+              <MatchRow key={match.id} match={match} tip={myTip(match.id)} stats={tipStats[match.id]} tips={tips}
+                profiles={profiles} userId={userId} onTip={onTip} onLocked={onLocked} />
+            ))}
+          </div>
+        );
+      })}
 
       {finished.length > 0 && <FinishedMatches matches={finished} myTip={myTip} tips={tips} profiles={profiles} userId={userId} />}
     </>
