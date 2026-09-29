@@ -16,9 +16,9 @@ function Splash({ label }) {
   return (
     <>
       <style>{css}</style>
-      <div style={{ minHeight: "100vh", background: "#060a0f", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 12 }}>
-        <div style={{ width: 52, height: 52, background: "linear-gradient(135deg,#0051cc,#007aff)", borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26 }}>⚽</div>
-        {label && <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 14, color: "rgba(96,165,250,0.6)", letterSpacing: 3 }}>{label}</div>}
+      <div style={{ minHeight: "100vh", background: "#0E1A14", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 12 }}>
+        <div style={{ width: 52, height: 52, background: "#F2C94C", borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26 }}>⚽</div>
+        {label && <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: 14, color: "rgba(233,239,230,0.6)", letterSpacing: 3 }}>{label}</div>}
       </div>
     </>
   );
@@ -30,6 +30,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
   const [tab, setTab] = useState("matches");
   const [activeLeague, setActiveLeague] = useState(null);
   const [showTeamPicker, setShowTeamPicker] = useState(false);
+  const [moreView, setMoreView] = useState(null); // null | "rules" | "admin"
 
   const data = useAppData(user, profile);
   const { leagues, matches, tips, tipStats, profiles, polls, pollOptions, pollVotes, loading, toast, onlineUsers, actions } = data;
@@ -90,9 +91,10 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
     { key: "leaderboard", label: "Tabela" },
     { key: "stats", label: "Statystyki" },
     { key: "chat", label: "Czat" },
-    { key: "rules", label: "Regulamin" },
-    ...(isAdmin ? [{ key: "admin", label: "Admin" }] : []),
+    { key: "more", label: "Więcej" },
   ];
+
+  const openTab = key => { setTab(key); if (key !== "more") setMoreView(null); };
 
   if (loading) return <Splash label="ŁADOWANIE" />;
 
@@ -103,78 +105,70 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
         {showTeamPicker && <TeamPicker onSave={saveTeam} onSkip={() => setShowTeamPicker(false)} />}
 
         {/* NAGŁÓWEK */}
-        <div className="hdr">
-          <div className="hdr-photo" /><div className="hdr-ov" />
-          <div className="hdr-ct">
-            <div className="hdr-top">
-              <div className="logo">TYPOWE <span>DZIADY</span></div>
-              <div className="hdr-r">
-                <div className="upill" onClick={() => setShowTeamPicker(true)} title={onlineUsers.map(u => u.name).join(", ")}>
-                  <ClubAvatar favoriteTeam={profile?.favorite_team} name={profile?.name || ""} size={26} />
-                  <div style={{ minWidth: 0 }}>
-                    <div className="uname">{profile?.name || "Ty"}</div>
-                    {onlineUsers.length > 0 && <div className="uonline"><span className="uonline-dot" />{onlineUsers.length} online</div>}
-                  </div>
-                </div>
-                <button className="uout" onClick={onLogout}>Wyloguj</button>
-              </div>
-            </div>
-
-            <div className="league-tabs">
-              {leagues.map(l => (
-                <button key={l.id} className={`league-tab ${activeLeague === l.id ? "active" : ""}`} onClick={() => setActiveLeague(l.id)} title={l.name}>
-                  <img src={LEAGUE_LOGOS[l.name]} alt={l.name} onError={e => { e.target.style.opacity = "0.2"; }} />
-                  {missingByLeague[l.id] > 0 && <div className="lbadge">{missingByLeague[l.id]}</div>}
-                  <div className="ldot" />
-                </button>
-              ))}
-            </div>
-
-            <div className="stats">
-              {[
-                { label: "Punkty", value: (me?.points || 0).toFixed(2), b: true },
-                { label: "Pozycja", value: `#${myRank}` },
-                { label: "Trafione", value: me?.correct || 0 },
-              ].map(s => (
-                <div key={s.label} className="sbox">
-                  <div className="slbl">{s.label}</div>
-                  <div className={`sval ${s.b ? "b" : ""}`}>{s.value}</div>
-                </div>
-              ))}
-            </div>
-          </div>
+        <div className="rd-top">
+          <div className="rd-brand"><div className="rd-mark" /><div className="rd-name">Typowe Dziady</div></div>
+          <button className="rd-me" onClick={() => setShowTeamPicker(true)} title={onlineUsers.map(u => u.name).join(", ")}>
+            <ClubAvatar favoriteTeam={profile?.favorite_team} name={profile?.name || ""} size={28} />
+            <span className="n">{profile?.name || "Ty"}</span>
+            {onlineUsers.length > 0 && <span className="o">{onlineUsers.length} online</span>}
+          </button>
         </div>
+
+        {/* LIGI */}
+        {(tab === "matches" || tab === "leaderboard") && (
+          <div className="rd-leagues">
+            {leagues.map(l => (
+              <button key={l.id} className={`rd-lg ${activeLeague === l.id ? "on" : ""}`} onClick={() => setActiveLeague(l.id)}>
+                <img src={LEAGUE_LOGOS[l.name]} alt="" onError={e => { e.target.style.opacity = "0.2"; }} />
+                {l.name}
+                {missingByLeague[l.id] > 0 && <span className="dot">{missingByLeague[l.id]}</span>}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* ZAKŁADKI — błąd w jednej zakładce nie wyłącza reszty aplikacji */}
         <div className="ct">
-          <ErrorBoundary inline key={`${tab}-${activeLeague}`}>
+          <ErrorBoundary inline key={`${tab}-${moreView}-${activeLeague}`}>
           {tab === "matches" && (
             <MatchesTab activeLg={activeLg} leaguePolls={leaguePolls} pollOptions={pollOptions} pollVotes={pollVotes}
               userId={user.id} onVote={actions.castVote} upcoming={upcoming} finished={finished}
               tips={tips} tipStats={tipStats} profiles={profiles} myTip={myTip} onTip={actions.placeTip}
-              onLocked={actions.refreshMatchTips} missingCount={missingByLeague[activeLeague] || 0} />
+              onLocked={actions.refreshMatchTips} myPoints={me?.points || 0} myRank={myRank} />
           )}
           {tab === "leaderboard" && <LeaderboardTab lb={lb} roundStars={roundStars} rankChanges={rankChanges} userId={user.id} activeLg={activeLg} finished={finished} tips={tips} />}
           {tab === "stats" && <StatsTab profiles={profiles} tips={tips} matches={matches} leagues={leagues} userId={user.id} />}
           {tab === "chat" && <ChatTab user={user} profile={profile} profiles={profiles} />}
-          {tab === "rules" && <RulesTab profiles={profiles} tips={tips} matches={matches} leagues={leagues} userId={user.id} />}
-          {tab === "admin" && isAdmin && (
+
+          {tab === "more" && !moreView && (
+            <>
+              <div className="rd-h1">Więcej</div>
+              <div className="rd-menu">
+                <button onClick={() => setMoreView("rules")}>Regulamin i nagrody <span>›</span></button>
+                {isAdmin && <button onClick={() => setMoreView("admin")}>Panel admina <span>{activeLg?.name} ›</span></button>}
+                <button onClick={() => setShowTeamPicker(true)}>Ulubiony klub <span>{profile?.favorite_team || "wybierz"} ›</span></button>
+                <button className="danger" onClick={onLogout}>Wyloguj</button>
+              </div>
+            </>
+          )}
+          {tab === "more" && moreView && <button className="rd-back" onClick={() => setMoreView(null)}>‹ Więcej</button>}
+          {tab === "more" && moreView === "rules" && <RulesTab profiles={profiles} tips={tips} matches={matches} leagues={leagues} userId={user.id} />}
+          {tab === "more" && moreView === "admin" && isAdmin && (
             <AdminTab activeLeague={activeLeague} activeLg={activeLg} leagues={leagues} upcoming={upcoming} finished={finished}
               leaguePolls={leaguePolls} pollVotes={pollVotes} profiles={profiles} tipStats={tipStats} actions={actions} />
           )}
           </ErrorBoundary>
         </div>
 
-        {/* NAWIGACJA */}
-        <div className="nav">
+        {/* PŁYWAJĄCE MENU */}
+        <nav className="rd-nav">
           {tabs.map(t => (
-            <button key={t.key} className={`ni ${tab === t.key ? "on" : ""}`} onClick={() => setTab(t.key)}>
-              <div className="nic"><NavIcon name={t.key} /></div>
-              <div className="nlbl">{t.label}</div>
-              <div className="ndot" />
+            <button key={t.key} className={`rd-ni ${tab === t.key ? "on" : ""}`} onClick={() => openTab(t.key)} aria-label={t.label}>
+              <NavIcon name={t.key} />
+              <span className="l">{t.label}</span>
             </button>
           ))}
-        </div>
+        </nav>
 
         {toast && <div className="toast">{toast}</div>}
       </div>
