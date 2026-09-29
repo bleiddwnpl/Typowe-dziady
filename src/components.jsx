@@ -65,7 +65,7 @@ export function TeamPicker({ onSave, onSkip }) {
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.88)", zIndex: 200, display: "flex", alignItems: "flex-end", justifyContent: "center", backdropFilter: "blur(20px)" }}>
       <div style={{ background: "#080e1a", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "28px 28px 0 0", padding: "28px 20px 48px", width: "100%", maxWidth: 480, maxHeight: "90vh", display: "flex", flexDirection: "column" }}>
         <div style={{ width: 36, height: 4, background: "rgba(255,255,255,0.15)", borderRadius: 2, margin: "0 auto 20px" }} />
-        <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 24, color: "#fff", letterSpacing: 2, textAlign: "center", marginBottom: 4 }}>TWÓJ ULUBIONY KLUB</div>
+        <div style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: 24, color: "#fff", letterSpacing: 2, textAlign: "center", marginBottom: 4 }}>TWÓJ ULUBIONY KLUB</div>
         <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", textAlign: "center", marginBottom: 18 }}>Logo pojawi się przy Twoim nicku w rankingu i czacie</div>
         <div style={{ overflowY: "auto", flex: 1 }}>
           {Object.entries(TEAMS_BY_LEAGUE).map(([lgName, teams]) => (
@@ -258,7 +258,7 @@ function FeaturedSide({ team, featured, ft, nameFirst }) {
       style={{ width: size, height: size, objectFit: "contain", flexShrink: 0, filter: isF ? `drop-shadow(0 2px 10px rgba(${ft.colorRgb},0.6))` : "drop-shadow(0 2px 6px rgba(0,0,0,0.5))" }} />
   );
   const name = (
-    <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: isF ? 24 : 20, color: isF ? ft.textColor : "#fff", letterSpacing: 0.5, textShadow: isF ? `0 0 20px rgba(${ft.colorRgb},0.5)` : "none", textAlign: nameFirst ? "right" : "left" }}>
+    <span style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: isF ? 24 : 20, color: isF ? ft.textColor : "#fff", letterSpacing: 0.5, textShadow: isF ? `0 0 20px rgba(${ft.colorRgb},0.5)` : "none", textAlign: nameFirst ? "right" : "left" }}>
       {team.toUpperCase()}
     </span>
   );
@@ -277,7 +277,7 @@ function FeaturedMatchCard({ match, tip, onTip, lck, featured, missing, bottom }
         <div style={{ position: "absolute", top: 12, right: 14 }}><span style={{ ...chip, fontWeight: 600 }}>{match.match_date} · {match.match_time?.slice(0, 5)}</span></div>
         <div style={{ position: "absolute", bottom: 14, left: 14, right: 14, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
           <FeaturedSide team={match.home} featured={featured} ft={ft} />
-          <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 16, color: "rgba(255,255,255,0.4)", flexShrink: 0 }}>VS</span>
+          <span style={{ fontFamily: "'Barlow Condensed',sans-serif", fontSize: 16, color: "rgba(255,255,255,0.4)", flexShrink: 0 }}>VS</span>
           <FeaturedSide team={match.away} featured={featured} ft={ft} nameFirst />
         </div>
       </div>
@@ -312,6 +312,7 @@ const NAV_PATHS = {
   stats: <><rect x="4" y="12" width="4" height="8" rx="1" /><rect x="10" y="5" width="4" height="15" rx="1" /><rect x="16" y="9" width="4" height="11" rx="1" /></>,
   chat: <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z" />,
   rules: <><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z" /><path d="M14 2v5h5M8 13h8M8 17h8M8 9h2" /></>,
+  more: <><circle cx="5" cy="12" r="1.2" /><circle cx="12" cy="12" r="1.2" /><circle cx="19" cy="12" r="1.2" /></>,
   admin: <><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></>,
 };
 
@@ -320,5 +321,68 @@ export function NavIcon({ name }) {
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       {NAV_PATHS[name]}
     </svg>
+  );
+}
+
+// ── WIERSZ MECZU — szata „Murawa nocą” ────────────────────────────────────────
+// Rozkład typów kolegów jest wpisany w same przyciski kursów (wypełnienie = % graczy).
+const revealWhen = match => {
+  const today = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Warsaw" }).format(new Date());
+  const time = match.match_time?.slice(0, 5);
+  return match.match_date === today ? `o ${time}` : `${match.match_date} o ${time}`;
+};
+
+export function MatchRow({ match, tip, stats, tips, profiles, userId, onTip, onLocked }) {
+  const lck = isMatchLocked(match);
+  const featured = getFeaturedTeam(match);
+  useEffect(() => { if (lck) onLocked?.(match.id); }, [lck, match.id]); // eslint-disable-line
+
+  const missing = !tip && !lck;
+  const total = stats ? stats.home + stats.draw + stats.away : 0;
+  const pct = pick => (total ? Math.round((stats[pick] / total) * 100) : null);
+
+  const row = (
+    <div className={`rd-match ${missing ? "missing" : ""}`}>
+      <div className="rd-time">{match.match_time?.slice(0, 5)}<small>{match.round}</small></div>
+      <div className="rd-teams">
+        {[match.home, match.away].map(team => (
+          <div key={team} className={`rd-team ${team === featured ? "feat" : ""}`}>
+            <TeamLogo name={team} size={team === featured ? 30 : 24} />
+            <span>{team}</span>
+          </div>
+        ))}
+      </div>
+      <div className="rd-odds">
+        {["home", "draw", "away"].map(pick => {
+          const p = pct(pick);
+          const sel = tip?.pick === pick;
+          return (
+            <button key={pick} className={`rd-odd ${sel ? "sel" : ""} ${lck && !sel ? "dim" : ""}`}
+              style={{ "--p": `${p || 0}%` }} onClick={() => onTip(match.id, pick)} disabled={lck}>
+              <span className="t"><span>{PICK_LABELS[pick]}{sel ? " ✓" : ""}</span>{p != null && <span>{p}%</span>}</span>
+              <span className="v">{parseFloat(match[`odds_${pick}`]).toFixed(2)}</span>
+            </button>
+          );
+        })}
+      </div>
+      <div className="rd-foot">
+        {lck ? (
+          <>
+            <div className="rd-note">Typowanie zamknięte</div>
+            <PickReveal match={match} tips={tips} profiles={profiles} userId={userId} />
+          </>
+        ) : (
+          <div className="rd-note">Typy kolegów zobaczysz {revealWhen(match)}</div>
+        )}
+      </div>
+    </div>
+  );
+
+  if (!featured) return row;
+  return (
+    <div className="rd-feat">
+      <div className="rd-photo" style={{ backgroundImage: `url('${FEATURED_TEAMS[featured].photo}')` }} />
+      <div className="rd-feat-body">{row}</div>
+    </div>
   );
 }
