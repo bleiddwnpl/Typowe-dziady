@@ -16,6 +16,7 @@ export const css = `
   --warn:#ff9500;          --warn-rgb:255,149,0;
   --gold:#fbbf24;          --gold-rgb:251,191,36;     /* gwiazdki */
   --poll:#a78bfa;          --poll-rgb:167,139,250;    /* ankiety */
+  --medal-1:#E8C35A; --medal-2:#C9D1D3; --medal-3:#D08B5B;  /* miejsca 1–3 w tabeli */
   --r-sm:8px; --r-md:12px; --r-lg:20px; --r-pill:999px;
 }
 
@@ -266,4 +267,20 @@ body { background:var(--bg); font-family:'Inter',sans-serif; }
 button:focus-visible, [role="button"]:focus-visible { outline:2px solid var(--accent-light); outline-offset:2px; }
 .picker-tile { font-family:inherit; color:inherit; width:100%; }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation:none !important; transition:none !important; } }
+
+/* TABELA — jak tablica wyników */
+.tb-list { border-bottom:1px solid rgba(var(--ink-rgb),0.08); }
+.tb-row { display:grid; grid-template-columns:38px 32px 1fr auto; align-items:center; gap:10px; padding:12px 2px; border-top:1px solid rgba(var(--ink-rgb),0.08); cursor:pointer; }
+.tb-row.me { background:linear-gradient(90deg, rgba(var(--accent-rgb),0.16), transparent 75%); margin:0 -14px; padding-left:16px; padding-right:16px; border-left:2px solid var(--accent); }
+.tb-pos { font-family:'Bebas Neue',sans-serif; font-size:30px; line-height:0.9; text-align:center; color:rgba(var(--ink-rgb),0.45); }
+.tb-pos small { display:block; font-family:'Inter',sans-serif; font-weight:700; font-size:11px; margin-top:3px; }
+.tb-pos.g1 { color:var(--medal-1); } .tb-pos.g2 { color:var(--medal-2); } .tb-pos.g3 { color:var(--medal-3); }
+.tb-up { color:var(--win); } .tb-down { color:var(--loss); } .tb-same { color:rgba(var(--ink-rgb),0.3); }
+.tb-nm { font-size:16px; font-weight:600; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.tb-nm .ty { font-size:12px; color:var(--accent-light); font-weight:700; margin-left:5px; }
+.tb-nm .st { color:var(--gold); font-size:13px; font-weight:700; margin-left:6px; }
+.tb-sub { font-size:13px; color:rgba(var(--ink-rgb),0.45); margin-top:2px; }
+.tb-sub .plus { color:var(--win); } .tb-sub .minus { color:var(--loss); }
+.tb-pts { font-family:'Bebas Neue',sans-serif; font-size:26px; letter-spacing:0.5px; text-align:right; color:var(--ink); font-variant-numeric:tabular-nums; }
+.tb-row.lead .tb-pts { color:var(--accent-light); }
 `;
