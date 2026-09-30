@@ -3,10 +3,10 @@ import { buildLeaderboard } from "../lib";
 import { ClubAvatar } from "../components";
 
 const RULES = [
-  { icon: "⏱️", bg: "rgba(0,122,255,0.1)", title: "Typowanie", text: "Wybierasz wynik meczu: 1, X lub 2. Typ możesz zmienić przed godziną startu — po jej upływie typowanie jest zablokowane." },
-  { icon: "🎯", bg: "rgba(255,59,48,0.1)", title: "Punktacja", text: "Za trafiony typ dostajesz tyle punktów ile wynosił kurs bukmacherski. Za chybiony typ — 0 punktów." },
-  { icon: "⭐", bg: "rgba(251,191,36,0.1)", title: "Gwiazdki za kolejkę", text: "Gracz z najwyższą sumą punktów w danej kolejce zdobywa gwiazdkę ⭐. Przy remisie gwiazdkę dostają wszyscy z najwyższym wynikiem. Licznik gwiazdek widoczny jest w rankingu." },
-  { icon: "🏆", bg: "rgba(0,122,255,0.08)", title: "Klasyfikacja", text: "Wygrywa gracz z największą sumą punktów po zakończeniu sezonu — licząc wszystkie ligi razem. Ekstraklasa ma dodatkowo osobny ranking z nagrodą 100 zł." },
+  { icon: "⏱️", bg: "rgba(var(--accent-rgb),0.1)", title: "Typowanie", text: "Wybierasz wynik meczu: 1, X lub 2. Typ możesz zmienić przed godziną startu — po jej upływie typowanie jest zablokowane." },
+  { icon: "🎯", bg: "rgba(var(--loss-rgb),0.1)", title: "Punktacja", text: "Za trafiony typ dostajesz tyle punktów ile wynosił kurs bukmacherski. Za chybiony typ — 0 punktów." },
+  { icon: "⭐", bg: "rgba(var(--gold-rgb),0.1)", title: "Gwiazdki za kolejkę", text: "Gracz z najwyższą sumą punktów w danej kolejce zdobywa gwiazdkę ⭐. Przy remisie gwiazdkę dostają wszyscy z najwyższym wynikiem. Licznik gwiazdek widoczny jest w rankingu." },
+  { icon: "🏆", bg: "rgba(var(--accent-rgb),0.08)", title: "Klasyfikacja", text: "Wygrywa gracz z największą sumą punktów po zakończeniu sezonu — licząc wszystkie ligi razem. Ekstraklasa ma dodatkowo osobny ranking z nagrodą 100 zł." },
 ];
 
 // ── ZAKŁADKA REGULAMIN ────────────────────────────────────────────────────────
@@ -31,7 +31,7 @@ export default function RulesTab({ profiles, tips, matches, leagues, userId }) {
       <div className="sh">Nagrody</div>
       <div className="rc" style={{ marginBottom: 10 }}>
         {prizes.map((r, i, arr) => (
-          <div key={r.name} className="prow" style={{ borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", flexDirection: "column", alignItems: "flex-start", gap: 8 }}>
+          <div key={r.name} className="prow" style={{ borderBottom: i < arr.length - 1 ? "1px solid rgba(var(--ink-rgb),0.05)" : "none", flexDirection: "column", alignItems: "flex-start", gap: 8 }}>
             <div style={{ display: "flex", alignItems: "center", width: "100%", gap: 12 }}>
               <div className="pic2" style={{ background: r.bg }}>{r.emoji}</div>
               <div style={{ flex: 1 }}><div className="pnm">{r.name}</div></div>
@@ -40,12 +40,12 @@ export default function RulesTab({ profiles, tips, matches, leagues, userId }) {
             {r.leader && r.leader.points > 0 ? (
               <div style={{ display: "flex", alignItems: "center", gap: 8, paddingLeft: 60, width: "100%" }}>
                 <ClubAvatar favoriteTeam={r.leader.favorite_team} name={r.leader.name} size={22} />
-                <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.7)" }}>{r.leader.name}</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: "rgba(var(--ink-rgb),0.7)" }}>{r.leader.name}</span>
                 {r.leader.id === userId && <span className="lbme">TY</span>}
-                <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.4)" }}>{r.leader.points.toFixed(2)} pkt</span>
+                <span style={{ marginLeft: "auto", fontSize: 12, fontWeight: 700, color: "rgba(var(--ink-rgb),0.4)" }}>{r.leader.points.toFixed(2)} pkt</span>
               </div>
             ) : (
-              <div style={{ paddingLeft: 60, fontSize: 12, color: "rgba(255,255,255,0.2)" }}>Brak danych</div>
+              <div style={{ paddingLeft: 60, fontSize: 12, color: "rgba(var(--ink-rgb),0.2)" }}>Brak danych</div>
             )}
           </div>
         ))}
