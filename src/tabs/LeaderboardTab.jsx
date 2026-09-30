@@ -82,15 +82,17 @@ function CompareSheet({ other, me, finished, tips, onClose }) {
 
 // ── ZAKŁADKA TABELA ───────────────────────────────────────────────────────────
 // Strzałka zmiany miejsca pod numerem pozycji
-function RankDelta({ d }) {
-  if (d > 0) return <div className="rdelta" style={{ color: "var(--win)" }}>▲{d}</div>;
-  if (d < 0) return <div className="rdelta" style={{ color: "var(--loss)" }}>▼{-d}</div>;
-  return <div className="rdelta" style={{ color: "rgba(var(--ink-rgb),0.25)" }}>–</div>;
+function Delta({ d }) {
+  if (d > 0) return <small className="tb-up">▲{d}</small>;
+  if (d < 0) return <small className="tb-down">▼{-d}</small>;
+  return <small className="tb-same">–</small>;
 }
 
+// ── ZAKŁADKA TABELA — jak tablica wyników ─────────────────────────────────────
 export default function LeaderboardTab({ lb, roundStars, rankChanges, userId, activeLg, finished, tips }) {
   const [selected, setSelected] = useState(null);
   const me = lb.find(u => u.id === userId);
+  const open = u => setSelected(u);
 
   return (
     <>
@@ -101,36 +103,29 @@ export default function LeaderboardTab({ lb, roundStars, rankChanges, userId, ac
           {rankChanges ? `Zmiany pozycji po: ${rankChanges.round} · ` : ""}Dotknij gracza, żeby porównać się z nim
         </div>
       )}
-      <div className="lbc">
+
+      <div className="tb-list">
         {lb.map((u, i) => (
-          <div key={u.id} className={`lbr click ${u.id === userId ? "me" : ""}`} onClick={() => setSelected(u)}
-            role="button" tabIndex={0} onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSelected(u); } }}>
-            <div className={`lbrank ${rankChanges ? "col" : ""}`}>
-              <div>{i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : <span className="lbrn">#{i + 1}</span>}</div>
-              {rankChanges && <RankDelta d={rankChanges.changes[u.id]} />}
+          <div key={u.id} className={`tb-row ${u.id === userId ? "me" : ""} ${i === 0 ? "lead" : ""}`}
+            onClick={() => open(u)} role="button" tabIndex={0}
+            onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(u); } }}>
+            <div className={`tb-pos ${i < 3 ? `g${i + 1}` : ""}`}>
+              {i + 1}
+              {rankChanges && <Delta d={rankChanges.changes[u.id]} />}
             </div>
-            <ClubAvatar favoriteTeam={u.favorite_team} name={u.name} size={36} />
-            <div style={{ flex: 1 }}>
-              <div className="lbn">
+            <ClubAvatar favoriteTeam={u.favorite_team} name={u.name} size={32} />
+            <div style={{ minWidth: 0 }}>
+              <div className="tb-nm">
                 {u.name}
-                {u.id === userId && <span className="lbme">TY</span>}
-                {roundStars[u.id] > 0 && (
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "var(--gold)", background: "rgba(var(--gold-rgb),0.1)", border: "1px solid rgba(var(--gold-rgb),0.2)", padding: "1px 7px", borderRadius: 20 }}>
-                    ⭐ ×{roundStars[u.id]}
-                  </span>
-                )}
+                {u.id === userId && <span className="ty">Ty</span>}
+                {roundStars[u.id] > 0 && <span className="st">★{roundStars[u.id]}</span>}
               </div>
-              <div className="lbs">
-                {u.correct} {plural(u.correct, "trafiony", "trafione", "trafionych")} ·{" "}
-                <span style={{ color: u.balance >= 0 ? "var(--win)" : "var(--loss)", fontWeight: 700 }}>
-                  {u.balance >= 0 ? "+" : ""}{u.balance.toFixed(0)} zł
-                </span>
+              <div className="tb-sub">
+                {u.correct} {plural(u.correct, "trafiony", "trafione", "trafionych")}, bilans{" "}
+                <span className={u.balance >= 0 ? "plus" : "minus"}>{u.balance >= 0 ? "+" : "−"}{Math.abs(u.balance).toFixed(0)} zł</span>
               </div>
             </div>
-            <div style={{ textAlign: "right" }}>
-              <div className={`lbp ${i === 0 ? "top" : "nm"}`}>{u.points.toFixed(2)}</div>
-              <div className="lbpl">PKT</div>
-            </div>
+            <div className="tb-pts">{u.points.toFixed(2)}</div>
           </div>
         ))}
       </div>
