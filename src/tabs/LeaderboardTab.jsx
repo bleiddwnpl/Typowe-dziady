@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
-import { buildPlayerStats } from "../lib";
-import { ClubAvatar } from "../components";
+import { buildPlayerStats, plural } from "../lib";
+import { ClubAvatar, useSheetClose } from "../components";
 
 const pctFmt = v => `${v}%`;
 const oddsFmt = v => v.toFixed(2);
@@ -15,6 +15,7 @@ const ROWS = [
 
 // Porównanie: wybrany gracz kontra Ty (albo same Twoje liczby po kliknięciu siebie)
 function CompareSheet({ other, me, finished, tips, onClose }) {
+  useSheetClose(onClose);
   const isSelf = other.id === me?.id;
   const a = useMemo(() => buildPlayerStats(other.id, tips, finished), [other.id, tips, finished]);
   const b = useMemo(() => (me ? buildPlayerStats(me.id, tips, finished) : null), [me, tips, finished]);
@@ -40,7 +41,7 @@ function CompareSheet({ other, me, finished, tips, onClose }) {
               <ClubAvatar favoriteTeam={other.favorite_team} name={other.name} size={38} />
               <div>
                 <div className="mtt" style={{ marginBottom: 0 }}>Twoje statystyki</div>
-                <div className="mst" style={{ marginBottom: 0 }}>{a.settled} rozstrzygniętych typów w tej lidze</div>
+                <div className="mst" style={{ marginBottom: 0 }}>{a.settled} {plural(a.settled, "rozstrzygnięty typ", "rozstrzygnięte typy", "rozstrzygniętych typów")} w tej lidze</div>
               </div>
             </div>
             {rows.map(r => (
@@ -54,7 +55,7 @@ function CompareSheet({ other, me, finished, tips, onClose }) {
           <>
             <div className="cmp-head">
               <div className="cmp-p"><ClubAvatar favoriteTeam={other.favorite_team} name={other.name} size={38} /><span>{other.name}</span></div>
-              <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 18, color: "rgba(255,255,255,0.35)" }}>VS</div>
+              <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 18, color: "rgba(var(--ink-rgb),0.35)" }}>VS</div>
               <div className="cmp-p"><ClubAvatar favoriteTeam={me?.favorite_team} name={me?.name || ""} size={38} /><span>Ty</span></div>
             </div>
             {rows.map(r => (
@@ -65,7 +66,7 @@ function CompareSheet({ other, me, finished, tips, onClose }) {
               </div>
             ))}
             {compared > 0 && (
-              <div style={{ textAlign: "center", fontSize: 13, color: "rgba(255,255,255,0.65)", marginTop: 12 }}>
+              <div style={{ textAlign: "center", fontSize: 13, color: "rgba(var(--ink-rgb),0.65)", marginTop: 12 }}>
                 {myWins > compared / 2 ? `Wygrywasz w ${myWins} z ${compared} kategorii 💪`
                   : myWins === compared / 2 ? `Remis: po ${myWins} kategorie dla każdego 🤝`
                   : `${other.name} wygrywa w ${compared - myWins} z ${compared} kategorii`}
@@ -82,9 +83,9 @@ function CompareSheet({ other, me, finished, tips, onClose }) {
 // ── ZAKŁADKA TABELA ───────────────────────────────────────────────────────────
 // Strzałka zmiany miejsca pod numerem pozycji
 function RankDelta({ d }) {
-  if (d > 0) return <div className="rdelta" style={{ color: "#34c759" }}>▲{d}</div>;
-  if (d < 0) return <div className="rdelta" style={{ color: "#ff453a" }}>▼{-d}</div>;
-  return <div className="rdelta" style={{ color: "rgba(255,255,255,0.25)" }}>–</div>;
+  if (d > 0) return <div className="rdelta" style={{ color: "var(--win)" }}>▲{d}</div>;
+  if (d < 0) return <div className="rdelta" style={{ color: "var(--loss)" }}>▼{-d}</div>;
+  return <div className="rdelta" style={{ color: "rgba(var(--ink-rgb),0.25)" }}>–</div>;
 }
 
 export default function LeaderboardTab({ lb, roundStars, rankChanges, userId, activeLg, finished, tips }) {
@@ -96,13 +97,14 @@ export default function LeaderboardTab({ lb, roundStars, rankChanges, userId, ac
       <div className="sh">Klasyfikacja — {activeLg?.flag} {activeLg?.name}</div>
       {lb.length === 0 && <div className="empty"><div className="ei">🏆</div><div className="et">Brak uczestników</div></div>}
       {lb.length > 0 && (
-        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", margin: "-4px 2px 8px" }}>
+        <div style={{ fontSize: 11, color: "rgba(var(--ink-rgb),0.35)", margin: "-4px 2px 8px" }}>
           {rankChanges ? `Zmiany pozycji po: ${rankChanges.round} · ` : ""}Dotknij gracza, żeby porównać się z nim
         </div>
       )}
       <div className="lbc">
         {lb.map((u, i) => (
-          <div key={u.id} className={`lbr click ${u.id === userId ? "me" : ""}`} onClick={() => setSelected(u)}>
+          <div key={u.id} className={`lbr click ${u.id === userId ? "me" : ""}`} onClick={() => setSelected(u)}
+            role="button" tabIndex={0} onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setSelected(u); } }}>
             <div className={`lbrank ${rankChanges ? "col" : ""}`}>
               <div>{i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : <span className="lbrn">#{i + 1}</span>}</div>
               {rankChanges && <RankDelta d={rankChanges.changes[u.id]} />}
@@ -113,14 +115,14 @@ export default function LeaderboardTab({ lb, roundStars, rankChanges, userId, ac
                 {u.name}
                 {u.id === userId && <span className="lbme">TY</span>}
                 {roundStars[u.id] > 0 && (
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "#fbbf24", background: "rgba(251,191,36,0.1)", border: "1px solid rgba(251,191,36,0.2)", padding: "1px 7px", borderRadius: 20 }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "var(--gold)", background: "rgba(var(--gold-rgb),0.1)", border: "1px solid rgba(var(--gold-rgb),0.2)", padding: "1px 7px", borderRadius: 20 }}>
                     ⭐ ×{roundStars[u.id]}
                   </span>
                 )}
               </div>
               <div className="lbs">
-                {u.correct} trafione ·{" "}
-                <span style={{ color: u.balance >= 0 ? "#34c759" : "#ff3b30", fontWeight: 700 }}>
+                {u.correct} {plural(u.correct, "trafiony", "trafione", "trafionych")} ·{" "}
+                <span style={{ color: u.balance >= 0 ? "var(--win)" : "var(--loss)", fontWeight: 700 }}>
                   {u.balance >= 0 ? "+" : ""}{u.balance.toFixed(0)} zł
                 </span>
               </div>
