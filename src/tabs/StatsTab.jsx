@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { buildPlayerStats, buildGroupRecords } from "../lib";
+import { buildPlayerStats, buildGroupRecords, plural } from "../lib";
 import { ClubAvatar } from "../components";
 
 const verdict = s => {
@@ -62,8 +62,8 @@ export default function StatsTab({ profiles, tips, matches, leagues, userId }) {
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <ClubAvatar favoriteTeam={meProfile?.favorite_team} name={meProfile?.name || ""} size={34} />
               <div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>{meProfile?.name}</div>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)" }}>{me.settled} rozstrzygniętych typów</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: "var(--ink)" }}>{meProfile?.name}</div>
+                <div style={{ fontSize: 11, color: "rgba(var(--ink-rgb),0.45)" }}>{me.settled} {plural(me.settled, "rozstrzygnięty typ", "rozstrzygnięte typy", "rozstrzygniętych typów")}</div>
               </div>
             </div>
             <div className="st-big">
@@ -76,15 +76,15 @@ export default function StatsTab({ profiles, tips, matches, leagues, userId }) {
           <div className="st-card">
             <div className="sh" style={{ marginBottom: 10 }}>Faworyci czy niespodzianki?</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              <SplitBar icon="🛡️" label="Na faworyta" correct={me.favCorrect} total={me.favTotal} value={me.favPct} color="#34c759" />
-              <SplitBar icon="💥" label="Na niespodziankę" correct={me.upsCorrect} total={me.upsTotal} value={me.upsPct} color="#f59e0b" />
+              <SplitBar icon="🛡️" label="Na faworyta" correct={me.favCorrect} total={me.favTotal} value={me.favPct} color="var(--win)" />
+              <SplitBar icon="💥" label="Na niespodziankę" correct={me.upsCorrect} total={me.upsTotal} value={me.upsPct} color="var(--warn)" />
             </div>
-            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.6)", marginTop: 10 }}>{verdict(me)}</div>
+            <div style={{ fontSize: 12, color: "rgba(var(--ink-rgb),0.6)", marginTop: 10 }}>{verdict(me)}</div>
           </div>
 
           <div className="st-grid">
-            <div className="st-tile"><div className="t">🔥 Najdłuższa seria</div><div className="v">{me.longestStreak}</div><div className="d">trafień z rzędu</div></div>
-            <div className="st-tile"><div className="t">▶️ Obecna seria</div><div className="v">{me.currentStreak}</div><div className="d">trafień z rzędu</div></div>
+            <div className="st-tile"><div className="t">🔥 Najdłuższa seria</div><div className="v">{me.longestStreak}</div><div className="d">{plural(me.longestStreak, "trafienie", "trafienia", "trafień")} z rzędu</div></div>
+            <div className="st-tile"><div className="t">▶️ Obecna seria</div><div className="v">{me.currentStreak}</div><div className="d">{plural(me.currentStreak, "trafienie", "trafienia", "trafień")} z rzędu</div></div>
             <div className="st-tile"><div className="t">🎯 Najwyższy kurs</div><div className="v">{me.bestOdds ? me.bestOdds.odds.toFixed(2) : "—"}</div><div className="d">{me.bestOdds?.detail || "brak trafień"}</div></div>
             <div className="st-tile"><div className="t">📈 Średni trafiony kurs</div><div className="v">{me.avgOdds ? me.avgOdds.toFixed(2) : "—"}</div><div className="d">im wyżej, tym odważniej</div></div>
           </div>
