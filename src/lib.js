@@ -348,3 +348,17 @@ export function buildRankChanges(profiles, tips, leagueMatches) {
     changes: Object.fromEntries(profiles.map(p => [p.id, before[p.id] - now[p.id]])),
   };
 }
+
+// ── TEKSTY ────────────────────────────────────────────────────────────────────
+// Polska odmiana: 1 głos, 2 głosy, 5 głosów (też 12–14 → „głosów”)
+export const plural = (n, one, few, many) => {
+  if (n === 1) return one;
+  const d = n % 10, dd = n % 100;
+  return d >= 2 && d <= 4 && (dd < 12 || dd > 14) ? few : many;
+};
+
+// „2026-09-27” → „27.09”
+export const formatDate = iso => {
+  const [, m, d] = (iso || "").split("-");
+  return d && m ? `${d}.${m}` : iso || "";
+};
