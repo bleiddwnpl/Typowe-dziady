@@ -16,9 +16,9 @@ function Splash({ label }) {
   return (
     <>
       <style>{css}</style>
-      <div style={{ minHeight: "100vh", background: "#060a0f", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 12 }}>
-        <div style={{ width: 52, height: 52, background: "linear-gradient(135deg,#0051cc,#007aff)", borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26 }}>⚽</div>
-        {label && <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 14, color: "rgba(96,165,250,0.6)", letterSpacing: 3 }}>{label}</div>}
+      <div style={{ minHeight: "100vh", background: "var(--bg)", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 12 }}>
+        <div style={{ width: 52, height: 52, background: "linear-gradient(135deg,var(--accent-deep),var(--accent))", borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26 }}>⚽</div>
+        {label && <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 14, color: "rgba(var(--accent-light-rgb),0.6)", letterSpacing: 3 }}>{label}</div>}
       </div>
     </>
   );
@@ -133,7 +133,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
             <div className="stats">
               {[
                 { label: "Punkty", value: (me?.points || 0).toFixed(2), b: true },
-                { label: "Pozycja", value: `#${myRank}` },
+                { label: "Pozycja", value: myRank > 0 ? `#${myRank}` : "–" },
                 { label: "Trafione", value: me?.correct || 0 },
               ].map(s => (
                 <div key={s.label} className="sbox">
