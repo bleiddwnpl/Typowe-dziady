@@ -30,6 +30,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
   const [tab, setTab] = useState("matches");
   const [activeLeague, setActiveLeague] = useState(null);
   const [showTeamPicker, setShowTeamPicker] = useState(false);
+  const [moreView, setMoreView] = useState(null); // null | "rules" | "admin"
 
   const data = useAppData(user, profile);
   const { leagues, matches, tips, tipStats, profiles, polls, pollOptions, pollVotes, loading, toast, onlineUsers, actions } = data;
@@ -90,9 +91,10 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
     { key: "leaderboard", label: "Tabela" },
     { key: "stats", label: "Statystyki" },
     { key: "chat", label: "Czat" },
-    { key: "rules", label: "Regulamin" },
-    ...(isAdmin ? [{ key: "admin", label: "Admin" }] : []),
+    { key: "more", label: "Więcej" },
   ];
+
+  const openTab = key => { setTab(key); if (key !== "more") setMoreView(null); };
 
   if (loading) return <Splash label="ŁADOWANIE" />;
 
@@ -147,7 +149,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
 
         {/* ZAKŁADKI — błąd w jednej zakładce nie wyłącza reszty aplikacji */}
         <div className="ct">
-          <ErrorBoundary inline key={`${tab}-${activeLeague}`}>
+          <ErrorBoundary inline key={`${tab}-${moreView}-${activeLeague}`}>
           {tab === "matches" && (
             <MatchesTab activeLg={activeLg} leaguePolls={leaguePolls} pollOptions={pollOptions} pollVotes={pollVotes}
               userId={user.id} onVote={actions.castVote} upcoming={upcoming} finished={finished}
@@ -157,8 +159,20 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
           {tab === "leaderboard" && <LeaderboardTab lb={lb} roundStars={roundStars} rankChanges={rankChanges} userId={user.id} activeLg={activeLg} finished={finished} tips={tips} />}
           {tab === "stats" && <StatsTab profiles={profiles} tips={tips} matches={matches} leagues={leagues} userId={user.id} />}
           {tab === "chat" && <ChatTab user={user} profile={profile} profiles={profiles} />}
-          {tab === "rules" && <RulesTab profiles={profiles} tips={tips} matches={matches} leagues={leagues} userId={user.id} />}
-          {tab === "admin" && isAdmin && (
+          {tab === "more" && !moreView && (
+            <>
+              <div className="more-h1">Więcej</div>
+              <div className="more-menu">
+                <button onClick={() => setMoreView("rules")}>Regulamin i nagrody <span>›</span></button>
+                {isAdmin && <button onClick={() => setMoreView("admin")}>Panel admina <span>{activeLg?.name} ›</span></button>}
+                <button onClick={() => setShowTeamPicker(true)}>Ulubiony klub <span>{profile?.favorite_team || "wybierz"} ›</span></button>
+                <button className="danger" onClick={onLogout}>Wyloguj</button>
+              </div>
+            </>
+          )}
+          {tab === "more" && moreView && <button className="more-back" onClick={() => setMoreView(null)}>‹ Więcej</button>}
+          {tab === "more" && moreView === "rules" && <RulesTab profiles={profiles} tips={tips} matches={matches} leagues={leagues} userId={user.id} />}
+          {tab === "more" && moreView === "admin" && isAdmin && (
             <AdminTab activeLeague={activeLeague} activeLg={activeLg} leagues={leagues} upcoming={upcoming} finished={finished}
               leaguePolls={leaguePolls} pollVotes={pollVotes} profiles={profiles} tipStats={tipStats} actions={actions} />
           )}
@@ -166,15 +180,14 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
         </div>
 
         {/* NAWIGACJA */}
-        <div className="nav">
+        <nav className="fnav">
           {tabs.map(t => (
-            <button key={t.key} className={`ni ${tab === t.key ? "on" : ""}`} onClick={() => setTab(t.key)}>
-              <div className="nic"><NavIcon name={t.key} /></div>
-              <div className="nlbl">{t.label}</div>
-              <div className="ndot" />
+            <button key={t.key} className={`fni ${tab === t.key ? "on" : ""}`} onClick={() => openTab(t.key)} aria-label={t.label}>
+              <NavIcon name={t.key} />
+              <span className="l">{t.label}</span>
             </button>
           ))}
-        </div>
+        </nav>
 
         {toast && <div className="toast">{toast}</div>}
       </div>
