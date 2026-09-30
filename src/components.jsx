@@ -323,3 +323,20 @@ export function NavIcon({ name }) {
     </svg>
   );
 }
+
+// ── ZNAK APLIKACJI: boisko z lotu ptaka ───────────────────────────────────────
+export function PitchMark({ size = 36 }) {
+  return (
+    <svg className="pitch-mark" width={size} height={size * 0.66} viewBox="0 0 40 26" fill="none"
+      stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" aria-hidden="true">
+      <rect x="1" y="1" width="38" height="24" rx="2" />
+      <line x1="20" y1="1" x2="20" y2="25" />
+      <circle cx="20" cy="13" r="4.5" />
+      <circle cx="20" cy="13" r="0.9" fill="currentColor" stroke="none" />
+      <rect x="1" y="6.5" width="7" height="13" />
+      <rect x="32" y="6.5" width="7" height="13" />
+      <rect x="1" y="10" width="2.8" height="6" />
+      <rect x="36.2" y="10" width="2.8" height="6" />
+    </svg>
+  );
+}
