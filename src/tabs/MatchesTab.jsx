@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { PICK_LABELS, buildRoundSummary } from "../lib";
+import { PICK_LABELS, buildRoundSummary, plural } from "../lib";
 import { TeamLogo, ClubAvatar, PollCard, MatchCard, PickReveal } from "../components";
 
 // ── FINISHED MATCHES ──────────────────────────────────────────────────────────
@@ -8,7 +8,7 @@ function FinishedMatches({ matches, myTip, tips, profiles, userId }) {
   return (
     <div style={{ marginTop: 8 }}>
       <button onClick={() => setOpen(p => !p)}
-        style={{ width: "100%", padding: "12px 16px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, color: "rgba(255,255,255,0.45)", fontFamily: "inherit", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", transition: "all 0.2s" }}>
+        style={{ width: "100%", padding: "12px 16px", background: "rgba(var(--ink-rgb),0.03)", border: "1px solid rgba(var(--ink-rgb),0.08)", borderRadius: 14, color: "rgba(var(--ink-rgb),0.45)", fontFamily: "inherit", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", transition: "all 0.2s" }}>
         <span>📁 Zakończone mecze ({matches.length})</span>
         <span style={{ fontSize: 11, opacity: 0.6 }}>{open ? "▲ Ukryj" : "▼ Pokaż"}</span>
       </button>
@@ -20,7 +20,7 @@ function FinishedMatches({ matches, myTip, tips, profiles, userId }) {
             return (
               <div key={match.id} className="mc" style={{ opacity: 0.85 }}>
                 <div className="mt2">
-                  <span style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", fontWeight: 600 }}>{match.round}</span>
+                  <span style={{ fontSize: 11, color: "rgba(var(--ink-rgb),0.4)", fontWeight: 600 }}>{match.round}</span>
                   <span className={isCor && tip ? "res-w" : tip ? "res-l" : "res-n"}>
                     {tip ? (isCor ? `+${parseFloat(match[`odds_${tip.pick}`]).toFixed(2)} pkt ✓` : "0 pkt ✗") : "Brak typu"}
                   </span>
@@ -29,7 +29,7 @@ function FinishedMatches({ matches, myTip, tips, profiles, userId }) {
                   <div className="tms">
                     <div className="tm"><TeamLogo name={match.home} size={28} /><span className="tn">{match.home}</span></div>
                     <div className="vs-sep">
-                      <div style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: 1, textAlign: "center" }}>Wynik</div>
+                      <div style={{ fontSize: 10, color: "rgba(var(--ink-rgb),0.4)", textTransform: "uppercase", letterSpacing: 1, textAlign: "center" }}>Wynik</div>
                       <div className="vs-result">{PICK_LABELS[match.result]}</div>
                     </div>
                     <div className="tm r"><TeamLogo name={match.away} size={28} /><span className="tn">{match.away}</span></div>
@@ -38,7 +38,7 @@ function FinishedMatches({ matches, myTip, tips, profiles, userId }) {
                     {["home","draw","away"].map(pick => (
                       <button key={pick} className={`odd ${pick === match.result ? "ok" : tip?.pick === pick ? "no" : ""}`} disabled>
                         <div className="ol">{PICK_LABELS[pick]}</div>
-                        <div className="ov" style={{ color: pick === match.result ? "#34c759" : "rgba(255,255,255,0.3)" }}>{parseFloat(match[`odds_${pick}`]).toFixed(2)}</div>
+                        <div className="ov" style={{ color: pick === match.result ? "var(--win)" : "rgba(var(--ink-rgb),0.3)" }}>{parseFloat(match[`odds_${pick}`]).toFixed(2)}</div>
                       </button>
                     ))}
                   </div>
@@ -54,11 +54,6 @@ function FinishedMatches({ matches, myTip, tips, profiles, userId }) {
 }
 
 // ── PODSUMOWANIE KOLEJKI ──────────────────────────────────────────────────────
-const plural = (n, one, few, many) => {
-  if (n === 1) return one;
-  const d = n % 10, dd = n % 100;
-  return d >= 2 && d <= 4 && (dd < 12 || dd > 14) ? few : many;
-};
 
 function RoundSummary({ summary, leagueId, userId }) {
   const storageKey = `rs-hidden-${leagueId}-${summary.round}`;
@@ -94,31 +89,31 @@ function RoundSummary({ summary, leagueId, userId }) {
             <div className="rs-name">{x.profile.name}{x.profile.id === userId && <span className="lbme" style={{ marginLeft: 6 }}>TY</span>}</div>
             <div className="rs-det">{x.correct} z {matchCount} trafionych</div>
           </div>
-          <div className="rs-val" style={{ color: x.pos === 1 ? "#fbbf24" : "#fff" }}>{x.pts.toFixed(2)}</div>
+          <div className="rs-val" style={{ color: x.pos === 1 ? "var(--gold)" : "var(--ink)" }}>{x.pts.toFixed(2)}</div>
         </div>
       ))}
 
       {summary.best && (
         <div className="rs-hl">
-          <div className="rs-ic" style={{ background: "rgba(52,199,89,0.15)" }}>🎯</div>
+          <div className="rs-ic" style={{ background: "rgba(var(--win-rgb),0.15)" }}>🎯</div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div className="rs-det" style={{ marginTop: 0, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.8, fontSize: 10 }}>Najwyższy trafiony kurs</div>
             <div className="rs-name">{summary.best.names.join(", ")}</div>
             <div className="rs-det">{summary.best.detail}</div>
           </div>
-          <div className="rs-val" style={{ color: "#34c759" }}>{summary.best.odds.toFixed(2)}</div>
+          <div className="rs-val" style={{ color: "var(--win)" }}>{summary.best.odds.toFixed(2)}</div>
         </div>
       )}
 
       {summary.flop && (
         <div className="rs-hl">
-          <div className="rs-ic" style={{ background: "rgba(255,59,48,0.15)" }}>🙈</div>
+          <div className="rs-ic" style={{ background: "rgba(var(--loss-rgb),0.15)" }}>🙈</div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div className="rs-det" style={{ marginTop: 0, fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.8, fontSize: 10 }}>Wpadka kolejki</div>
             <div className="rs-name">{summary.flop.profile.name}</div>
             <div className="rs-det">{summary.flop.correct} z {matchCount} trafionych</div>
           </div>
-          <div className="rs-val" style={{ color: "#ff6b60" }}>{summary.flop.pts.toFixed(2)}</div>
+          <div className="rs-val" style={{ color: "var(--loss)" }}>{summary.flop.pts.toFixed(2)}</div>
         </div>
       )}
     </div>
@@ -156,7 +151,7 @@ export default function MatchesTab({ activeLg, leaguePolls, pollOptions, pollVot
       {upcoming.length > 0 && <>
         <div className="sh" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <span>Nadchodzące</span>
-          {missingCount > 0 && <span style={{ color: "#ff3b30", letterSpacing: 0, textTransform: "none", fontSize: 12 }}>{missingCount} bez typu</span>}
+          {missingCount > 0 && <span style={{ color: "var(--loss)", letterSpacing: 0, textTransform: "none", fontSize: 12 }}>{missingCount} bez typu</span>}
         </div>
         {upcoming.map(match => (
           <MatchCard key={match.id} match={match} tip={myTip(match.id)} stats={tipStats[match.id]} tips={tips}
