@@ -35,7 +35,7 @@ export default class ErrorBoundary extends Component {
     }
 
     return (
-      <div style={{ minHeight: "100vh", background: "#060a0f", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, fontFamily: "'Inter',sans-serif" }}>
+      <div style={{ minHeight: "100vh", background: "#0E1A14", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, fontFamily: "'Inter',sans-serif" }}>
         <div style={{ textAlign: "center", maxWidth: 320 }}>
           <div style={{ fontSize: 44, marginBottom: 12 }}>⚽</div>
           <div style={{ fontSize: 20, fontWeight: 800, color: "#fff", marginBottom: 8 }}>Coś poszło nie tak</div>
