@@ -57,8 +57,8 @@ export default function AuthScreen({ onAuth }) {
             <>
               <div style={{ textAlign: "center", marginBottom: 16 }}>
                 <div style={{ fontSize: 32, marginBottom: 8 }}>🔒</div>
-                <div style={{ fontSize: 17, fontWeight: 700, color: "#fff", marginBottom: 6 }}>Resetuj hasło</div>
-                <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", lineHeight: 1.6 }}>{resetSent ? "Sprawdź skrzynkę e-mail." : "Podaj e-mail — wyślemy link."}</div>
+                <div style={{ fontSize: 17, fontWeight: 700, color: "var(--ink)", marginBottom: 6 }}>Resetuj hasło</div>
+                <div style={{ fontSize: 13, color: "rgba(var(--ink-rgb),0.4)", lineHeight: 1.6 }}>{resetSent ? "Sprawdź skrzynkę e-mail." : "Podaj e-mail — wyślemy link."}</div>
               </div>
               {!resetSent && <>
                 <div className="afield"><span className="aicon">✉️</span><input className="ainput" type="email" placeholder="Adres e-mail" value={resetEmail} onChange={e => setResetEmail(e.target.value)} onKeyDown={e => e.key === "Enter" && handleReset()} /></div>
