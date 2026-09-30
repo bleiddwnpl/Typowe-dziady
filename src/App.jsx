@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { supabase, LEAGUE_LOGOS, buildLeaderboard, buildRoundStars, buildRankChanges, isMatchLocked } from "./lib";
 import { css } from "./styles";
-import { ClubAvatar, TeamPicker, NavIcon } from "./components";
+import { ClubAvatar, TeamPicker, NavIcon, PitchMark } from "./components";
 import { useAppData } from "./useAppData";
 import AuthScreen from "./AuthScreen";
 import ErrorBoundary from "./ErrorBoundary";
@@ -109,17 +109,15 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
           <div className="hdr-photo" /><div className="hdr-ov" />
           <div className="hdr-ct">
             <div className="hdr-top">
-              <div className="logo">TYPOWE <span>DZIADY</span></div>
-              <div className="hdr-r">
-                <div className="upill" onClick={() => setShowTeamPicker(true)} title={onlineUsers.map(u => u.name).join(", ")}>
-                  <ClubAvatar favoriteTeam={profile?.favorite_team} name={profile?.name || ""} size={26} />
-                  <div style={{ minWidth: 0 }}>
-                    <div className="uname">{profile?.name || "Ty"}</div>
-                    {onlineUsers.length > 0 && <div className="uonline"><span className="uonline-dot" />{onlineUsers.length} online</div>}
-                  </div>
-                </div>
-                <button className="uout" onClick={onLogout}>Wyloguj</button>
+              <div className="brand">
+                <PitchMark />
+                <div className="logo">TYPOWE <span>DZIADY</span></div>
               </div>
+              <button className="mepill" onClick={() => setShowTeamPicker(true)} title={onlineUsers.map(u => u.name).join(", ")}>
+                <ClubAvatar favoriteTeam={profile?.favorite_team} name={profile?.name || ""} size={28} />
+                <span className="n">{profile?.name || "Ty"}</span>
+                {onlineUsers.length > 0 && <span className="o"><i />{onlineUsers.length}<span className="w">&nbsp;online</span></span>}
+              </button>
             </div>
 
             <div className="league-tabs">
