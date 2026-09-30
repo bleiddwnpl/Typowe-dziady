@@ -254,4 +254,14 @@ body { background:#060a0f; font-family:'Inter',sans-serif; }
 .more-menu button span { color:rgba(255,255,255,0.4); font-size:13px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .more-menu button.danger { color:#ff453a; }
 .more-back { background:none; border:none; color:#60a5fa; font-family:inherit; font-size:14px; font-weight:600; padding:2px 2px 12px; cursor:pointer; }
+
+.brand { display:flex; align-items:center; gap:9px; flex-shrink:0; }
+.pitch-mark { color:#fff; flex-shrink:0; display:block; }
+.brand .logo { font-size:24px; letter-spacing:1.5px; line-height:1; }
+.mepill { display:flex; align-items:center; gap:8px; background:rgba(0,0,0,0.45); border:1px solid rgba(255,255,255,0.1); border-radius:22px; padding:4px 12px 4px 4px; backdrop-filter:blur(8px); min-width:0; cursor:pointer; font-family:inherit; color:#fff; }
+.mepill:hover { border-color:rgba(0,122,255,0.45); }
+.mepill .n { font-size:14px; font-weight:600; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.mepill .o { display:flex; align-items:center; gap:5px; font-size:12px; font-weight:600; color:#4ade80; white-space:nowrap; flex-shrink:0; }
+.mepill .o i { width:6px; height:6px; border-radius:50%; background:#34c759; display:block; }
+@media (max-width: 420px) { .mepill .o .w { display:none; } }
 `;
