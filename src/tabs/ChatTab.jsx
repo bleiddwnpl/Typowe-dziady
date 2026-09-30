@@ -1,113 +1,212 @@
-import { useState, useEffect, useLayoutEffect, useRef } from "react";
-import { supabase } from "../lib";
-import { ClubAvatar } from "../components";
+import { useState } from "react";
+import { PICK_LABELS, PICK_NAMES, plural, formatDate } from "../lib";
+import { MatchFormFields, useSheetClose } from "../components";
 
-const PAGE = 100; // ile wiadomości wczytywać naraz
+const EMPTY_MATCH = { league_id: "", home: "", away: "", match_date: "", match_time: "18:00", round: "Kolejka 1", odds_home: "", odds_draw: "", odds_away: "" };
 
-// ── CZAT ──────────────────────────────────────────────────────────────────────
-export default function ChatTab({ user, profile, profiles }) {
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState("");
-  const [sending, setSending] = useState(false);
-  const [hasMore, setHasMore] = useState(false);
-  const [loadingOlder, setLoadingOlder] = useState(false);
-  const bottomRef = useRef(null);
-  const listRef = useRef(null);
-  const keepScroll = useRef(null); // odległość od dołu do przywrócenia po doładowaniu starszych
+const smallBtn = (color, rgb) => ({
+  padding: "5px 12px", background: `rgba(${rgb},0.1)`, border: `1px solid rgba(${rgb},0.25)`, color,
+  borderRadius: 10, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
+});
 
-  const scrollToBottom = delay => setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), delay);
-
-  // Najnowsze wiadomości + nowe na żywo
-  useEffect(() => {
-    supabase.from("messages").select("*").order("created_at", { ascending: false }).limit(PAGE)
-      .then(({ data }) => {
-        const rows = data || [];
-        setMessages([...rows].reverse());
-        setHasMore(rows.length === PAGE);
-        scrollToBottom(100);
-      });
-    const ch = supabase.channel("messages")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, p => {
-        setMessages(prev => prev.some(m => m.id === p.new.id) ? prev : [...prev, p.new]);
-        scrollToBottom(50);
-      }).subscribe();
-    return () => { supabase.removeChannel(ch); };
-  }, []);
-
-  // Po doładowaniu starszych: zostań w tym samym miejscu zamiast skakać na górę
-  useLayoutEffect(() => {
-    const el = listRef.current;
-    if (keepScroll.current == null || !el) return;
-    el.scrollTop = el.scrollHeight - keepScroll.current;
-    keepScroll.current = null;
-  }, [messages]);
-
-  const loadOlder = async () => {
-    if (loadingOlder || messages.length === 0) return;
-    setLoadingOlder(true);
-    const { data } = await supabase.from("messages").select("*")
-      .lt("created_at", messages[0].created_at)
-      .order("created_at", { ascending: false }).limit(PAGE);
-    const rows = data || [];
-    const el = listRef.current;
-    if (el) keepScroll.current = el.scrollHeight - el.scrollTop;
-    setMessages(prev => [...[...rows].reverse(), ...prev]);
-    setHasMore(rows.length === PAGE);
-    setLoadingOlder(false);
-  };
-
-  const send = async () => {
-    const c = input.trim(); if (!c || sending) return;
-    setSending(true); setInput("");
-    const { error } = await supabase.from("messages").insert({ user_id: user.id, user_name: profile?.name || user.email, content: c });
-    if (error) setInput(c); // nie zgub tekstu, gdy wysyłka się nie uda
-    setSending(false);
-  };
-
-  const fmt = ts => new Date(ts).toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Warsaw" });
-  const fmtD = ts => new Date(ts).toLocaleDateString("pl-PL", { day: "numeric", month: "long", timeZone: "Europe/Warsaw" });
-  const grouped = messages.reduce((acc, m) => { const d = fmtD(m.created_at); if (!acc[d]) acc[d] = []; acc[d].push(m); return acc; }, {});
-  const getSP = uid => profiles.find(p => p.id === uid);
-
+// Wysuwane okno od dołu ekranu
+function Sheet({ title, subtitle, onClose, children }) {
+  useSheetClose(onClose);
   return (
-    <div className="chat-wrap">
-      <div className="chat-msgs" ref={listRef}>
-        {hasMore && (
-          <div style={{ textAlign: "center", margin: "6px 0 4px" }}>
-            <button onClick={loadOlder} disabled={loadingOlder}
-              style={{ padding: "7px 14px", background: "rgba(var(--ink-rgb),0.05)", border: "1px solid rgba(var(--ink-rgb),0.1)", borderRadius: 20, color: "rgba(var(--ink-rgb),0.55)", fontFamily: "inherit", fontSize: 12, fontWeight: 600, cursor: loadingOlder ? "default" : "pointer" }}>
-              {loadingOlder ? "Wczytywanie..." : "Pokaż starsze wiadomości"}
-            </button>
-          </div>
-        )}
-        {messages.length === 0 && <div className="empty"><div className="ei">💬</div><div className="et">Brak wiadomości</div><div className="es">Zacznij rozmowę</div></div>}
-        {Object.entries(grouped).map(([date, msgs]) => (
-          <div key={date}>
-            <div className="cdt"><span>{date}</span></div>
-            {msgs.map((msg, i) => {
-              const isMe = msg.user_id === user.id;
-              const sp = getSP(msg.user_id);
-              const showName = !msgs[i + 1] || msgs[i + 1].user_id !== msg.user_id;
-              return (
-                <div key={msg.id} className="cbw" style={{ alignItems: isMe ? "flex-end" : "flex-start" }}>
-                  <div className={`crow ${isMe ? "me" : ""}`}>
-                    {!isMe && showName && <ClubAvatar favoriteTeam={sp?.favorite_team} name={msg.user_name} size={28} />}
-                    {!isMe && !showName && <div style={{ width: 28, flexShrink: 0 }} />}
-                    <div className={`cb ${isMe ? "mine" : "theirs"}`}>{msg.content}</div>
-                  </div>
-                  {showName && !isMe && <div className="csnd">{msg.user_name}</div>}
-                  {showName && isMe && <div className="ctm">{fmt(msg.created_at)}</div>}
-                </div>
-              );
-            })}
-          </div>
-        ))}
-        <div ref={bottomRef} />
-      </div>
-      <div className="chat-bar">
-        <input className="cin" placeholder="Wiadomość..." value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && send()} maxLength={500} />
-        <button className="csend" onClick={send} disabled={!input.trim() || sending}>↑</button>
+    <div className="mo" onClick={onClose}>
+      <div className="mbox" onClick={e => e.stopPropagation()}>
+        <div className="mh" />
+        <div className="mtt">{title}</div>
+        <div className="mst">{subtitle}</div>
+        {children}
       </div>
     </div>
+  );
+}
+
+// ── ZAKŁADKA ADMIN ────────────────────────────────────────────────────────────
+export default function AdminTab({ activeLeague, activeLg, leagues, upcoming, finished, leaguePolls, pollVotes, profiles, tipStats, actions }) {
+  const [resultModal, setResultModal] = useState(null);
+  const [addModal, setAddModal] = useState(false);
+  const [newMatch, setNewMatch] = useState(EMPTY_MATCH);
+  const [editModal, setEditModal] = useState(null);
+  const [editData, setEditData] = useState({});
+  const [addPollModal, setAddPollModal] = useState(false);
+  const [newPollQ, setNewPollQ] = useState("");
+  const [newPollOpts, setNewPollOpts] = useState(["", ""]);
+
+  const openEdit = m => {
+    setEditData({
+      league_id: m.league_id, home: m.home, away: m.away, match_date: m.match_date,
+      match_time: m.match_time?.slice(0, 5), round: m.round,
+      odds_home: parseFloat(m.odds_home).toFixed(2), odds_draw: parseFloat(m.odds_draw).toFixed(2), odds_away: parseFloat(m.odds_away).toFixed(2),
+    });
+    setEditModal(m);
+  };
+
+  const handleSaveResult = async pick => { if (await actions.saveResult(resultModal.id, pick)) setResultModal(null); };
+  const handleAddMatch = async () => { if (await actions.addMatch(newMatch)) { setAddModal(false); setNewMatch(EMPTY_MATCH); } };
+  const handleSaveEdit = async () => { if (await actions.updateMatch(editModal.id, editData)) setEditModal(null); };
+  const handleAddPoll = async () => {
+    if (await actions.addPoll(activeLeague, newPollQ, newPollOpts)) {
+      setNewPollQ(""); setNewPollOpts(["", ""]); setAddPollModal(false);
+    }
+  };
+
+  return (
+    <>
+      <div className="sh">Panel — {activeLg?.name}</div>
+      <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+        <button className="mprim" style={{ flex: 1 }} onClick={() => setAddModal(true)}>+ Mecz</button>
+        <button onClick={() => setAddPollModal(true)}
+          style={{ flex: 1, padding: 14, background: "rgba(var(--poll-rgb),0.1)", border: "1px solid rgba(var(--poll-rgb),0.25)", borderRadius: 14, color: "var(--poll)", fontFamily: "inherit", fontSize: 15, fontWeight: 700, cursor: "pointer" }}>
+          + Ankieta
+        </button>
+      </div>
+
+      {/* ANKIETY */}
+      {leaguePolls.length > 0 && <>
+        <div className="sh">Ankiety</div>
+        <div className="rc" style={{ marginBottom: 16 }}>
+          {leaguePolls.map((poll, i, arr) => (
+            <div key={poll.id} style={{ padding: "12px 16px", borderBottom: i < arr.length - 1 ? "1px solid rgba(var(--ink-rgb),0.05)" : "none" }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "var(--ink)", marginBottom: 4 }}>{poll.question}</div>
+              <div style={{ fontSize: 11, color: "rgba(var(--ink-rgb),0.4)", marginBottom: 8 }}>
+                {(n => `${n} ${plural(n, "głos", "głosy", "głosów")}`)(pollVotes.filter(v => v.poll_id === poll.id).length)} ·{" "}
+                <span style={{ color: poll.status === "active" ? "var(--win)" : "var(--warn)" }}>{poll.status === "active" ? "Aktywna" : "Zamknięta"}</span>
+              </div>
+              <div style={{ display: "flex", gap: 6 }}>
+                {poll.status === "active" && <button onClick={() => actions.closePoll(poll.id)} style={smallBtn("var(--warn)", "255,149,0")}>Zamknij</button>}
+                <button onClick={() => actions.deletePoll(poll.id)} style={smallBtn("var(--loss)", "255,59,48")}>Usuń</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </>}
+
+      {/* NADCHODZĄCE + kto nie wytypował */}
+      {upcoming.length > 0 && <>
+        <div className="sh">Nadchodzące</div>
+        <div className="rc" style={{ marginBottom: 10 }}>
+          {upcoming.map((m, i) => {
+            const tipped = new Set(tipStats[m.id]?.tipped || []);
+            const notTipped = profiles.filter(p => !tipped.has(p.id));
+            return (
+              <div key={m.id} style={{ borderBottom: i < upcoming.length - 1 ? "1px solid rgba(var(--ink-rgb),0.05)" : "none" }}>
+                <div className="ar" style={{ borderBottom: "none" }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div className="an">{m.home} vs {m.away}</div>
+                    <div className="at">{formatDate(m.match_date)} · {m.match_time?.slice(0, 5)} · {m.round}</div>
+                  </div>
+                  <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                    <button className="aedt" onClick={() => openEdit(m)}>Edytuj</button>
+                    <button className="ares-btn" onClick={() => setResultModal(m)}>Wynik</button>
+                  </div>
+                </div>
+                <div style={{ padding: "0 16px 12px" }}>
+                  {notTipped.length === 0 ? (
+                    <div style={{ fontSize: 11, color: "var(--win)", fontWeight: 600 }}>✓ Wszyscy wytypowali</div>
+                  ) : (
+                    <>
+                      <div style={{ fontSize: 10, fontWeight: 700, color: "rgba(var(--ink-rgb),0.3)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 5 }}>
+                        Brak typu ({notTipped.length}):
+                      </div>
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                        {notTipped.map(p => (
+                          <span key={p.id} style={{ fontSize: 11, fontWeight: 600, color: "var(--warn)", background: "rgba(var(--warn-rgb),0.08)", border: "1px solid rgba(var(--warn-rgb),0.2)", padding: "2px 9px", borderRadius: 20 }}>
+                            {p.name}
+                          </span>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </>}
+
+      {/* ZAKOŃCZONE */}
+      {finished.length > 0 && <>
+        <div className="sh">Zakończone</div>
+        <div className="rc">
+          {finished.map((m, i) => (
+            <div key={m.id} className="ar" style={{ borderBottom: i < finished.length - 1 ? "1px solid rgba(var(--ink-rgb),0.05)" : "none" }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div className="an">{m.home} vs {m.away}</div>
+                <div className="at" style={{ color: "var(--accent-light)" }}>Wynik: {PICK_LABELS[m.result]}</div>
+              </div>
+              <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                <button className="aedt" onClick={() => openEdit(m)}>Edytuj</button>
+                <button className="ares-btn" onClick={() => setResultModal(m)}>Popraw</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </>}
+
+      {/* OKNA */}
+      {resultModal && (
+        <Sheet title={`${resultModal.home} vs ${resultModal.away}`} subtitle="Wybierz wynik meczu" onClose={() => setResultModal(null)}>
+          <div style={{ display: "flex", gap: 10 }}>
+            {["home", "draw", "away"].map(pick => (
+              <button key={pick} className="rbtn" onClick={() => handleSaveResult(pick)}>
+                <div style={{ fontSize: 22, fontWeight: 700 }}>{PICK_LABELS[pick]}</div>
+                <div style={{ fontSize: 11, marginTop: 4, color: "rgba(var(--ink-rgb),0.4)" }}>{PICK_NAMES[pick]}</div>
+              </button>
+            ))}
+          </div>
+          <button className="msec" style={{ marginTop: 12 }} onClick={() => setResultModal(null)}>Anuluj</button>
+        </Sheet>
+      )}
+
+      {addModal && (
+        <Sheet title="Dodaj mecz ⚽" subtitle="Wypełnij dane meczu" onClose={() => setAddModal(false)}>
+          <MatchFormFields data={newMatch} onChange={setNewMatch} leagues={leagues} />
+          <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 16 }}>
+            <button className="mprim" onClick={handleAddMatch}>Dodaj mecz</button>
+            <button className="msec" onClick={() => setAddModal(false)}>Anuluj</button>
+          </div>
+        </Sheet>
+      )}
+
+      {editModal && (
+        <Sheet title="Edytuj mecz ✏️" subtitle="Zmień dane meczu" onClose={() => setEditModal(null)}>
+          <MatchFormFields data={editData} onChange={setEditData} leagues={leagues} />
+          <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 16 }}>
+            <button className="mprim" onClick={handleSaveEdit}>Zapisz zmiany</button>
+            <button className="msec" onClick={() => setEditModal(null)}>Anuluj</button>
+          </div>
+        </Sheet>
+      )}
+
+      {addPollModal && (
+        <Sheet title="🗳️ Dodaj ankietę" subtitle="Zbierz opinie od uczestników" onClose={() => setAddPollModal(false)}>
+          <input className="mi" placeholder="Pytanie (np. Który trener odejdzie pierwszy?)" value={newPollQ} onChange={e => setNewPollQ(e.target.value)} />
+          <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(var(--ink-rgb),0.4)", letterSpacing: 1, textTransform: "uppercase", margin: "4px 0 8px" }}>Odpowiedzi</div>
+          {newPollOpts.map((opt, i) => (
+            <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+              <input className="mi" style={{ marginBottom: 0, flex: 1 }} placeholder={`Odpowiedź ${i + 1}`} value={opt}
+                onChange={e => { const o = [...newPollOpts]; o[i] = e.target.value; setNewPollOpts(o); }} />
+              {newPollOpts.length > 2 && (
+                <button onClick={() => setNewPollOpts(prev => prev.filter((_, j) => j !== i))}
+                  style={{ padding: "0 14px", background: "rgba(var(--loss-rgb),0.08)", border: "1px solid rgba(var(--loss-rgb),0.2)", color: "var(--loss)", borderRadius: 12, cursor: "pointer", fontFamily: "inherit", fontSize: 18, flexShrink: 0 }}>✕</button>
+              )}
+            </div>
+          ))}
+          {newPollOpts.length < 6 && (
+            <button onClick={() => setNewPollOpts(prev => [...prev, ""])}
+              style={{ width: "100%", padding: 10, background: "rgba(var(--poll-rgb),0.06)", border: "1px dashed rgba(var(--poll-rgb),0.25)", borderRadius: 12, color: "var(--poll)", fontFamily: "inherit", fontSize: 13, fontWeight: 600, cursor: "pointer", marginBottom: 16 }}>
+              + Dodaj odpowiedź
+            </button>
+          )}
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <button className="mprim" onClick={handleAddPoll}>Dodaj ankietę</button>
+            <button className="msec" onClick={() => setAddPollModal(false)}>Anuluj</button>
+          </div>
+        </Sheet>
+      )}
+    </>
   );
 }
