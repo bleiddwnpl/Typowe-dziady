@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { supabase, LEAGUE_LOGOS, buildLeaderboard, buildRoundStars, buildRankChanges, isMatchLocked } from "./lib";
+import { supabase, LEAGUE_LOGOS, buildLeaderboard, buildRoundStars, buildRankChanges, isMatchLocked, currentCouponWeekend, isCouponOpen, COUPON_MAX_PICKS } from "./lib";
 import { css } from "./styles";
 import { ClubAvatar, TeamPicker, NavIcon, PitchMark } from "./components";
 import { useAppData } from "./useAppData";
@@ -10,6 +10,7 @@ import LeaderboardTab from "./tabs/LeaderboardTab";
 import ChatTab from "./tabs/ChatTab";
 import RulesTab from "./tabs/RulesTab";
 import StatsTab from "./tabs/StatsTab";
+import CouponTab from "./tabs/CouponTab";
 import AdminTab from "./tabs/AdminTab";
 
 function Splash({ label }) {
@@ -30,10 +31,10 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
   const [tab, setTab] = useState("matches");
   const [activeLeague, setActiveLeague] = useState(null);
   const [showTeamPicker, setShowTeamPicker] = useState(false);
-  const [moreView, setMoreView] = useState(null); // null | "rules" | "admin"
+  const [moreView, setMoreView] = useState(null); // null | "coupons" | "rules" | "admin"
 
   const data = useAppData(user, profile);
-  const { leagues, matches, tips, tipStats, profiles, polls, pollOptions, pollVotes, loading, toast, onlineUsers, actions } = data;
+  const { leagues, matches, tips, tipStats, profiles, polls, pollOptions, pollVotes, loading, toast, onlineUsers, couponPicks, couponParticipants, actions } = data;
 
   // Domyślnie pierwsza liga
   useEffect(() => {
@@ -173,6 +174,15 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
             <>
               <div className="sh">Więcej</div>
               <div className="more-menu">
+                <button onClick={() => setMoreView("coupons")}>
+                  Strefa kuponów
+                  {(() => {
+                    const wk = currentCouponWeekend();
+                    if (!isCouponOpen(wk)) return <span>zobacz kupon ›</span>;
+                    const mine = couponPicks.filter(c => c.user_id === user.id && c.weekend === wk).length;
+                    return <span>do pt 12:00<i className="badge" style={{ fontStyle: "normal" }}>{mine}/{COUPON_MAX_PICKS}</i></span>;
+                  })()}
+                </button>
                 <button onClick={() => setMoreView("rules")}>Regulamin i nagrody <span>›</span></button>
                 {isAdmin && <button onClick={() => setMoreView("admin")}>Panel admina <span>{activeLg?.name} ›</span></button>}
                 <button onClick={() => setShowTeamPicker(true)}>Ulubiony klub <span>{profile?.favorite_team || "wybierz"} ›</span></button>
@@ -181,6 +191,10 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
             </>
           )}
           {tab === "more" && moreView && <button className="more-back" onClick={() => setMoreView(null)}>‹ Więcej</button>}
+          {tab === "more" && moreView === "coupons" && (
+            <CouponTab matches={matches} leagues={leagues} profiles={profiles} couponPicks={couponPicks}
+              couponParticipants={couponParticipants} userId={user.id} onToggle={actions.toggleCouponPick} onReload={actions.reloadCoupon} />
+          )}
           {tab === "more" && moreView === "rules" && <RulesTab profiles={profiles} tips={tips} matches={matches} leagues={leagues} userId={user.id} />}
           {tab === "more" && moreView === "admin" && isAdmin && (
             <AdminTab activeLeague={activeLeague} activeLg={activeLg} leagues={leagues} upcoming={upcoming} finished={finished}
