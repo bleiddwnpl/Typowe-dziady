@@ -89,7 +89,7 @@ export function TeamPicker({ onSave, onSkip }) {
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.88)", zIndex: 200, display: "flex", alignItems: "flex-end", justifyContent: "center", backdropFilter: "blur(20px)" }}>
       <div style={{ background: "var(--bg-raised)", border: "1px solid rgba(var(--ink-rgb),0.1)", borderRadius: "28px 28px 0 0", padding: "28px 20px 48px", width: "100%", maxWidth: 480, maxHeight: "90vh", display: "flex", flexDirection: "column" }}>
         <div style={{ width: 36, height: 4, background: "rgba(var(--ink-rgb),0.15)", borderRadius: 2, margin: "0 auto 20px" }} />
-        <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 24, color: "var(--ink)", letterSpacing: 2, textAlign: "center", marginBottom: 4 }}>TWÓJ ULUBIONY KLUB</div>
+        <div className="mtt" style={{ textAlign: "center" }}>Twój ulubiony klub</div>
         <div style={{ fontSize: 12, color: "rgba(var(--ink-rgb),0.4)", textAlign: "center", marginBottom: 18 }}>Logo pojawi się przy Twoim nicku w rankingu i czacie</div>
         <div style={{ overflowY: "auto", flex: 1 }}>
           {Object.entries(TEAMS_BY_LEAGUE).map(([lgName, teams]) => (
