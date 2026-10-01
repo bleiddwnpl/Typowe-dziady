@@ -98,13 +98,15 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
 
   // Pasek lig tylko tam, gdzie liga ma znaczenie: Mecze, Tabela i Panel admina
   const showLeagues = tab === "matches" || tab === "leaderboard" || (tab === "more" && moreView === "admin");
+  // Punkty, pozycja i trafienia dotyczą wybranej ligi — pokazujemy je tylko przy Meczach i Tabeli
+  const showStats = tab === "matches" || tab === "leaderboard";
 
   if (loading) return <Splash label="ŁADOWANIE" />;
 
   return (
     <>
       <style>{css}</style>
-      <div className={`app ${showLeagues ? "" : "no-leagues"}`}>
+      <div className={`app ${showLeagues ? "" : "no-leagues"} ${showStats ? "" : "no-stats"}`}>
         {showTeamPicker && <TeamPicker onSave={saveTeam} onSkip={() => setShowTeamPicker(false)} />}
 
         {/* NAGŁÓWEK */}
@@ -135,18 +137,20 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
               </div>
             )}
 
-            <div className="stats">
-              {[
-                { label: "Punkty", value: (me?.points || 0).toFixed(2), b: true },
-                { label: "Pozycja", value: myRank > 0 ? `#${myRank}` : "–" },
-                { label: "Trafione", value: me?.correct || 0 },
-              ].map(s => (
-                <div key={s.label} className="sbox">
-                  <div className="slbl">{s.label}</div>
-                  <div className={`sval ${s.b ? "b" : ""}`}>{s.value}</div>
-                </div>
-              ))}
-            </div>
+            {showStats && (
+              <div className="stats">
+                {[
+                  { label: "Punkty", value: (me?.points || 0).toFixed(2), b: true },
+                  { label: "Pozycja", value: myRank > 0 ? `#${myRank}` : "–" },
+                  { label: "Trafione", value: me?.correct || 0 },
+                ].map(s => (
+                  <div key={s.label} className="sbox">
+                    <div className="slbl">{s.label}</div>
+                    <div className={`sval ${s.b ? "b" : ""}`}>{s.value}</div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
