@@ -15,6 +15,8 @@ export function useAppData(user, profile) {
   const [toast, setToast] = useState(null);
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [tipStats, setTipStats] = useState({}); // { match_id: { home, draw, away, tipped: [user_id] } }
+  const [couponPicks, setCouponPicks] = useState([]);              // typy kuponowe widoczne dla mnie
+  const [couponParticipants, setCouponParticipants] = useState([]); // [{ weekend, user_id, picks }] przed terminem
 
   // Aktualne mecze dla subskrypcji realtime (bez ponownego łączenia przy każdej zmianie)
   const matchesRef = useRef([]);
@@ -44,6 +46,17 @@ export function useAppData(user, profile) {
     setTips(prev => [...prev.filter(t => t.match_id !== matchId), ...data]);
   }, []);
 
+  // Strefa kuponów: własne typy zawsze, cudze dopiero po piątku 12:00 (pilnuje baza).
+  // Przed terminem widać tylko, kto już dorzucił typy i ile.
+  const loadCoupon = useCallback(async () => {
+    const [{ data: cp }, { data: part }] = await Promise.all([
+      supabase.from("coupon_picks").select("*"),
+      supabase.rpc("coupon_participants"),
+    ]);
+    setCouponPicks(cp || []);
+    setCouponParticipants(part || []);
+  }, []);
+
   const load = useCallback(async () => {
     const [{ data: lg }, { data: m }, { data: p }, { data: pl }, { data: po }, { data: pv }] = await Promise.all([
       supabase.from("leagues").select("*").order("name"),
@@ -69,9 +82,9 @@ export function useAppData(user, profile) {
     setPolls(pl || []);
     setPollOptions(po || []);
     setPollVotes(pv || []);
-    await loadStats();
+    await Promise.all([loadStats(), loadCoupon()]);
     setLoading(false);
-  }, [loadStats]);
+  }, [loadStats, loadCoupon]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -81,11 +94,12 @@ export function useAppData(user, profile) {
   useEffect(() => {
     const ch = supabase.channel("tip-stats")
       .on("broadcast", { event: "changed" }, () => { loadStats(); })
+      .on("broadcast", { event: "coupon" }, () => { loadCoupon(); })
       .subscribe();
     statsChannelRef.current = ch;
     const i = setInterval(loadStats, 60000); // zapas, gdyby jakiś sygnał nie dotarł
     return () => { clearInterval(i); supabase.removeChannel(ch); statsChannelRef.current = null; };
-  }, [loadStats]);
+  }, [loadStats, loadCoupon]);
 
   // ── REALTIME: typy innych graczy ────────────────────────────────────────────
   useEffect(() => {
@@ -162,6 +176,31 @@ export function useAppData(user, profile) {
     showToast("🗳️ Głos oddany!");
   };
 
+  // Dodanie, zmiana albo usunięcie typu kuponowego (ten sam kurs drugi raz = usuń).
+  // Limit, termin i dozwolone mecze sprawdza też baza — komunikat błędu pochodzi stamtąd.
+  const toggleCouponPick = async (match, pick, weekend, maxPicks) => {
+    const mine = couponPicks.find(p => p.user_id === user.id && p.match_id === match.id);
+    let error;
+    if (mine && mine.pick === pick) {
+      ({ error } = await supabase.from("coupon_picks").delete().eq("id", mine.id));
+      if (!error) setCouponPicks(prev => prev.filter(p => p.id !== mine.id));
+    } else if (mine) {
+      let data;
+      ({ data, error } = await supabase.from("coupon_picks").update({ pick }).eq("id", mine.id).select().single());
+      if (!error) setCouponPicks(prev => prev.map(p => (p.id === mine.id ? data : p)));
+    } else {
+      const count = couponPicks.filter(p => p.user_id === user.id && p.weekend === weekend).length;
+      if (count >= maxPicks) { showToast(`Masz już ${maxPicks} typów — usuń któryś, żeby dodać nowy`); return; }
+      let data;
+      ({ data, error } = await supabase.from("coupon_picks").insert({ user_id: user.id, match_id: match.id, pick }).select().single());
+      if (!error) setCouponPicks(prev => [...prev, data]);
+    }
+    if (error) { showToast(`⚠️ ${error.message}`); return; }
+    const { data: part } = await supabase.rpc("coupon_participants");
+    setCouponParticipants(part || []);
+    statsChannelRef.current?.send({ type: "broadcast", event: "coupon", payload: {} });
+  };
+
   // ── AKCJE ADMINA ────────────────────────────────────────────────────────────
   const matchPayload = d => ({
     league_id: d.league_id, home: d.home, away: d.away,
@@ -223,6 +262,8 @@ export function useAppData(user, profile) {
 
   return {
     leagues, matches, tips, tipStats, profiles, polls, pollOptions, pollVotes, loading, toast, onlineUsers,
-    actions: { saveFavoriteTeam, placeTip, castVote, refreshMatchTips, addMatch, updateMatch, saveResult, addPoll, closePoll, deletePoll },
+    couponPicks, couponParticipants,
+    actions: { saveFavoriteTeam, placeTip, castVote, refreshMatchTips, addMatch, updateMatch, saveResult, addPoll, closePoll, deletePoll,
+      toggleCouponPick, reloadCoupon: loadCoupon },
   };
 }
