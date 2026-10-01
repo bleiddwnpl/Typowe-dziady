@@ -286,4 +286,7 @@ button:focus-visible, [role="button"]:focus-visible { outline:2px solid var(--ac
 
 /* TŁO: murawa nocą ze światłem reflektorów u góry */
 .app { background-color:var(--bg); background-image:radial-gradient(ellipse 120% 35% at 50% 0%, rgba(233,239,230,0.07), transparent 60%); }
+
+/* Bez paska lig nagłówek jest niższy — czat dostaje więcej miejsca */
+.app.no-leagues .chat-wrap { height:calc(100vh - 264px); height:calc(100dvh - 264px); }
 `;
