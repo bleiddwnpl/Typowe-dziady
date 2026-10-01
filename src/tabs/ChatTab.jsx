@@ -15,7 +15,11 @@ export default function ChatTab({ user, profile, profiles }) {
   const listRef = useRef(null);
   const keepScroll = useRef(null); // odległość od dołu do przywrócenia po doładowaniu starszych
 
-  const scrollToBottom = delay => setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), delay);
+  // Przewijamy tylko listę wiadomości — strona z belką zostaje na miejscu
+  const scrollToBottom = delay => setTimeout(() => {
+    const el = listRef.current;
+    if (el) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+  }, delay);
 
   // Najnowsze wiadomości + nowe na żywo
   useEffect(() => {
