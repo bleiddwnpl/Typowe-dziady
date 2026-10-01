@@ -316,11 +316,13 @@ export function buildGroupRecords(profiles, statsById) {
   };
   const recs = [
     ["Najlepsza skuteczność", top(s => s.pct, x => x.s.settled >= 5), v => `${v}%`, "min. 5 typów"],
-    ["Najdłuższa seria", top(s => s.longestStreak), v => `${v}`, "trafień z rzędu"],
+    ["Najdłuższa seria", top(s => s.longestStreak), v => `${v}`, v => `${plural(v, "trafienie", "trafienia", "trafień")} z rzędu`],
     ["Król niespodzianek", top(s => s.upsPct, x => x.s.upsTotal >= 3), v => `${v}%`, "min. 3 typy na niespodziankę"],
     ["Najwyższy trafiony kurs", top(s => s.bestOdds?.odds ?? null), v => v.toFixed(2), ""],
   ];
-  return recs.filter(([, r]) => r).map(([label, r, fmt, hint]) => ({ label, value: fmt(r.value), people: r.people, hint }));
+  return recs.filter(([, r]) => r).map(([label, r, fmt, hint]) => ({
+    label, value: fmt(r.value), people: r.people, hint: typeof hint === "function" ? hint(r.value) : hint,
+  }));
 }
 
 // ── ZMIANY POZYCJI W TABELI ───────────────────────────────────────────────────
