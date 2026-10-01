@@ -190,7 +190,7 @@ body { background:var(--bg); font-family:'Inter',sans-serif; }
 
 .rs { border-radius:var(--r-lg); overflow:hidden; border:1px solid rgba(var(--gold-rgb),0.3); background:linear-gradient(160deg, rgba(var(--gold-rgb),0.10), rgba(var(--ink-rgb),0.02) 55%); margin-bottom:14px; }
 .rs-top { padding:12px 14px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(var(--ink-rgb),0.06); }
-.rs-title { font-family:'Bebas Neue',sans-serif; font-size:20px; color:var(--ink); letter-spacing:1px; }
+.rs-title { font-size:16px; font-weight:700; color:var(--ink); }
 .rs-sub { font-size:11px; color:rgba(var(--ink-rgb),0.45); font-weight:600; }
 .rs-x { width:36px; height:36px; border-radius:50%; background:rgba(var(--ink-rgb),0.06); border:none; color:rgba(var(--ink-rgb),0.5); font-size:13px; cursor:pointer; flex-shrink:0; }
 .rs-sec { font-size:10px; font-weight:700; color:rgba(var(--ink-rgb),0.45); text-transform:uppercase; letter-spacing:0.8px; padding:10px 14px 2px; }
@@ -247,7 +247,7 @@ body { background:var(--bg); font-family:'Inter',sans-serif; }
 .fni.on { background:#E9EFE6; color:var(--bg); }
 .fni.on .l { display:inline; }
 .fni:focus-visible { outline:2px solid var(--accent-light); outline-offset:2px; }
-.more-h1 { font-family:'Bebas Neue',sans-serif; font-size:30px; letter-spacing:1px; color:var(--ink); margin:4px 2px 8px; }
+
 .more-menu { display:flex; flex-direction:column; background:rgba(var(--ink-rgb),0.03); border:1px solid rgba(var(--ink-rgb),0.08); border-radius:var(--r-lg); overflow:hidden; }
 .more-menu button { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:16px; border:none; border-top:1px solid rgba(var(--ink-rgb),0.06); background:none; color:var(--ink); font-family:inherit; font-size:16px; font-weight:600; cursor:pointer; text-align:left; }
 .more-menu button:first-child { border-top:none; }
@@ -298,4 +298,7 @@ button:focus-visible, [role="button"]:focus-visible { outline:2px solid var(--ac
 .app.chat-mode .hdr { flex-shrink:0; }
 .app.chat-mode .ct { flex:1; min-height:0; display:flex; flex-direction:column; padding-bottom:0; }
 .app.chat-mode .chat-wrap { flex:1; min-height:0; }
+
+/* CZCIONKI: przyciski i pola formularzy dziedziczą Inter (przeglądarki domyślnie dają im własną czcionkę) */
+button, input, select, textarea { font-family:inherit; }
 `;
