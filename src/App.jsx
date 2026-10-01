@@ -171,7 +171,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
           {tab === "chat" && <ChatTab user={user} profile={profile} profiles={profiles} />}
           {tab === "more" && !moreView && (
             <>
-              <div className="more-h1">Więcej</div>
+              <div className="sh">Więcej</div>
               <div className="more-menu">
                 <button onClick={() => setMoreView("rules")}>Regulamin i nagrody <span>›</span></button>
                 {isAdmin && <button onClick={() => setMoreView("admin")}>Panel admina <span>{activeLg?.name} ›</span></button>}
