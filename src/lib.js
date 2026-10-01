@@ -364,3 +364,92 @@ export const formatDate = iso => {
   const [, m, d] = (iso || "").split("-");
   return d && m ? `${d}.${m}` : iso || "";
 };
+
+// ── STREFA KUPONÓW ────────────────────────────────────────────────────────────
+// Weekend kuponowy = mecze od piątku 12:00 do poniedziałku, bez Ligi Mistrzów.
+// Typy można dodawać do piątku 12:00 (czas Warszawy). Klucz weekendu = data piątku.
+export const COUPON_MAX_PICKS = 10;   // typów na gracza
+export const COUPON_SIZE = 5;         // zdarzeń na kuponie
+export const COUPON_MIN_VOTES = 2;    // minimum głosów, żeby typ trafił na kupon
+export const COUPON_TEST_UNTIL = "2026-11-01"; // październik = miesiąc testowy
+
+export const warsawNowKey = () => new Intl.DateTimeFormat("sv-SE", {
+  timeZone: "Europe/Warsaw", year: "numeric", month: "2-digit", day: "2-digit",
+  hour: "2-digit", minute: "2-digit", second: "2-digit",
+}).format(new Date()).replace(" ", "T");
+
+const addDays = (iso, n) => { const d = new Date(`${iso}T12:00:00Z`); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+const isoDow = iso => { const d = new Date(`${iso}T12:00:00Z`).getUTCDay(); return d === 0 ? 7 : d; };
+
+// Piątek weekendu, do którego należy data (pt–pn), albo null dla wt–czw
+export const weekendOf = iso => {
+  const dow = isoDow(iso);
+  return [5, 6, 7, 1].includes(dow) ? addDays(iso, -((dow - 5 + 7) % 7)) : null;
+};
+
+// Aktualny weekend kuponowy: od wtorku pokazujemy już najbliższy piątek
+export const currentCouponWeekend = (nowKey = warsawNowKey()) => {
+  const today = nowKey.slice(0, 10);
+  return weekendOf(today) || addDays(today, 5 - isoDow(today));
+};
+
+export const couponDeadlineKey = wk => `${wk}T12:00`;
+export const isCouponOpen = (wk, nowKey = warsawNowKey()) => nowKey < couponDeadlineKey(wk);
+export const isCouponTest = wk => wk < COUPON_TEST_UNTIL;
+
+// „3–6 października” albo „31 października – 3 listopada”
+export const weekendLabel = wk => {
+  const end = addDays(wk, 3);
+  const f = (iso, o) => new Date(`${iso}T12:00:00Z`).toLocaleDateString("pl-PL", { timeZone: "UTC", ...o });
+  return wk.slice(5, 7) === end.slice(5, 7)
+    ? `${f(wk, { day: "numeric" })}–${f(end, { day: "numeric", month: "long" })}`
+    : `${f(wk, { day: "numeric", month: "long" })} – ${f(end, { day: "numeric", month: "long" })}`;
+};
+
+// Mecze, które można dodać do kuponu danego weekendu
+export const couponMatches = (matches, leagues, wk) => {
+  const ucl = new Set(leagues.filter(l => l.name === "Liga Mistrzów").map(l => l.id));
+  return matches
+    .filter(m => !ucl.has(m.league_id) && weekendOf(m.match_date) === wk && kickoffKey(m) >= couponDeadlineKey(wk))
+    .sort((a, b) => kickoffKey(a).localeCompare(kickoffKey(b)));
+};
+
+// Składanie kuponu z typów wszystkich graczy na jeden weekend:
+// 1) na każdy mecz liczy się tylko typ z największą liczbą głosów (remis → niższy kurs),
+// 2) typ musi mieć min. COUPON_MIN_VOTES głosów,
+// 3) bierzemy COUPON_SIZE najpopularniejszych (remis → niższy kurs).
+export function buildCoupon(picks, matchesById) {
+  const groups = new Map();
+  picks.forEach(p => {
+    if (!matchesById.get(p.match_id)) return;
+    const k = `${p.match_id}|${p.pick}`;
+    if (!groups.has(k)) groups.set(k, { match_id: p.match_id, pick: p.pick, voters: [] });
+    groups.get(k).voters.push(p.user_id);
+  });
+  const oddsOf = g => parseFloat(matchesById.get(g.match_id)[`odds_${g.pick}`]) || 99;
+  const better = (a, b) => a.voters.length - b.voters.length || oddsOf(b) - oddsOf(a);
+  const perMatch = new Map();
+  for (const g of groups.values()) {
+    const cur = perMatch.get(g.match_id);
+    if (!cur || better(g, cur) > 0) perMatch.set(g.match_id, g);
+  }
+  const events = [...perMatch.values()]
+    .filter(g => g.voters.length >= COUPON_MIN_VOTES)
+    .sort((a, b) => better(b, a))
+    .slice(0, COUPON_SIZE)
+    .map(g => {
+      const match = matchesById.get(g.match_id);
+      const status = match.status === "finished" ? (match.result === g.pick ? "won" : "lost") : "pending";
+      return { ...g, match, odds: oddsOf(g), status };
+    })
+    .sort((a, b) => kickoffKey(a.match).localeCompare(kickoffKey(b.match)));
+  const lost = events.filter(e => e.status === "lost");
+  return {
+    events,
+    totalOdds: events.reduce((s, e) => s * e.odds, 1),
+    status: events.length === 0 ? "empty" : lost.length ? "lost" : events.every(e => e.status === "won") ? "won" : "live",
+    killer: lost[0] || null,
+    picksCount: picks.length,
+    participants: new Set(picks.map(p => p.user_id)).size,
+  };
+}
