@@ -96,12 +96,15 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
 
   const openTab = key => { setTab(key); if (key !== "more") setMoreView(null); };
 
+  // Pasek lig tylko tam, gdzie liga ma znaczenie: Mecze, Tabela i Panel admina
+  const showLeagues = tab === "matches" || tab === "leaderboard" || (tab === "more" && moreView === "admin");
+
   if (loading) return <Splash label="ŁADOWANIE" />;
 
   return (
     <>
       <style>{css}</style>
-      <div className="app">
+      <div className={`app ${showLeagues ? "" : "no-leagues"}`}>
         {showTeamPicker && <TeamPicker onSave={saveTeam} onSkip={() => setShowTeamPicker(false)} />}
 
         {/* NAGŁÓWEK */}
@@ -120,15 +123,17 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
               </button>
             </div>
 
-            <div className="league-tabs">
-              {leagues.map(l => (
-                <button key={l.id} className={`league-tab ${activeLeague === l.id ? "active" : ""}`} onClick={() => setActiveLeague(l.id)} title={l.name}>
-                  <img src={LEAGUE_LOGOS[l.name]} alt={l.name} onError={e => { e.target.style.opacity = "0.2"; }} />
-                  {missingByLeague[l.id] > 0 && <div className="lbadge">{missingByLeague[l.id]}</div>}
-                  <div className="ldot" />
-                </button>
-              ))}
-            </div>
+            {showLeagues && (
+              <div className="league-tabs">
+                {leagues.map(l => (
+                  <button key={l.id} className={`league-tab ${activeLeague === l.id ? "active" : ""}`} onClick={() => setActiveLeague(l.id)} title={l.name}>
+                    <img src={LEAGUE_LOGOS[l.name]} alt={l.name} onError={e => { e.target.style.opacity = "0.2"; }} />
+                    {missingByLeague[l.id] > 0 && <div className="lbadge">{missingByLeague[l.id]}</div>}
+                    <div className="ldot" />
+                  </button>
+                ))}
+              </div>
+            )}
 
             <div className="stats">
               {[
