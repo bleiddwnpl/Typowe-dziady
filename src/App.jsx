@@ -96,6 +96,9 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
 
   const openTab = key => { setTab(key); if (key !== "more") setMoreView(null); };
 
+  // Każda zakładka i każdy ekran z „Więcej” zaczyna się od góry
+  useEffect(() => { window.scrollTo(0, 0); }, [tab, moreView]);
+
   // Pasek lig tylko tam, gdzie liga ma znaczenie: Mecze, Tabela i Panel admina
   const showLeagues = tab === "matches" || tab === "leaderboard" || (tab === "more" && moreView === "admin");
   // Punkty, pozycja i trafienia dotyczą wybranej ligi — pokazujemy je tylko przy Meczach i Tabeli
@@ -106,7 +109,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
   return (
     <>
       <style>{css}</style>
-      <div className={`app ${showLeagues ? "" : "no-leagues"} ${showStats ? "" : "no-stats"}`}>
+      <div className={`app ${showLeagues ? "" : "no-leagues"} ${showStats ? "" : "no-stats"} ${tab === "chat" ? "chat-mode" : ""}`}>
         {showTeamPicker && <TeamPicker onSave={saveTeam} onSkip={() => setShowTeamPicker(false)} />}
 
         {/* NAGŁÓWEK */}
