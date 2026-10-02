@@ -10,6 +10,7 @@ export const STADIUM_URL = "https://images.unsplash.com/photo-1522778119026-d647
 const CDN = "https://pub-3bd35431294c47068cbf31a95d572166.r2.dev/logos";
 const WF  = "https://cdn.prod.website-files.com/68f550992570ca0322737dc2";
 const STORAGE = "https://lutrkrahqwumjlsatzzd.supabase.co/storage/v1/object/public/Legia";
+const STORAGE_LALIGA = "https://lutrkrahqwumjlsatzzd.supabase.co/storage/v1/object/public/Laliga";
 
 export const PICK_LABELS = { home: "1", draw: "X", away: "2" };
 export const PICK_NAMES  = { home: "Gospodarz", draw: "Remis", away: "Gość" };
@@ -147,6 +148,8 @@ export const FEATURED_TEAMS = {
   "Legia Warszawa": { photo: `${STORAGE}/L1.jpg`, color: "#00963f", colorRgb: "0,150,63",   textColor: "#4ade80", bgDark: "#0a1a10" },
   "Barcelona":      { photo: `${STORAGE}/B.jpg`,  color: "#a50044", colorRgb: "165,0,68",   textColor: "#fb7185", bgDark: "#1a0a10" },
   "Real Madrid":    { photo: `${STORAGE}/R.jpg`,  color: "#febe10", colorRgb: "254,190,16", textColor: "#fde047", bgDark: "#1a1608" },
+  "Atlético Madrid": { photo: `${STORAGE_LALIGA}/Atm.jpeg`,     color: "#cb3524", colorRgb: "203,53,36",  textColor: "#f87171", bgDark: "#1a0c0a" },
+  "Real Sociedad":   { photo: `${STORAGE_LALIGA}/Sociedad.jpg`, color: "#0067b1", colorRgb: "0,103,177",  textColor: "#7cc4ff", bgDark: "#08131f" },
 };
 
 export const getFeaturedTeam = (match) =>
