@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { supabase, LEAGUE_LOGOS, buildLeaderboard, buildRoundStars, buildRankChanges, isMatchLocked, currentCouponWeekend, isCouponOpen, COUPON_MAX_PICKS } from "./lib";
 import { css } from "./styles";
-import { ClubAvatar, TeamPicker, NavIcon, PitchMark } from "./components";
+import { ClubAvatar, TeamPicker, NavIcon, PitchMark, NickEditor } from "./components";
 import { useAppData } from "./useAppData";
 import AuthScreen from "./AuthScreen";
 import ErrorBoundary from "./ErrorBoundary";
@@ -31,7 +31,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
   const [tab, setTab] = useState("matches");
   const [activeLeague, setActiveLeague] = useState(null);
   const [showTeamPicker, setShowTeamPicker] = useState(false);
-  const [moreView, setMoreView] = useState(null); // null | "coupons" | "rules" | "admin"
+  const [moreView, setMoreView] = useState(null); // null | "coupons" | "nick" | "rules" | "admin"
 
   const data = useAppData(user, profile);
   const { leagues, matches, tips, tipStats, profiles, polls, pollOptions, pollVotes, loading, toast, onlineUsers, couponPicks, couponParticipants, actions } = data;
@@ -186,6 +186,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
                 <button onClick={() => setMoreView("rules")}>Regulamin i nagrody <span>›</span></button>
                 {isAdmin && <button onClick={() => setMoreView("admin")}>Panel admina <span>{activeLg?.name} ›</span></button>}
                 <button onClick={() => setShowTeamPicker(true)}>Ulubiony klub <span>{profile?.favorite_team || "wybierz"} ›</span></button>
+                <button onClick={() => setMoreView("nick")}>Twój nick <span>{profile?.name} ›</span></button>
                 <button className="danger" onClick={onLogout}>Wyloguj</button>
               </div>
             </>
@@ -194,6 +195,12 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
           {tab === "more" && moreView === "coupons" && (
             <CouponTab matches={matches} leagues={leagues} profiles={profiles} couponPicks={couponPicks}
               couponParticipants={couponParticipants} userId={user.id} onToggle={actions.toggleCouponPick} onReload={actions.reloadCoupon} />
+          )}
+          {tab === "more" && moreView === "nick" && (
+            <NickEditor profile={profile} profiles={profiles} onSave={async name => {
+              const saved = await actions.changeNick(name);
+              if (saved) { setProfile(prev => ({ ...prev, name: saved.name, name_changed_at: saved.name_changed_at })); setMoreView(null); }
+            }} />
           )}
           {tab === "more" && moreView === "rules" && <RulesTab profiles={profiles} tips={tips} matches={matches} leagues={leagues} userId={user.id} />}
           {tab === "more" && moreView === "admin" && isAdmin && (
