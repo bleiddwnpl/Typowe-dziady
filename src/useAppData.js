@@ -201,6 +201,15 @@ export function useAppData(user, profile) {
     statsChannelRef.current?.send({ type: "broadcast", event: "coupon", payload: {} });
   };
 
+  // Zmiana nicku — limit 7 dni, długość i unikalność sprawdza też baza
+  const changeNick = async name => {
+    const { data, error } = await supabase.from("profiles").update({ name }).eq("id", user.id).select().single();
+    if (error) { showToast(`⚠️ ${error.message}`); return null; }
+    showToast(`Nick zmieniony na „${data.name}”`);
+    await load();
+    return data;
+  };
+
   // ── AKCJE ADMINA ────────────────────────────────────────────────────────────
   const matchPayload = d => ({
     league_id: d.league_id, home: d.home, away: d.away,
@@ -264,6 +273,6 @@ export function useAppData(user, profile) {
     leagues, matches, tips, tipStats, profiles, polls, pollOptions, pollVotes, loading, toast, onlineUsers,
     couponPicks, couponParticipants,
     actions: { saveFavoriteTeam, placeTip, castVote, refreshMatchTips, addMatch, updateMatch, saveResult, addPoll, closePoll, deletePoll,
-      toggleCouponPick, reloadCoupon: loadCoupon },
+      toggleCouponPick, reloadCoupon: loadCoupon, changeNick },
   };
 }
