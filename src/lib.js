@@ -150,6 +150,8 @@ export const FEATURED_TEAMS = {
   "Real Madrid":    { photo: `${STORAGE}/R.jpg`,  color: "#febe10", colorRgb: "254,190,16", textColor: "#fde047", bgDark: "#1a1608" },
   "Atlético Madrid": { photo: `${STORAGE_LALIGA}/Atm.jpeg`,     color: "#cb3524", colorRgb: "203,53,36",  textColor: "#f87171", bgDark: "#1a0c0a" },
   "Real Sociedad":   { photo: `${STORAGE_LALIGA}/Sociedad.jpg`, color: "#0067b1", colorRgb: "0,103,177",  textColor: "#7cc4ff", bgDark: "#08131f" },
+  "Real Betis":      { photo: `${STORAGE_LALIGA}/Betis.jpg`,    color: "#00954c", colorRgb: "0,149,76",   textColor: "#5fe39a", bgDark: "#081a10" },
+  "Athletic Bilbao": { photo: `${STORAGE_LALIGA}/Bilbao.jpg`,   color: "#ee2523", colorRgb: "238,37,35",  textColor: "#ff7b7b", bgDark: "#1a0b0b" },
 };
 
 export const getFeaturedTeam = (match) =>
