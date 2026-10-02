@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { TEAM_LOGOS, TEAMS_BY_LEAGUE, FEATURED_TEAMS, PICK_LABELS, getAvatar, getTeamsForLeague, getFeaturedTeam, isMatchLocked, plural, formatDate } from "./lib";
+import { TEAM_LOGOS, TEAMS_BY_LEAGUE, FEATURED_TEAMS, PICK_LABELS, getAvatar, getTeamsForLeague, getFeaturedTeam, isMatchLocked, plural, formatDate, normalizeNick, NICK_MIN, NICK_MAX, NICK_DAYS } from "./lib";
 
 // Wspólne elementy interfejsu używane przez kilka zakładek
 
@@ -362,5 +362,42 @@ export function PitchMark({ size = 36 }) {
       <rect x="1" y="10" width="2.8" height="6" />
       <rect x="36.2" y="10" width="2.8" height="6" />
     </svg>
+  );
+}
+
+// ── ZMIANA NICKU ──────────────────────────────────────────────────────────────
+export function NickEditor({ profile, profiles, onSave }) {
+  const [value, setValue] = useState(profile?.name || "");
+  const [saving, setSaving] = useState(false);
+  const clean = normalizeNick(value);
+  const nextAt = profile?.name_changed_at ? new Date(new Date(profile.name_changed_at).getTime() + NICK_DAYS * 86400000) : null;
+  const locked = !profile?.is_admin && nextAt && nextAt > new Date();
+  const taken = profiles.some(p => p.id !== profile?.id && (p.name || "").toLowerCase() === clean.toLowerCase());
+  const error = clean.length < NICK_MIN || clean.length > NICK_MAX ? `Nick musi mieć od ${NICK_MIN} do ${NICK_MAX} znaków`
+    : taken ? "Ten nick jest już zajęty" : null;
+  const same = clean === profile?.name;
+  const when = d => d.toLocaleString("pl-PL", { timeZone: "Europe/Warsaw", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" });
+
+  const save = async () => { setSaving(true); await onSave(clean); setSaving(false); };
+
+  return (
+    <>
+      <div className="sh">Twój nick</div>
+      <div className="nick-card">
+        <input className="mi" value={value} maxLength={30} onChange={e => setValue(e.target.value)} disabled={locked}
+          aria-label="Nowy nick" onKeyDown={e => { if (e.key === "Enter" && !locked && !same && !error) save(); }} />
+        <div className={`nick-hint ${!locked && !same && error ? "err" : ""}`}>
+          {locked ? `Kolejna zmiana możliwa od ${when(nextAt)}.`
+            : !same && error ? error
+            : `Od ${NICK_MIN} do ${NICK_MAX} znaków. Spacje w środku są dozwolone, np. „Stary Wilk”.`}
+        </div>
+        <button className="mprim" onClick={save} disabled={locked || same || !!error || saving}>
+          {saving ? "Zapisywanie..." : "Zapisz nick"}
+        </button>
+        <div className="nick-note">
+          Nick możesz zmienić raz na {NICK_DAYS} dni. Nowy nick od razu pojawi się w tabeli, na czacie, w statystykach i w strefie kuponów.
+        </div>
+      </div>
+    </>
   );
 }
