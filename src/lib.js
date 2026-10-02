@@ -453,3 +453,7 @@ export function buildCoupon(picks, matchesById) {
     participants: new Set(picks.map(p => p.user_id)).size,
   };
 }
+
+// ── NICK ──────────────────────────────────────────────────────────────────────
+export const NICK_MIN = 2, NICK_MAX = 20, NICK_DAYS = 7;   // te same zasady pilnuje baza
+export const normalizeNick = s => (s || "").trim().replace(/\s+/g, " ");
