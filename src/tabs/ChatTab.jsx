@@ -95,11 +95,11 @@ export default function ChatTab({ user, profile, profiles }) {
               return (
                 <div key={msg.id} className="cbw" style={{ alignItems: isMe ? "flex-end" : "flex-start" }}>
                   <div className={`crow ${isMe ? "me" : ""}`}>
-                    {!isMe && showName && <ClubAvatar favoriteTeam={sp?.favorite_team} name={msg.user_name} size={28} />}
+                    {!isMe && showName && <ClubAvatar favoriteTeam={sp?.favorite_team} name={sp?.name || msg.user_name} size={28} />}
                     {!isMe && !showName && <div style={{ width: 28, flexShrink: 0 }} />}
                     <div className={`cb ${isMe ? "mine" : "theirs"}`}>{msg.content}</div>
                   </div>
-                  {showName && !isMe && <div className="csnd">{msg.user_name}</div>}
+                  {showName && !isMe && <div className="csnd">{sp?.name || msg.user_name}</div>}
                   {showName && isMe && <div className="ctm">{fmt(msg.created_at)}</div>}
                 </div>
               );
