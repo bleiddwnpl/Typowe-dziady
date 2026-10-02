@@ -370,4 +370,13 @@ button, input, select, textarea { font-family:inherit; }
 .cz-hist-icon { font-family:'Bebas Neue',sans-serif; font-size:22px; color:rgba(var(--ink-rgb),0.35); }
 .cz-hist-icon.won { color:var(--win); } .cz-hist-icon.lost { color:var(--loss); }
 .more-menu .badge { color:var(--ink); background:var(--accent); font-size:11px; font-weight:700; padding:2px 8px; border-radius:var(--r-pill); margin-left:8px; }
+
+/* ZMIANA NICKU */
+.nick-card { background:rgba(var(--ink-rgb),0.04); border:1px solid rgba(var(--ink-rgb),0.08); border-radius:var(--r-lg); padding:16px; }
+.nick-card .mi { font-size:16px; margin-bottom:6px; }
+.nick-card .mi:disabled { opacity:0.5; }
+.nick-hint { font-size:12px; color:rgba(var(--ink-rgb),0.45); margin:0 2px 14px; line-height:1.5; }
+.nick-hint.err { color:var(--loss); }
+.nick-note { font-size:12px; color:rgba(var(--ink-rgb),0.45); margin-top:12px; line-height:1.5; }
+.mprim:disabled { opacity:0.4; cursor:not-allowed; }
 `;
