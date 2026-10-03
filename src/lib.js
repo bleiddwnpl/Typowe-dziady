@@ -152,6 +152,10 @@ export const FEATURED_TEAMS = {
   "Real Sociedad":   { photo: `${STORAGE_LALIGA}/Sociedad.jpg`, color: "#0067b1", colorRgb: "0,103,177",  textColor: "#7cc4ff", bgDark: "#08131f" },
   "Real Betis":      { photo: `${STORAGE_LALIGA}/Betis.jpg`,    color: "#00954c", colorRgb: "0,149,76",   textColor: "#5fe39a", bgDark: "#081a10" },
   "Athletic Bilbao": { photo: `${STORAGE_LALIGA}/Bilbao.jpg`,   color: "#ee2523", colorRgb: "238,37,35",  textColor: "#ff7b7b", bgDark: "#1a0b0b" },
+  "Málaga":           { photo: `${STORAGE_LALIGA}/Malaga.jpg`,   color: "#0096d6", colorRgb: "0,150,214",  textColor: "#6cc8ff", bgDark: "#07141d" },
+  "Valencia":         { photo: `${STORAGE_LALIGA}/Valencia.jpg`, color: "#ee7623", colorRgb: "238,118,35", textColor: "#ffb07a", bgDark: "#1a1008" },
+  "Racing Santander": { photo: `${STORAGE_LALIGA}/Santander.jpg`, color: "#008d45", colorRgb: "0,141,69",  textColor: "#59d98e", bgDark: "#07180e" },
+  "Elche":            { photo: `${STORAGE_LALIGA}/Elche.jpg`,    color: "#2f9e5b", colorRgb: "47,158,91",  textColor: "#8fe8b2", bgDark: "#0a1810" },
 };
 
 export const getFeaturedTeam = (match) =>
