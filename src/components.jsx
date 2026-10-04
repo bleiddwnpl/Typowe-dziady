@@ -277,18 +277,23 @@ export function MatchCard({ match, tip, stats, tips, profiles, userId, onTip, on
 // highlight = drużyna podświetlona w barwach z ft (przy remisie obie, każda w swoich).
 function FeaturedSide({ team, highlight, ft, nameFirst, compact }) {
   const size = highlight ? 44 : 40;
-  // Długie nazwy i karta remisowa (dwie podświetlone nazwy) dostają mniejszą czcionkę, zawsze w jednej linii
-  const fontSize = team.length > 14 ? 15 : team.length > 10 ? 18 : compact ? 21 : highlight ? 24 : 20;
+  // Nazwy wielowyrazowe w dwóch liniach: pierwszy wyraz u góry, reszta pod spodem (np. REAL / MADRID)
+  const [first, ...rest] = team.toUpperCase().split(" ");
+  const lines = rest.length ? [first, rest.join(" ")] : [first];
+  const longest = Math.max(...lines.map(s => s.length));
+  const fontSize = longest > 10 ? 18 : compact ? 21 : highlight ? 24 : 20;
   const logo = (
     <img src={TEAM_LOGOS[team]} alt={team}
       style={{ width: size, height: size, objectFit: "contain", flexShrink: 0, filter: highlight ? `drop-shadow(0 2px 10px rgba(${ft.colorRgb},0.6))` : "drop-shadow(0 2px 6px rgba(0,0,0,0.5))" }} />
   );
   const name = (
-    <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize, color: highlight ? ft.textColor : "var(--ink)", letterSpacing: 0.5, textShadow: highlight ? `0 0 20px rgba(${ft.colorRgb},0.5)` : "none", textAlign: nameFirst ? "right" : "left", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", minWidth: 0 }}>
-      {team.toUpperCase()}
+    <span style={{ display: "flex", flexDirection: "column", alignItems: nameFirst ? "flex-end" : "flex-start", minWidth: 0,
+      fontFamily: "'Bebas Neue',sans-serif", fontSize, lineHeight: 1, color: highlight ? ft.textColor : "var(--ink)", letterSpacing: 0.5,
+      textShadow: highlight ? `0 0 20px rgba(${ft.colorRgb},0.5)` : "none", textAlign: nameFirst ? "right" : "left" }}>
+      {lines.map(line => <span key={line} style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "100%" }}>{line}</span>)}
     </span>
   );
-  return <div style={{ display: "flex", alignItems: "center", gap: team.length > 14 ? 6 : 8, minWidth: 0 }}>{nameFirst ? <>{name}{logo}</> : <>{logo}{name}</>}</div>;
+  return <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>{nameFirst ? <>{name}{logo}</> : <>{logo}{name}</>}</div>;
 }
 
 // Remis przy dwóch klubach ze zdjęciem: karta podzielona po skosie.
