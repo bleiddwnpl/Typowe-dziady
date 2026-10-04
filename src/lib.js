@@ -163,6 +163,9 @@ export const FEATURED_TEAMS = {
   "Rayo Vallecano":      { photo: `${STORAGE_LALIGA}/Vallecano.jpg`, color: "#e53027", colorRgb: "229,48,39",  textColor: "#ff9a8a", bgDark: "#1a0a09" },
   "Villarreal":          { photo: `${STORAGE_LALIGA}/Vilareal.jpg`,  color: "#ffe114", colorRgb: "255,225,20", textColor: "#fff07a", bgDark: "#1a1806" },
   "Deportivo La Coruña": { photo: `${STORAGE_LALIGA}/Deportivo.jpg`, color: "#0055a4", colorRgb: "0,85,164",   textColor: "#7aaeff", bgDark: "#06101c" },
+  "Deportivo Alavés":    { photo: `${STORAGE_LALIGA}/Alaves.jpg`,    color: "#1a5bab", colorRgb: "26,91,171",  textColor: "#84b3ff", bgDark: "#07111d" },
+  "Celta Vigo":          { photo: `${STORAGE_LALIGA}/Celta.jpg`,     color: "#8ac3ee", colorRgb: "138,195,238", textColor: "#bfe0ff", bgDark: "#0a141c" },
+  "Getafe":              { photo: `${STORAGE_LALIGA}/Getafe.jpg`,    color: "#005999", colorRgb: "0,89,153",   textColor: "#74b4ff", bgDark: "#06101b" },
 };
 
 // Klub, którego zdjęcie i barwy pokazujemy na karcie meczu.
