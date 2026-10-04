@@ -156,6 +156,9 @@ export const FEATURED_TEAMS = {
   "Valencia":         { photo: `${STORAGE_LALIGA}/Valencia.jpg`, color: "#ee7623", colorRgb: "238,118,35", textColor: "#ffb07a", bgDark: "#1a1008" },
   "Racing Santander": { photo: `${STORAGE_LALIGA}/Santander.jpg`, color: "#008d45", colorRgb: "0,141,69",  textColor: "#59d98e", bgDark: "#07180e" },
   "Elche":            { photo: `${STORAGE_LALIGA}/Elche.jpg`,    color: "#2f9e5b", colorRgb: "47,158,91",  textColor: "#8fe8b2", bgDark: "#0a1810" },
+  "Levante":          { photo: `${STORAGE_LALIGA}/Levante.jpg`,  color: "#1d4f91", colorRgb: "29,79,145",  textColor: "#8db8ff", bgDark: "#07101d" },
+  "Sevilla":          { photo: `${STORAGE_LALIGA}/Sevilla.jpg`,  color: "#d71920", colorRgb: "215,25,32",  textColor: "#ff8a8a", bgDark: "#1a0a0b" },
+  "Espanyol":         { photo: `${STORAGE_LALIGA}/Espanyol.jpg`, color: "#007fc8", colorRgb: "0,127,200",  textColor: "#74c2ff", bgDark: "#06121d" },
 };
 
 export const getFeaturedTeam = (match) =>
