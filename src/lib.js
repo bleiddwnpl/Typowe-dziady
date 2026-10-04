@@ -161,8 +161,13 @@ export const FEATURED_TEAMS = {
   "Espanyol":         { photo: `${STORAGE_LALIGA}/Espanyol.jpg`, color: "#007fc8", colorRgb: "0,127,200",  textColor: "#74c2ff", bgDark: "#06121d" },
 };
 
-export const getFeaturedTeam = (match) =>
-  FEATURED_TEAMS[match.home] ? match.home : FEATURED_TEAMS[match.away] ? match.away : null;
+// Klub, którego zdjęcie i barwy pokazujemy na karcie meczu.
+// Gdy zdjęcie mają oba kluby: przed typowaniem gospodarz, po typie „2” goście (po „1” i „X” gospodarz).
+export const getFeaturedTeam = (match, pick = null) => {
+  const home = !!FEATURED_TEAMS[match.home], away = !!FEATURED_TEAMS[match.away];
+  if (home && away) return pick === "away" ? match.away : match.home;
+  return home ? match.home : away ? match.away : null;
+};
 
 // ── AVATARY ───────────────────────────────────────────────────────────────────
 const AVATAR_COLORS = [
