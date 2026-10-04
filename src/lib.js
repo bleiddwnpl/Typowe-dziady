@@ -159,6 +159,10 @@ export const FEATURED_TEAMS = {
   "Levante":          { photo: `${STORAGE_LALIGA}/Levante.jpg`,  color: "#1d4f91", colorRgb: "29,79,145",  textColor: "#8db8ff", bgDark: "#07101d" },
   "Sevilla":          { photo: `${STORAGE_LALIGA}/Sevilla.jpg`,  color: "#d71920", colorRgb: "215,25,32",  textColor: "#ff8a8a", bgDark: "#1a0a0b" },
   "Espanyol":         { photo: `${STORAGE_LALIGA}/Espanyol.jpg`, color: "#007fc8", colorRgb: "0,127,200",  textColor: "#74c2ff", bgDark: "#06121d" },
+  "Osasuna":             { photo: `${STORAGE_LALIGA}/Osasuna.jpg`,   color: "#c4122f", colorRgb: "196,18,47",  textColor: "#ff7a8a", bgDark: "#1a080c" },
+  "Rayo Vallecano":      { photo: `${STORAGE_LALIGA}/Vallecano.jpg`, color: "#e53027", colorRgb: "229,48,39",  textColor: "#ff9a8a", bgDark: "#1a0a09" },
+  "Villarreal":          { photo: `${STORAGE_LALIGA}/Vilareal.jpg`,  color: "#ffe114", colorRgb: "255,225,20", textColor: "#fff07a", bgDark: "#1a1806" },
+  "Deportivo La Coruña": { photo: `${STORAGE_LALIGA}/Deportivo.jpg`, color: "#0055a4", colorRgb: "0,85,164",   textColor: "#7aaeff", bgDark: "#06101c" },
 };
 
 // Klub, którego zdjęcie i barwy pokazujemy na karcie meczu.
