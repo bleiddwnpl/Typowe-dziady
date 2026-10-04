@@ -230,7 +230,7 @@ function PicksHidden({ match }) {
 // Sama wybiera wygląd: zwykła karta albo duża karta wyróżnionego klubu
 export function MatchCard({ match, tip, stats, tips, profiles, userId, onTip, onLocked }) {
   const lck = isMatchLocked(match);
-  const featured = getFeaturedTeam(match);
+  const featured = getFeaturedTeam(match, tip?.pick);
 
   // Po gwizdku dociągamy typy wszystkich graczy tego meczu
   useEffect(() => { if (lck) onLocked?.(match.id); }, [lck, match.id]); // eslint-disable-line
