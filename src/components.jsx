@@ -274,56 +274,92 @@ export function MatchCard({ match, tip, stats, tips, profiles, userId, onTip, on
 }
 
 // Jedna strona meczu na dużej karcie. Gospodarz: herb → nazwa. Gość: nazwa → herb.
-function FeaturedSide({ team, featured, ft, nameFirst }) {
-  const isF = team === featured;
-  const size = isF ? 44 : 40;
+// highlight = drużyna podświetlona w barwach z ft (przy remisie obie, każda w swoich).
+function FeaturedSide({ team, highlight, ft, nameFirst, compact }) {
+  const size = highlight ? 44 : 40;
+  // Długie nazwy i karta remisowa (dwie podświetlone nazwy) dostają mniejszą czcionkę, zawsze w jednej linii
+  const fontSize = team.length > 14 ? 15 : team.length > 10 ? 18 : compact ? 21 : highlight ? 24 : 20;
   const logo = (
     <img src={TEAM_LOGOS[team]} alt={team}
-      style={{ width: size, height: size, objectFit: "contain", flexShrink: 0, filter: isF ? `drop-shadow(0 2px 10px rgba(${ft.colorRgb},0.6))` : "drop-shadow(0 2px 6px rgba(0,0,0,0.5))" }} />
+      style={{ width: size, height: size, objectFit: "contain", flexShrink: 0, filter: highlight ? `drop-shadow(0 2px 10px rgba(${ft.colorRgb},0.6))` : "drop-shadow(0 2px 6px rgba(0,0,0,0.5))" }} />
   );
   const name = (
-    <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: isF ? 24 : 20, color: isF ? ft.textColor : "var(--ink)", letterSpacing: 0.5, textShadow: isF ? `0 0 20px rgba(${ft.colorRgb},0.5)` : "none", textAlign: nameFirst ? "right" : "left" }}>
+    <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize, color: highlight ? ft.textColor : "var(--ink)", letterSpacing: 0.5, textShadow: highlight ? `0 0 20px rgba(${ft.colorRgb},0.5)` : "none", textAlign: nameFirst ? "right" : "left", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", minWidth: 0 }}>
       {team.toUpperCase()}
     </span>
   );
-  return <div style={{ display: "flex", alignItems: "center", gap: 8 }}>{nameFirst ? <>{name}{logo}</> : <>{logo}{name}</>}</div>;
+  return <div style={{ display: "flex", alignItems: "center", gap: team.length > 14 ? 6 : 8, minWidth: 0 }}>{nameFirst ? <>{name}{logo}</> : <>{logo}{name}</>}</div>;
+}
+
+// Remis przy dwóch klubach ze zdjęciem: karta podzielona po skosie.
+// Każde zdjęcie ma własną połówkę (58% szerokości, nachodzą na siebie pod skosem) i jest w niej wyśrodkowane.
+const DRAW_ACCENT = { color: "#e9eef2", colorRgb: "220,225,230", textColor: "#ffffff", bgDark: "#141413" };
+
+function SplitPhotos({ homeFt, awayFt }) {
+  const layer = { position: "absolute", top: 0, bottom: 0, width: "58%", backgroundSize: "cover", filter: "brightness(0.45) saturate(1.3)" };
+  return (
+    <>
+      <div style={{ ...layer, left: 0, backgroundImage: `url('${homeFt.photo}')`, backgroundPosition: "43% center", clipPath: "polygon(0 0, 100% 0, 72.41% 100%, 0 100%)" }} />
+      <div style={{ ...layer, right: 0, backgroundImage: `url('${awayFt.photo}')`, backgroundPosition: "57% center", clipPath: "polygon(27.59% 0, 100% 0, 100% 100%, 0 100%)" }} />
+      <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }} viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <line x1="58" y1="0" x2="42" y2="100" stroke="rgba(255,255,255,0.7)" strokeWidth="0.6" vectorEffect="non-scaling-stroke" />
+      </svg>
+    </>
+  );
 }
 
 function FeaturedMatchCard({ match, tip, onTip, lck, featured, missing, bottom }) {
-  const ft = FEATURED_TEAMS[featured];
+  const homeFt = FEATURED_TEAMS[match.home], awayFt = FEATURED_TEAMS[match.away];
+  const split = tip?.pick === "draw" && !!homeFt && !!awayFt;
+  const ft = split ? DRAW_ACCENT : FEATURED_TEAMS[featured];
   const chip = { background: "rgba(0,0,0,0.5)", color: "rgba(var(--ink-rgb),0.85)", fontSize: 11, fontWeight: 700, padding: "4px 10px", borderRadius: 20, backdropFilter: "blur(6px)" };
+
+  // Ramka: przy remisie przejście z barw gospodarza w barwy gości
+  const outer = split
+    ? { borderRadius: 24, padding: 2, marginBottom: 12, background: `linear-gradient(90deg, ${homeFt.color}, ${awayFt.color})`, boxShadow: "0 12px 40px rgba(0,0,0,0.35)" }
+    : { borderRadius: 24, marginBottom: 12, boxShadow: `0 0 0 2px ${missing ? "var(--loss)" : ft.color}, 0 12px 40px rgba(${ft.colorRgb},0.25)` };
+
   return (
-    <div style={{ borderRadius: 24, overflow: "hidden", marginBottom: 12, boxShadow: `0 0 0 2px ${missing ? "var(--loss)" : ft.color}, 0 12px 40px rgba(${ft.colorRgb},0.25)` }}>
-      <div style={{ position: "relative", height: 190 }}>
-        <div style={{ position: "absolute", inset: 0, backgroundImage: `url('${ft.photo}')`, backgroundSize: "cover", backgroundPosition: "center", filter: "brightness(0.45) saturate(1.3)" }} />
-        <div style={{ position: "absolute", inset: 0, background: `linear-gradient(180deg, rgba(${ft.colorRgb},0.15) 0%, rgba(var(--bg-rgb),0.55) 55%, ${ft.bgDark} 100%)` }} />
-        <div style={{ position: "absolute", top: 12, left: 14 }}><span style={chip}>{match.round}</span></div>
-        <div style={{ position: "absolute", top: 12, right: 14 }}><span style={{ ...chip, fontWeight: 600 }}>{formatDate(match.match_date)} · {match.match_time?.slice(0, 5)}</span></div>
-        <div style={{ position: "absolute", bottom: 14, left: 14, right: 14, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-          <FeaturedSide team={match.home} featured={featured} ft={ft} />
-          <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 16, color: "rgba(var(--ink-rgb),0.4)", flexShrink: 0 }}>VS</span>
-          <FeaturedSide team={match.away} featured={featured} ft={ft} nameFirst />
-        </div>
-      </div>
-      <div style={{ background: ft.bgDark, padding: 14 }}>
-        <div className="odds">
-          {["home", "draw", "away"].map(pick => {
-            const isSel = tip?.pick === pick && !lck;
-            return (
-              <button key={pick} className={`odd ${lck && tip?.pick !== pick ? "no" : ""}`} onClick={() => onTip(match.id, pick)} disabled={lck}
-                style={isSel ? { background: `rgba(${ft.colorRgb},0.15)`, borderColor: ft.color } : {}}>
-                <div className="ol" style={isSel ? { color: ft.textColor } : {}}>{PICK_LABELS[pick]}</div>
-                <div className="ov" style={isSel ? { color: ft.textColor } : {}}>{parseFloat(match[`odds_${pick}`]).toFixed(2)}</div>
-              </button>
-            );
-          })}
-        </div>
-        {!lck && tip && (
-          <div style={{ marginTop: 10, background: `rgba(${ft.colorRgb},0.1)`, border: `1px solid rgba(${ft.colorRgb},0.3)`, borderRadius: 10, padding: "8px 12px", fontSize: 13, color: ft.textColor, fontWeight: 600 }}>
-            ✓ Typ: {PICK_LABELS[tip.pick]} · +{parseFloat(match[`odds_${tip.pick}`]).toFixed(2)} pkt
+    <div style={outer}>
+      <div style={{ borderRadius: split ? 22 : 24, overflow: "hidden", background: ft.bgDark }}>
+        <div style={{ position: "relative", height: 190, overflow: "hidden" }}>
+          {split ? <SplitPhotos homeFt={homeFt} awayFt={awayFt} /> : (
+            <div style={{ position: "absolute", inset: 0, backgroundImage: `url('${ft.photo}')`, backgroundSize: "cover", backgroundPosition: "center", filter: "brightness(0.45) saturate(1.3)" }} />
+          )}
+          <div style={{ position: "absolute", inset: 0, background: split
+            ? `linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(10,10,10,0.55) 60%, ${ft.bgDark} 100%)`
+            : `linear-gradient(180deg, rgba(${ft.colorRgb},0.15) 0%, rgba(var(--bg-rgb),0.55) 55%, ${ft.bgDark} 100%)` }} />
+          <div style={{ position: "absolute", top: 12, left: 14 }}><span style={chip}>{match.round}</span></div>
+          <div style={{ position: "absolute", top: 12, right: 14 }}><span style={{ ...chip, fontWeight: 600 }}>{formatDate(match.match_date)} · {match.match_time?.slice(0, 5)}</span></div>
+          {split && (
+            <div style={{ position: "absolute", left: "50%", top: "44%", transform: "translate(-50%,-50%)", width: 38, height: 38, borderRadius: "50%", background: "rgba(0,0,0,0.6)", border: "1.5px solid rgba(255,255,255,0.6)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Bebas Neue',sans-serif", fontSize: 20, color: "#fff" }}>X</div>
+          )}
+          <div style={{ position: "absolute", bottom: 14, left: 14, right: 14, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+            <FeaturedSide team={match.home} highlight={split || match.home === featured} ft={split ? homeFt : ft} compact={split} />
+            {!split && <span style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 16, color: "rgba(var(--ink-rgb),0.4)", flexShrink: 0 }}>VS</span>}
+            <FeaturedSide team={match.away} highlight={split || match.away === featured} ft={split ? awayFt : ft} nameFirst compact={split} />
           </div>
-        )}
-        {bottom}
+        </div>
+        <div style={{ background: ft.bgDark, padding: 14 }}>
+          <div className="odds">
+            {["home", "draw", "away"].map(pick => {
+              const isSel = tip?.pick === pick && !lck;
+              return (
+                <button key={pick} className={`odd ${lck && tip?.pick !== pick ? "no" : ""}`} onClick={() => onTip(match.id, pick)} disabled={lck}
+                  style={isSel ? { background: `rgba(${ft.colorRgb},0.15)`, borderColor: ft.color } : {}}>
+                  <div className="ol" style={isSel ? { color: ft.textColor } : {}}>{PICK_LABELS[pick]}</div>
+                  <div className="ov" style={isSel ? { color: ft.textColor } : {}}>{parseFloat(match[`odds_${pick}`]).toFixed(2)}</div>
+                </button>
+              );
+            })}
+          </div>
+          {!lck && tip && (
+            <div style={{ marginTop: 10, background: `rgba(${ft.colorRgb},0.1)`, border: `1px solid rgba(${ft.colorRgb},0.3)`, borderRadius: 10, padding: "8px 12px", fontSize: 13, color: ft.textColor, fontWeight: 600 }}>
+              ✓ Typ: {PICK_LABELS[tip.pick]} · +{parseFloat(match[`odds_${tip.pick}`]).toFixed(2)} pkt
+            </div>
+          )}
+          {bottom}
+        </div>
       </div>
     </div>
   );
