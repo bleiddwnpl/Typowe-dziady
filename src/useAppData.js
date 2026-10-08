@@ -17,6 +17,7 @@ export function useAppData(user, profile) {
   const [tipStats, setTipStats] = useState({}); // { match_id: { home, draw, away, tipped: [user_id] } }
   const [couponPicks, setCouponPicks] = useState([]);              // typy kuponowe widoczne dla mnie
   const [couponParticipants, setCouponParticipants] = useState([]); // [{ weekend, user_id, picks }] przed terminem
+  const [couponOdds, setCouponOdds] = useState({});                  // kursy kuponu zamrożone w piątek o 12:00
 
   // Aktualne mecze dla subskrypcji realtime (bez ponownego łączenia przy każdej zmianie)
   const matchesRef = useRef([]);
@@ -49,12 +50,14 @@ export function useAppData(user, profile) {
   // Strefa kuponów: własne typy zawsze, cudze dopiero po piątku 12:00 (pilnuje baza).
   // Przed terminem widać tylko, kto już dorzucił typy i ile.
   const loadCoupon = useCallback(async () => {
-    const [{ data: cp }, { data: part }] = await Promise.all([
+    const [{ data: cp }, { data: part }, { data: co }] = await Promise.all([
       supabase.from("coupon_picks").select("*"),
       supabase.rpc("coupon_participants"),
+      supabase.from("coupon_odds").select("*"),
     ]);
     setCouponPicks(cp || []);
     setCouponParticipants(part || []);
+    setCouponOdds(Object.fromEntries((co || []).map(o => [o.match_id, o])));
   }, []);
 
   const load = useCallback(async () => {
@@ -210,12 +213,23 @@ export function useAppData(user, profile) {
     return data;
   };
 
+  // Aktualizacja kursów na żądanie (funkcja sync-odds w Supabase)
+  const syncOdds = async () => {
+    const { data, error } = await supabase.functions.invoke("sync-odds");
+    if (error) { showToast("⚠️ Nie udało się uruchomić aktualizacji kursów"); return null; }
+    if (!data?.ok) { showToast(`⏳ ${data?.message || "Aktualizacja niedostępna"}`); return data; }
+    showToast(`Kursy: zaktualizowano ${data.updated} z ${data.matched} dopasowanych meczów`);
+    await load();
+    return data;
+  };
+
   // ── AKCJE ADMINA ────────────────────────────────────────────────────────────
   const matchPayload = d => ({
     league_id: d.league_id, home: d.home, away: d.away,
     home_logo: TEAM_LOGOS[d.home] || null, away_logo: TEAM_LOGOS[d.away] || null,
     match_date: d.match_date, match_time: d.match_time, round: d.round,
     odds_home: parseFloat(d.odds_home), odds_draw: parseFloat(d.odds_draw), odds_away: parseFloat(d.odds_away),
+    ...(d.odds_manual !== undefined ? { odds_manual: d.odds_manual } : {}),
   });
 
   const addMatch = async d => {
@@ -271,8 +285,8 @@ export function useAppData(user, profile) {
 
   return {
     leagues, matches, tips, tipStats, profiles, polls, pollOptions, pollVotes, loading, toast, onlineUsers,
-    couponPicks, couponParticipants,
+    couponPicks, couponParticipants, couponOdds,
     actions: { saveFavoriteTeam, placeTip, castVote, refreshMatchTips, addMatch, updateMatch, saveResult, addPoll, closePoll, deletePoll,
-      toggleCouponPick, reloadCoupon: loadCoupon, changeNick },
+      toggleCouponPick, reloadCoupon: loadCoupon, changeNick, syncOdds },
   };
 }
