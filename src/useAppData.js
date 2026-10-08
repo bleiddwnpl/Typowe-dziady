@@ -225,7 +225,7 @@ export function useAppData(user, profile) {
         : status === 401 && !reason ? "brak uprawnień — zaloguj się ponownie"
         : reason ? reason
         : status ? `błąd serwera ${status}`
-        : "brak połączenia z funkcją — sprawdź, czy jest wdrożona";
+        : "funkcja nie odpowiada — nie jest wdrożona pod nazwą sync-odds albo nie uruchomiła się";
       console.error("sync-odds:", status, reason || error.message);
       showToast(`⚠️ Kursy: ${msg}`);
       return null;
