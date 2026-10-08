@@ -107,11 +107,15 @@ function CouponCard({ wk, number, coupon, userId, myPicks, profiles }) {
 }
 
 // ── STREFA KUPONÓW ────────────────────────────────────────────────────────────
-export default function CouponTab({ matches, leagues, profiles, couponPicks, couponParticipants, userId, onToggle, onReload }) {
+export default function CouponTab({ matches, leagues, profiles, couponPicks, couponParticipants, couponOdds = {}, userId, onToggle, onReload }) {
   const wk = currentCouponWeekend();
   const { nowKey, days, hours, mins } = useCountdown(wk);
   const open = isCouponOpen(wk, nowKey);
-  const matchesById = useMemo(() => new Map(matches.map(m => [m.id, m])), [matches]);
+  // Kupon po terminie liczymy z kursów zamrożonych w piątek o 12:00 (późniejsze zmiany go nie ruszają)
+  const matchesById = useMemo(() => new Map(matches.map(m => {
+    const f = couponOdds[m.id];
+    return [m.id, f ? { ...m, odds_home: f.odds_home, odds_draw: f.odds_draw, odds_away: f.odds_away } : m];
+  })), [matches, couponOdds]);
 
   // Po zamknięciu baza odsłania typy kolegów — dociągamy je
   useEffect(() => { onReload?.(); }, [open]); // eslint-disable-line
