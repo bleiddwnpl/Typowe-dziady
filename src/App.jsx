@@ -34,7 +34,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
   const [moreView, setMoreView] = useState(null); // null | "coupons" | "nick" | "rules" | "admin"
 
   const data = useAppData(user, profile);
-  const { leagues, matches, tips, tipStats, profiles, polls, pollOptions, pollVotes, loading, toast, onlineUsers, couponPicks, couponParticipants, actions } = data;
+  const { leagues, matches, tips, tipStats, profiles, polls, pollOptions, pollVotes, loading, toast, onlineUsers, couponPicks, couponParticipants, couponOdds, actions } = data;
 
   // Domyślnie pierwsza liga
   useEffect(() => {
@@ -194,7 +194,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
           {tab === "more" && moreView && <button className="more-back" onClick={() => setMoreView(null)}>‹ Więcej</button>}
           {tab === "more" && moreView === "coupons" && (
             <CouponTab matches={matches} leagues={leagues} profiles={profiles} couponPicks={couponPicks}
-              couponParticipants={couponParticipants} userId={user.id} onToggle={actions.toggleCouponPick} onReload={actions.reloadCoupon} />
+              couponParticipants={couponParticipants} couponOdds={couponOdds} userId={user.id} onToggle={actions.toggleCouponPick} onReload={actions.reloadCoupon} />
           )}
           {tab === "more" && moreView === "nick" && (
             <NickEditor profile={profile} profiles={profiles} onSave={async name => {
@@ -205,7 +205,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
           {tab === "more" && moreView === "rules" && <RulesTab profiles={profiles} tips={tips} matches={matches} leagues={leagues} userId={user.id} />}
           {tab === "more" && moreView === "admin" && isAdmin && (
             <AdminTab activeLeague={activeLeague} activeLg={activeLg} leagues={leagues} upcoming={upcoming} finished={finished}
-              leaguePolls={leaguePolls} pollVotes={pollVotes} profiles={profiles} tipStats={tipStats} actions={actions} />
+              leaguePolls={leaguePolls} pollVotes={pollVotes} profiles={profiles} tipStats={tipStats} actions={actions} canSync={!!profile?.is_admin} />
           )}
           </ErrorBoundary>
         </div>
