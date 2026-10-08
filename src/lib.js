@@ -481,3 +481,11 @@ export function buildCoupon(picks, matchesById) {
 // ── NICK ──────────────────────────────────────────────────────────────────────
 export const NICK_MIN = 2, NICK_MAX = 20, NICK_DAYS = 7;   // te same zasady pilnuje baza
 export const normalizeNick = s => (s || "").trim().replace(/\s+/g, " ");
+
+// ── TREND KURSU ───────────────────────────────────────────────────────────────
+// Zmiana od kursu otwarcia (pierwsza automatyczna aktualizacja albo ostatnia ręczna poprawka)
+export const oddsTrend = (match, pick) => {
+  const now = parseFloat(match[`odds_${pick}`]), open = parseFloat(match[`odds_open_${pick}`]);
+  if (!(now > 0) || !(open > 0) || Math.abs(now - open) < 0.05) return null;
+  return { dir: now > open ? "up" : "down", from: open };
+};
