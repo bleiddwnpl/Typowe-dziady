@@ -216,7 +216,20 @@ export function useAppData(user, profile) {
   // Aktualizacja kursów na żądanie (funkcja sync-odds w Supabase)
   const syncOdds = async () => {
     const { data, error } = await supabase.functions.invoke("sync-odds");
-    if (error) { showToast("⚠️ Nie udało się uruchomić aktualizacji kursów"); return null; }
+    if (error) {
+      // Pokazujemy prawdziwą przyczynę zamiast ogólnego komunikatu
+      const status = error.context?.status;
+      let reason = "";
+      try { reason = (await error.context.json())?.message || ""; } catch { /* odpowiedź bez treści JSON */ }
+      const msg = status === 404 ? "funkcja sync-odds nie jest wdrożona w Supabase (sprawdź nazwę)"
+        : status === 401 && !reason ? "brak uprawnień — zaloguj się ponownie"
+        : reason ? reason
+        : status ? `błąd serwera ${status}`
+        : "brak połączenia z funkcją — sprawdź, czy jest wdrożona";
+      console.error("sync-odds:", status, reason || error.message);
+      showToast(`⚠️ Kursy: ${msg}`);
+      return null;
+    }
     if (!data?.ok) { showToast(`⏳ ${data?.message || "Aktualizacja niedostępna"}`); return data; }
     showToast(`Kursy: zaktualizowano ${data.updated} z ${data.matched} dopasowanych meczów`);
     await load();
