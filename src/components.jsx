@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { TEAM_LOGOS, TEAMS_BY_LEAGUE, FEATURED_TEAMS, PICK_LABELS, getAvatar, getTeamsForLeague, getFeaturedTeam, isMatchLocked, plural, formatDate, normalizeNick, NICK_MIN, NICK_MAX, NICK_DAYS } from "./lib";
+import { TEAM_LOGOS, TEAMS_BY_LEAGUE, FEATURED_TEAMS, PICK_LABELS, getAvatar, getTeamsForLeague, getFeaturedTeam, isMatchLocked, plural, formatDate, oddsTrend, normalizeNick, NICK_MIN, NICK_MAX, NICK_DAYS } from "./lib";
 
 // Wspólne elementy interfejsu używane przez kilka zakładek
 
@@ -79,6 +79,13 @@ export function useSheetClose(onClose) {
       if (!closedByBack && window.history.state?.tdSheet === id) window.history.back();
     };
   }, []);
+}
+
+// Mała strzałka przy kursie: ▲ kurs wzrósł, ▼ spadł od dodania meczu
+export function OddsTrend({ match, pick }) {
+  const t = oddsTrend(match, pick);
+  if (!t) return null;
+  return <span className={`otr ${t.dir}`} title={`Kurs ${t.dir === "up" ? "wzrósł" : "spadł"} z ${t.from.toFixed(2)}`}>{t.dir === "up" ? "▲" : "▼"}</span>;
 }
 
 // ── TEAM PICKER ───────────────────────────────────────────────────────────────
@@ -263,6 +270,7 @@ export function MatchCard({ match, tip, stats, tips, profiles, userId, onTip, on
             <button key={pick} className={`odd ${tip?.pick === pick && !lck ? "sel" : ""} ${lck && tip?.pick !== pick ? "no" : ""}`} onClick={() => onTip(match.id, pick)} disabled={lck}>
               <div className="ol">{PICK_LABELS[pick]}</div>
               <div className="ov">{parseFloat(match[`odds_${pick}`]).toFixed(2)}</div>
+              <OddsTrend match={match} pick={pick} />
             </button>
           ))}
         </div>
@@ -354,6 +362,7 @@ function FeaturedMatchCard({ match, tip, onTip, lck, featured, missing, bottom }
                   style={isSel ? { background: `rgba(${ft.colorRgb},0.15)`, borderColor: ft.color } : {}}>
                   <div className="ol" style={isSel ? { color: ft.textColor } : {}}>{PICK_LABELS[pick]}</div>
                   <div className="ov" style={isSel ? { color: ft.textColor } : {}}>{parseFloat(match[`odds_${pick}`]).toFixed(2)}</div>
+                  <OddsTrend match={match} pick={pick} />
                 </button>
               );
             })}
