@@ -30,7 +30,7 @@ function FinishedMatches({ matches, myTip, tips, profiles, userId }) {
                     <div className="tm"><TeamLogo name={match.home} size={28} /><span className="tn">{match.home}</span></div>
                     <div className="vs-sep">
                       <div style={{ fontSize: 10, color: "rgba(var(--ink-rgb),0.4)", textTransform: "uppercase", letterSpacing: 1, textAlign: "center" }}>Wynik</div>
-                      <div className="vs-result">{PICK_LABELS[match.result]}</div>
+                      <div className="vs-result">{match.score_home != null ? `${match.score_home}:${match.score_away}` : PICK_LABELS[match.result]}</div>
                     </div>
                     <div className="tm r"><TeamLogo name={match.away} size={28} /><span className="tn">{match.away}</span></div>
                   </div>
