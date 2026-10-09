@@ -400,4 +400,6 @@ button, input, select, textarea { font-family:inherit; }
 .sync-import { width:100%; margin-top:12px; padding:10px 12px; border-radius:var(--r-md); border:1px dashed rgba(var(--ink-rgb),0.18); background:rgba(var(--ink-rgb),0.03); color:var(--ink); font-size:13px; font-weight:700; cursor:pointer; text-align:left; font-family:inherit; }
 .sync-import span { display:block; font-size:11px; font-weight:500; color:rgba(var(--ink-rgb),0.45); margin-top:2px; }
 .sync-import:disabled { opacity:0.5; cursor:wait; }
+
+.sync-sep { margin-top:14px; padding-top:14px; border-top:1px solid rgba(var(--ink-rgb),0.08); }
 `;
