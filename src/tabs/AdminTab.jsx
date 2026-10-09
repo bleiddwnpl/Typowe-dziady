@@ -35,7 +35,8 @@ function OddsSyncPanel({ onSync }) {
   }, []);
   useEffect(() => { loadRun(); }, [loadRun]);
 
-  const sync = async () => { setBusy(true); await onSync(); await loadRun(); setBusy(false); };
+  const sync = async (importMatches = false) => { setBusy(true); await onSync({ importMatches }); await loadRun(); setBusy(false); };
+  const [showAdded, setShowAdded] = useState(false);
   const when = run && new Date(run.ran_at).toLocaleString("pl-PL", { timeZone: "Europe/Warsaw", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
   const miss = run?.unmatched || [];
 
@@ -45,13 +46,30 @@ function OddsSyncPanel({ onSync }) {
         <div style={{ minWidth: 0 }}>
           <div className="sync-title">⚡ Kursy automatyczne</div>
           <div className="sync-meta">
-            {run ? <>Ostatnio: {when} ({run.trigger === "admin" ? "ręcznie" : "automatycznie"}) · {run.updated} zmian, {run.matched} dopasowanych
+            {run ? <>Ostatnio: {when} ({run.trigger?.startsWith("admin") ? "ręcznie" : "automatycznie"}) · {run.updated} zmian, {run.matched} dopasowanych
+              {run.trigger?.endsWith("+import") && <> · dodano {run.added} meczów</>}
               {run.credits_remaining != null && <> · limit API: {run.credits_remaining}</>}</> : "Jeszcze nie było aktualizacji"}
             {run?.error && <div className="err">⚠️ {run.error}</div>}
           </div>
         </div>
-        <button className="sync-btn" onClick={sync} disabled={busy}>{busy ? "Pobieranie..." : "Odśwież teraz"}</button>
+        <button className="sync-btn" onClick={() => sync(false)} disabled={busy}>{busy ? "Pobieranie..." : "Odśwież teraz"}</button>
       </div>
+      <button className="sync-import" onClick={() => sync(true)} disabled={busy}>
+        ⬇️ Pobierz mecze weekendu <span>Ekstraklasa, Premier League, La Liga, Serie A · automatycznie we wtorek rano</span>
+      </button>
+      {(run?.added_list?.length > 0 || run?.import_issues?.length > 0) && (
+        <div className="sync-miss">
+          {run.added_list?.length > 0 && <><b style={{ color: "var(--win)" }}>Dodano {run.added_list.length} meczów</b>{" "}</>}
+          {run.import_issues?.length > 0 && <><b>{run.import_issues.length} nie dodano</b>{" "}</>}
+          <button onClick={() => setShowAdded(v => !v)} style={{ background: "none", border: "none", color: "var(--accent-light)", fontSize: 12, fontWeight: 600, cursor: "pointer", padding: 0 }}>
+            {showAdded ? "Ukryj" : "Pokaż"}
+          </button>
+          {showAdded && <div style={{ marginTop: 6 }}>
+            {run.added_list?.map(m => <div key={m}>✓ {m}</div>)}
+            {run.import_issues?.map(m => <div key={m} style={{ color: "var(--warn)" }}>• {m}</div>)}
+          </div>}
+        </div>
+      )}
       {miss.length > 0 && (
         <div className="sync-miss">
           <b>{miss.length} {plural(miss.length, "mecz bez dopasowania", "mecze bez dopasowania", "meczów bez dopasowania")}</b> — mają kursy wpisane ręcznie.{" "}
