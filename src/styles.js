@@ -396,4 +396,8 @@ button, input, select, textarea { font-family:inherit; }
 .auto-toggle { display:flex; gap:10px; align-items:flex-start; padding:12px; margin:4px 0 12px; border-radius:var(--r-md); background:rgba(var(--ink-rgb),0.04); border:1px solid rgba(var(--ink-rgb),0.08); font-size:13px; color:rgba(var(--ink-rgb),0.8); line-height:1.45; cursor:pointer; }
 .auto-toggle input { margin-top:2px; width:18px; height:18px; accent-color:var(--accent); flex-shrink:0; }
 .auto-toggle small { display:block; color:rgba(var(--ink-rgb),0.45); font-size:12px; margin-top:2px; }
+
+.sync-import { width:100%; margin-top:12px; padding:10px 12px; border-radius:var(--r-md); border:1px dashed rgba(var(--ink-rgb),0.18); background:rgba(var(--ink-rgb),0.03); color:var(--ink); font-size:13px; font-weight:700; cursor:pointer; text-align:left; font-family:inherit; }
+.sync-import span { display:block; font-size:11px; font-weight:500; color:rgba(var(--ink-rgb),0.45); margin-top:2px; }
+.sync-import:disabled { opacity:0.5; cursor:wait; }
 `;
