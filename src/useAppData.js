@@ -214,8 +214,8 @@ export function useAppData(user, profile) {
   };
 
   // Aktualizacja kursów na żądanie (funkcja sync-odds w Supabase)
-  const syncOdds = async () => {
-    const { data, error } = await supabase.functions.invoke("sync-odds");
+  const syncOdds = async ({ importMatches = false } = {}) => {
+    const { data, error } = await supabase.functions.invoke("sync-odds", { body: { import: importMatches } });
     if (error) {
       // Pokazujemy prawdziwą przyczynę zamiast ogólnego komunikatu
       const status = error.context?.status;
@@ -231,7 +231,9 @@ export function useAppData(user, profile) {
       return null;
     }
     if (!data?.ok) { showToast(`⏳ ${data?.message || "Aktualizacja niedostępna"}`); return data; }
-    showToast(`Kursy: zaktualizowano ${data.updated} z ${data.matched} dopasowanych meczów`);
+    showToast(data.imported
+      ? `Dodano ${data.added} ${data.added === 1 ? "mecz" : "meczów"} weekendu · kursy: ${data.updated} zmian`
+      : `Kursy: zaktualizowano ${data.updated} z ${data.matched} dopasowanych meczów`);
     await load();
     return data;
   };
