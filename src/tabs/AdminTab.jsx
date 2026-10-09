@@ -26,18 +26,26 @@ function Sheet({ title, subtitle, onClose, children }) {
 
 // ── AUTOMATYCZNE KURSY: ostatnia aktualizacja i przycisk ──────────────────────
 function OddsSyncPanel({ onSync }) {
-  const [run, setRun] = useState(null);
+  const [run, setRun] = useState(null);       // ostatnia aktualizacja kursów
+  const [resRun, setResRun] = useState(null); // ostatnie sprawdzenie wyników
   const [busy, setBusy] = useState(false);
   const [showMiss, setShowMiss] = useState(false);
+  const [showRes, setShowRes] = useState(false);
   const loadRun = useCallback(async () => {
-    const { data } = await supabase.from("odds_sync_runs").select("*").order("ran_at", { ascending: false }).limit(1).maybeSingle();
-    setRun(data || null);
+    const base = () => supabase.from("odds_sync_runs").select("*").order("ran_at", { ascending: false }).limit(1);
+    const [{ data: o }, { data: r }] = await Promise.all([
+      base().not("trigger", "like", "%-results").maybeSingle(),
+      base().like("trigger", "%-results").maybeSingle(),
+    ]);
+    setRun(o || null); setResRun(r || null);
   }, []);
   useEffect(() => { loadRun(); }, [loadRun]);
 
-  const sync = async (importMatches = false) => { setBusy(true); await onSync({ importMatches }); await loadRun(); setBusy(false); };
+  const sync = async (importMatches = false, mode = "odds") => { setBusy(true); await onSync({ importMatches, mode }); await loadRun(); setBusy(false); };
   const [showAdded, setShowAdded] = useState(false);
-  const when = run && new Date(run.ran_at).toLocaleString("pl-PL", { timeZone: "Europe/Warsaw", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+  const fmt = r => new Date(r.ran_at).toLocaleString("pl-PL", { timeZone: "Europe/Warsaw", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+  const when = run && fmt(run);
+  const linkBtn = { background: "none", border: "none", color: "var(--accent-light)", fontSize: 12, fontWeight: 600, cursor: "pointer", padding: 0 };
   const miss = run?.unmatched || [];
 
   return (
@@ -55,15 +63,13 @@ function OddsSyncPanel({ onSync }) {
         <button className="sync-btn" onClick={() => sync(false)} disabled={busy}>{busy ? "Pobieranie..." : "Odśwież teraz"}</button>
       </div>
       <button className="sync-import" onClick={() => sync(true)} disabled={busy}>
-        ⬇️ Pobierz mecze weekendu <span>Ekstraklasa, Premier League, La Liga, Serie A · automatycznie we wtorek rano</span>
+        ⬇️ Pobierz mecze weekendu <span>Ekstraklasa, Premier League, La Liga, Serie A · automatycznie we wtorek o 8:00</span>
       </button>
       {(run?.added_list?.length > 0 || run?.import_issues?.length > 0) && (
         <div className="sync-miss">
           {run.added_list?.length > 0 && <><b style={{ color: "var(--win)" }}>Dodano {run.added_list.length} meczów</b>{" "}</>}
           {run.import_issues?.length > 0 && <><b>{run.import_issues.length} nie dodano</b>{" "}</>}
-          <button onClick={() => setShowAdded(v => !v)} style={{ background: "none", border: "none", color: "var(--accent-light)", fontSize: 12, fontWeight: 600, cursor: "pointer", padding: 0 }}>
-            {showAdded ? "Ukryj" : "Pokaż"}
-          </button>
+          <button onClick={() => setShowAdded(v => !v)} style={linkBtn}>{showAdded ? "Ukryj" : "Pokaż"}</button>
           {showAdded && <div style={{ marginTop: 6 }}>
             {run.added_list?.map(m => <div key={m}>✓ {m}</div>)}
             {run.import_issues?.map(m => <div key={m} style={{ color: "var(--warn)" }}>• {m}</div>)}
@@ -73,10 +79,32 @@ function OddsSyncPanel({ onSync }) {
       {miss.length > 0 && (
         <div className="sync-miss">
           <b>{miss.length} {plural(miss.length, "mecz bez dopasowania", "mecze bez dopasowania", "meczów bez dopasowania")}</b> — mają kursy wpisane ręcznie.{" "}
-          <button onClick={() => setShowMiss(v => !v)} style={{ background: "none", border: "none", color: "var(--accent-light)", fontSize: 12, fontWeight: 600, cursor: "pointer", padding: 0 }}>
-            {showMiss ? "Ukryj" : "Pokaż"}
-          </button>
+          <button onClick={() => setShowMiss(v => !v)} style={linkBtn}>{showMiss ? "Ukryj" : "Pokaż"}</button>
           {showMiss && <div style={{ marginTop: 6 }}>{miss.map(m => <div key={m}>• {m}</div>)}</div>}
+        </div>
+      )}
+
+      {/* WYNIKI */}
+      <div className="sync-top sync-sep">
+        <div style={{ minWidth: 0 }}>
+          <div className="sync-title">🏁 Wyniki automatyczne</div>
+          <div className="sync-meta">
+            {resRun ? <>Ostatnio: {fmt(resRun)} ({resRun.trigger?.startsWith("admin") ? "ręcznie" : "automatycznie"}) · wpisano {resRun.results_saved}
+              {resRun.credits_remaining != null && <> · limit API: {resRun.credits_remaining}</>}</> : "Codziennie o 17:30 i 23:15 — tylko gdy jakiś mecz czeka na wynik"}
+            {resRun?.error && <div className="err">⚠️ {resRun.error}</div>}
+          </div>
+        </div>
+        <button className="sync-btn" onClick={() => sync(false, "results")} disabled={busy}>{busy ? "Pobieranie..." : "Pobierz wyniki"}</button>
+      </div>
+      {(resRun?.results_list?.length > 0 || resRun?.results_issues?.length > 0) && (
+        <div className="sync-miss">
+          {resRun.results_list?.length > 0 && <><b style={{ color: "var(--win)" }}>Wpisano {resRun.results_list.length}</b>{" "}</>}
+          {resRun.results_issues?.length > 0 && <><b>{resRun.results_issues.length} do wpisania ręcznie</b>{" "}</>}
+          <button onClick={() => setShowRes(v => !v)} style={linkBtn}>{showRes ? "Ukryj" : "Pokaż"}</button>
+          {showRes && <div style={{ marginTop: 6 }}>
+            {resRun.results_list?.map(m => <div key={m}>✓ {m}</div>)}
+            {resRun.results_issues?.map(m => <div key={m} style={{ color: "var(--warn)" }}>• {m}</div>)}
+          </div>}
         </div>
       )}
     </div>
