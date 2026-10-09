@@ -9,6 +9,29 @@ const RULES = [
   { icon: "🏆", bg: "rgba(var(--accent-rgb),0.08)", title: "Klasyfikacja", text: "Wygrywa gracz z największą sumą punktów po zakończeniu sezonu — licząc wszystkie ligi razem. Ekstraklasa ma dodatkowo osobny ranking z nagrodą 100 zł." },
 ];
 
+// Harmonogram automatu (funkcja sync-odds w Supabase) — godziny w czasie polskim
+const AUTO = [
+  { icon: "📅", bg: "rgba(var(--accent-rgb),0.1)", title: "Dodawanie meczów — wtorek, 8:00",
+    text: "Mecze najbliższego weekendu (od piątku do poniedziałku) z Ekstraklasy, Premier League, La Liga i Serie A dodają się same. Mecze Ligi Mistrzów dodaje admin." },
+  { icon: "📈", bg: "rgba(var(--win-rgb),0.1)", title: "Kursy — codziennie, 8:00",
+    text: "Kurs to mediana kursów bukmacherów europejskich, więc może różnić się o kilka setnych od kursów polskich bukmacherów. Strzałka ▲ lub ▼ przy kursie pokazuje, że od dodania meczu kurs wzrósł lub spadł. Punkty liczymy z ostatniego kursu przed rozpoczęciem meczu — dla wszystkich takiego samego, bez względu na to, kiedy typowałeś." },
+  { icon: "🏁", bg: "rgba(var(--gold-rgb),0.1)", title: "Wyniki — codziennie, 17:30 i 23:15",
+    text: "Wyniki zakończonych meczów wpisują się same, a razem z nimi rozliczają się typy, tabela, gwiazdki i podsumowanie kolejki. Jeśli wyniku nie ma jeszcze w serwisie (np. mecz się przedłużył albo został przełożony), pojawi się przy kolejnej aktualizacji albo wpisze go admin." },
+  { icon: "🧾", bg: "rgba(var(--poll-rgb),0.1)", title: "Strefa kuponów",
+    text: "Typy do wspólnego kuponu można dodawać do piątku do 12:00. Kursy na kuponie to kursy z piątku z 8:00 — późniejsze zmiany kuponu już nie ruszają." },
+];
+
+function RuleCard({ icon, bg, title, text }) {
+  return (
+    <div className="rc" style={{ marginBottom: 8 }}>
+      <div className="rrow">
+        <div className="ric" style={{ background: bg }}>{icon}</div>
+        <div><div className="rtit">{title}</div><div className="rtxt">{text}</div></div>
+      </div>
+    </div>
+  );
+}
+
 // ── ZAKŁADKA REGULAMIN ────────────────────────────────────────────────────────
 export default function RulesTab({ profiles, tips, matches, leagues, userId }) {
   const { globalLb, ekstraLb } = useMemo(() => {
@@ -52,14 +75,23 @@ export default function RulesTab({ profiles, tips, matches, leagues, userId }) {
       </div>
 
       <div className="sh" style={{ marginTop: 16 }}>Zasady gry</div>
-      {RULES.map(s => (
-        <div key={s.title} className="rc" style={{ marginBottom: 8 }}>
-          <div className="rrow">
-            <div className="ric" style={{ background: s.bg }}>{s.icon}</div>
-            <div><div className="rtit">{s.title}</div><div className="rtxt">{s.text}</div></div>
+      {RULES.map(s => <RuleCard key={s.title} {...s} />)}
+
+      <div className="sh" style={{ marginTop: 16 }}>Automatyczne aktualizacje</div>
+      {AUTO.map(s => <RuleCard key={s.title} {...s} />)}
+      <div className="rc" style={{ marginBottom: 8 }}>
+        <div className="rrow">
+          <div className="ric" style={{ background: "rgba(var(--ink-rgb),0.06)" }}>🔗</div>
+          <div>
+            <div className="rtit">Źródło danych</div>
+            <div className="rtxt">
+              Mecze, kursy i wyniki pobieramy z serwisu{" "}
+              <a href="https://the-odds-api.com" target="_blank" rel="noopener noreferrer" style={{ color: "var(--accent-light)", fontWeight: 700 }}>The Odds API</a>
+              {" "}(the-odds-api.com). Wszystkie godziny podane są w czasie polskim. Admin może w każdej chwili poprawić mecz, kurs lub wynik ręcznie.
+            </div>
           </div>
         </div>
-      ))}
+      </div>
     </>
   );
 }
