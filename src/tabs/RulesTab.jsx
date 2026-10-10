@@ -15,7 +15,7 @@ const AUTO = [
     text: "Mecze najbliższego weekendu (od piątku do poniedziałku) z Ekstraklasy, Premier League, La Liga i Serie A dodają się same. Mecze Ligi Mistrzów dodaje admin." },
   { icon: "📈", bg: "rgba(var(--win-rgb),0.1)", title: "Kursy — codziennie, 8:00",
     text: "Kurs to mediana kursów bukmacherów europejskich, więc może różnić się o kilka setnych od kursów polskich bukmacherów. Strzałka ▲ lub ▼ przy kursie pokazuje, że od dodania meczu kurs wzrósł lub spadł. Punkty liczymy z ostatniego kursu przed rozpoczęciem meczu — dla wszystkich takiego samego, bez względu na to, kiedy typowałeś." },
-  { icon: "🏁", bg: "rgba(var(--gold-rgb),0.1)", title: "Wyniki — codziennie, 17:30 i 23:15",
+  { icon: "🏁", bg: "rgba(var(--gold-rgb),0.1)", title: "Wyniki — codziennie, 18:30 i 23:15",
     text: "Wyniki zakończonych meczów wpisują się same, a razem z nimi rozliczają się typy, tabela, gwiazdki i podsumowanie kolejki. Jeśli wyniku nie ma jeszcze w serwisie (np. mecz się przedłużył albo został przełożony), pojawi się przy kolejnej aktualizacji albo wpisze go admin." },
   { icon: "🧾", bg: "rgba(var(--poll-rgb),0.1)", title: "Strefa kuponów",
     text: "Typy do wspólnego kuponu można dodawać do piątku do 12:00. Kursy na kuponie to kursy z piątku z 8:00 — późniejsze zmiany kuponu już nie ruszają." },
