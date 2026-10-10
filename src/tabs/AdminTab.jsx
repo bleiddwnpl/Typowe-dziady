@@ -90,7 +90,7 @@ function OddsSyncPanel({ onSync }) {
           <div className="sync-title">🏁 Wyniki automatyczne</div>
           <div className="sync-meta">
             {resRun ? <>Ostatnio: {fmt(resRun)} ({resRun.trigger?.startsWith("admin") ? "ręcznie" : "automatycznie"}) · wpisano {resRun.results_saved}
-              {resRun.credits_remaining != null && <> · limit API: {resRun.credits_remaining}</>}</> : "Codziennie o 17:30 i 23:15 — tylko gdy jakiś mecz czeka na wynik"}
+              {resRun.credits_remaining != null && <> · limit API: {resRun.credits_remaining}</>}</> : "Codziennie o 18:30 i 23:15 — tylko gdy jakiś mecz czeka na wynik"}
             {resRun?.error && <div className="err">⚠️ {resRun.error}</div>}
           </div>
         </div>
