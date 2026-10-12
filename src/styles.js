@@ -402,4 +402,12 @@ button, input, select, textarea { font-family:inherit; }
 .sync-import:disabled { opacity:0.5; cursor:wait; }
 
 .sync-sep { margin-top:14px; padding-top:14px; border-top:1px solid rgba(var(--ink-rgb),0.08); }
+
+.cz-pay { margin:4px 16px 6px; padding:10px 12px; border-radius:var(--r-md); background:rgba(0,0,0,0.2); border:1px solid rgba(var(--ink-rgb),0.06); font-size:12px; color:rgba(var(--ink-rgb),0.6); }
+.cz-pay > div { display:flex; justify-content:space-between; gap:10px; padding:2px 0; }
+.cz-pay > div span:last-child { font-variant-numeric:tabular-nums; white-space:nowrap; color:rgba(var(--ink-rgb),0.8); }
+.cz-pay .sum { margin-top:4px; padding-top:6px; border-top:1px solid rgba(var(--ink-rgb),0.1); font-weight:700; color:var(--ink); font-size:13px; }
+.cz-pay .sum span:last-child { color:var(--win); }
+
+.cz-tot .v .cur { font-family:'Inter',sans-serif; font-size:13px; font-weight:700; margin-left:4px; letter-spacing:0; }
 `;
