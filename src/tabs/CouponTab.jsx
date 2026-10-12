@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import {
   PICK_LABELS, COUPON_MAX_PICKS, COUPON_SIZE, COUPON_MIN_VOTES, COUPON_TEST_UNTIL,
+  COUPON_STAKE, STAKE_TAX, WIN_TAX, WIN_TAX_THRESHOLD, couponPayout, zl, money,
   currentCouponWeekend, isCouponOpen, isCouponTest, couponDeadlineKey, couponMatches, weekendLabel,
   buildCoupon, warsawNowKey, plural,
 } from "../lib";
@@ -46,6 +47,7 @@ function HowItWorks() {
           <li><span>W piątek o 12:00 kupon <b>składa się sam z {COUPON_SIZE} najczęściej wybieranych typów</b>. Każdy musi mieć co najmniej {COUPON_MIN_VOTES} głosy.</span></li>
           <li><span>Remis w głosach rozstrzyga <b>niższy kurs</b>. Gdy na ten sam mecz są różne typy, na kupon trafia ten z większą liczbą głosów.</span></li>
           <li><span>W weekend <b>śledzimy kupon na żywo</b>. Jeśli padnie, zobaczysz, który mecz go zatopił.</span></li>
+          <li><span>Gramy za <b>{COUPON_STAKE} zł</b>. Bukmacher pobiera {Math.round(STAKE_TAX * 100)}% podatku od stawki, więc w grze jest <b>{zl(couponPayout(1).inPlay)}</b>. Od wygranej powyżej {WIN_TAX_THRESHOLD} zł potrąca dodatkowo {Math.round(WIN_TAX * 100)}%.</span></li>
           <li><span>Strefa kuponów <b>nie wpływa na punkty</b> w rankingu.</span></li>
         </ol>
       )}
@@ -55,6 +57,7 @@ function HowItWorks() {
 
 // Kupon złożony (bieżący po terminie albo z historii)
 function CouponCard({ wk, number, coupon, userId, myPicks, profiles }) {
+  const pay = couponPayout(coupon.totalOdds);
   const st = STATUS[coupon.status];
   const name = id => profiles.find(p => p.id === id)?.name || "?";
   const mineOnCoupon = coupon.events.filter(e => e.voters.includes(userId)).length;
@@ -87,8 +90,16 @@ function CouponCard({ wk, number, coupon, userId, myPicks, profiles }) {
             </div>
           ))}
           <div className="cz-totals">
-            <div className="cz-tot"><div className="l">Łączny kurs</div><div className="v">{coupon.totalOdds.toFixed(2)}</div></div>
-            <div className="cz-tot"><div className="l">Kupon za 10 zł</div><div className={`v ${coupon.status === "lost" ? "lost" : "win"}`}>{Math.round(coupon.totalOdds * 10)} zł</div></div>
+            <div className="cz-tot"><div className="l">Łączny kurs</div><div className="v">{pay.odds.toFixed(2)}</div></div>
+            <div className="cz-tot"><div className="l">{coupon.status === "won" ? "Wypłata" : "Do wygrania"}</div><div className={`v ${coupon.status === "lost" ? "lost" : "win"}`}>{money(pay.net)}<span className="cur">zł</span></div></div>
+          </div>
+          <div className="cz-pay">
+            <div><span>Stawka</span><span>{zl(pay.stake)}</span></div>
+            <div><span>Podatek od stawki {Math.round(STAKE_TAX * 100)}%</span><span>− {zl(pay.stakeTax)}</span></div>
+            <div><span>W grze</span><span>{zl(pay.inPlay)}</span></div>
+            <div><span>Wygrana ({zl(pay.inPlay)} × {pay.odds.toFixed(2)})</span><span>{zl(pay.gross)}</span></div>
+            {pay.winTax > 0 && <div><span>Podatek od wygranej {Math.round(WIN_TAX * 100)}% (powyżej {WIN_TAX_THRESHOLD} zł)</span><span>− {zl(pay.winTax)}</span></div>}
+            <div className="sum"><span>Do wypłaty</span><span>{zl(pay.net)}</span></div>
           </div>
           {coupon.killer && (
             <div className="cz-kill">
@@ -162,7 +173,7 @@ export default function CouponTab({ matches, leagues, profiles, couponPicks, cou
           <div className="cz-card">
             <div className="cz-hero">
               <div className="cz-title">Kupon weekendu<TestTag wk={wk} /></div>
-              <div className="cz-sub">Mecze {weekendLabel(wk)} · wszystkie ligi poza LM</div>
+              <div className="cz-sub">Mecze {weekendLabel(wk)} · wszystkie ligi poza LM · stawka {COUPON_STAKE} zł</div>
               <div className="cz-countdown">
                 <div className="cz-cd"><div className="v">{days}</div><div className="l">{plural(days, "dzień", "dni", "dni")}</div></div>
                 <div className="cz-cd"><div className="v">{String(hours).padStart(2, "0")}</div><div className="l">godz.</div></div>
@@ -244,7 +255,7 @@ export default function CouponTab({ matches, leagues, profiles, couponPicks, cou
           {history.map(w => {
             const c = couponFor(w);
             const won = c.events.filter(e => e.status === "won").length;
-            const desc = c.status === "won" ? `Wszedł! Kurs ${c.totalOdds.toFixed(2)} → ${Math.round(c.totalOdds * 10)} zł za 10 zł`
+            const desc = c.status === "won" ? `Wszedł! Kurs ${couponPayout(c.totalOdds).odds.toFixed(2)} → ${zl(couponPayout(c.totalOdds).net)} do wypłaty`
               : c.status === "lost" ? `Padł na ${c.killer.match.home} – ${c.killer.match.away} · ${won} z ${c.events.length} trafionych`
               : c.status === "empty" ? "Kupon nie powstał" : "Jeszcze się rozstrzyga";
             return (
