@@ -436,6 +436,8 @@ export const currentCouponWeekend = (nowKey = warsawNowKey()) => {
 export const couponDeadlineKey = wk => `${wk}T12:00`;
 export const isCouponOpen = (wk, nowKey = warsawNowKey()) => nowKey < couponDeadlineKey(wk);
 export const isCouponTest = wk => wk < COUPON_TEST_UNTIL;
+// Pierwszy weekend z realnym kuponem (pierwszy piątek od COUPON_TEST_UNTIL)
+export const firstRealCouponWeekend = () => addDays(COUPON_TEST_UNTIL, (5 - isoDow(COUPON_TEST_UNTIL) + 7) % 7);
 
 // „3–6 października” albo „31 października – 3 listopada”
 export const weekendLabel = wk => {
@@ -493,6 +495,60 @@ export function buildCoupon(picks, matchesById) {
     participants: new Set(picks.map(p => p.user_id)).size,
   };
 }
+
+// Mecze z kursami zamrożonymi w piątek o 12:00 — z nich liczymy kupony po terminie
+export const couponMatchesById = (matches, couponOdds = {}) => new Map(matches.map(m => {
+  const f = couponOdds[m.id];
+  return [m.id, f ? { ...m, odds_home: f.odds_home, odds_draw: f.odds_draw, odds_away: f.odds_away } : m];
+}));
+
+// ── PULA NAGRÓD Z KUPONÓW ─────────────────────────────────────────────────────
+// Admin stawia 100 zł na każdy realny kupon (testowe się nie liczą). Bilans liczymy narastająco przez sezon:
+//   kupon wszedł → + (wypłata po podatkach − 100 zł), kupon padł → − 100 zł.
+// Dopóki bilans jest na minusie, wygrane najpierw zwracają adminowi postawione stawki.
+// Pula = dodatni bilans; na koniec sezonu dzielona według PRIZE_POOL_SPLIT jako dodatek do nagród gwarantowanych.
+export const PRIZES = [
+  { key: "p1", guaranteed: 100, share: 0.35, emoji: "🥇", short: "1. miejsce" },
+  { key: "p2", guaranteed: 30, share: 0.20, emoji: "🥈", short: "2. miejsce" },
+  { key: "p3", guaranteed: 20, share: 0.10, emoji: "🥉", short: "3. miejsce" },
+  { key: "ekstra", guaranteed: 100, share: 0.35, emoji: "🏆", short: "Ekstraklasa" },
+];
+const round2 = x => Math.round(x * 100) / 100;
+
+export function buildCouponLedger(couponPicks, matchesById, nowKey = warsawNowKey()) {
+  const weekends = [...new Set(couponPicks.map(p => p.weekend))]
+    .filter(w => !isCouponTest(w) && !isCouponOpen(w, nowKey))
+    .sort();
+  const byWeekend = {};
+  let balance = 0, won = 0, lost = 0, staked = 0, paidOut = 0;
+  const live = [];
+  for (const w of weekends) {
+    const c = buildCoupon(couponPicks.filter(p => p.weekend === w), matchesById);
+    if (c.status === "empty") continue;                 // kupon nie powstał — admin nic nie stawia
+    if (c.status === "live") { live.push(w); byWeekend[w] = { status: "live" }; continue; }
+    const net = c.status === "won" ? couponPayout(c.totalOdds).net : 0;
+    const delta = round2(net - COUPON_STAKE);
+    const poolBefore = Math.max(0, balance);
+    balance = round2(balance + delta);
+    staked += COUPON_STAKE; paidOut = round2(paidOut + net);
+    if (c.status === "won") won++; else lost++;
+    byWeekend[w] = { status: c.status, net, delta, balance, poolChange: round2(Math.max(0, balance) - poolBefore) };
+  }
+  const pool = Math.max(0, balance);
+  return {
+    byWeekend, live, won, lost, played: won + lost, staked, paidOut, balance, pool,
+    adminDebt: Math.max(0, -balance),
+    // Grosze zaokrąglamy w dół, żeby suma udziałów nigdy nie przekroczyła puli
+    prizes: PRIZES.map(p => {
+      const bonus = Math.floor(pool * p.share * 100 + 1e-6) / 100;
+      return { ...p, bonus, total: round2(p.guaranteed + bonus) };
+    }),
+  };
+}
+
+// O ile urośnie pula, jeśli rozgrywany teraz kupon wejdzie
+export const poolIfWon = (ledger, totalOdds) =>
+  round2(Math.max(0, ledger.balance + couponPayout(totalOdds).net - COUPON_STAKE) - ledger.pool);
 
 // ── NICK ──────────────────────────────────────────────────────────────────────
 export const NICK_MIN = 2, NICK_MAX = 20, NICK_DAYS = 7;   // te same zasady pilnuje baza
