@@ -18,7 +18,7 @@ const AUTO = [
   { icon: "🏁", bg: "rgba(var(--gold-rgb),0.1)", title: "Wyniki — codziennie, 18:30 i 23:15",
     text: "Wyniki zakończonych meczów wpisują się same, a razem z nimi rozliczają się typy, tabela, gwiazdki i podsumowanie kolejki. Jeśli wyniku nie ma jeszcze w serwisie (np. mecz się przedłużył albo został przełożony), pojawi się przy kolejnej aktualizacji albo wpisze go admin." },
   { icon: "🧾", bg: "rgba(var(--poll-rgb),0.1)", title: "Strefa kuponów",
-    text: "Typy do wspólnego kuponu można dodawać do piątku do 12:00. Kursy na kuponie to kursy z piątku z 8:00 — późniejsze zmiany kuponu już nie ruszają." },
+    text: "Typy do wspólnego kuponu można dodawać do piątku do 12:00. Kursy na kuponie to kursy z piątku z 8:00 — późniejsze zmiany kuponu już nie ruszają. Gramy za 100 zł: bukmacher pobiera 12% podatku od stawki, więc w grze jest 88 zł. Od wygranej powyżej 2280 zł bukmacher potrąca dodatkowo 10% podatku." },
 ];
 
 function RuleCard({ icon, bg, title, text }) {
