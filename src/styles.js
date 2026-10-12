@@ -410,4 +410,35 @@ button, input, select, textarea { font-family:inherit; }
 .cz-pay .sum span:last-child { color:var(--win); }
 
 .cz-tot .v .cur { font-family:'Inter',sans-serif; font-size:13px; font-weight:700; margin-left:4px; letter-spacing:0; }
+
+/* Pula nagród z kuponów */
+.cz-pool { background:linear-gradient(160deg, rgba(var(--gold-rgb),0.10), rgba(var(--ink-rgb),0.03) 60%); border-color:rgba(var(--gold-rgb),0.28); }
+.cz-pool-head { display:flex; justify-content:space-between; align-items:flex-end; gap:12px; padding:14px 16px 10px; }
+.cz-pool-l { font-size:11px; font-weight:700; color:rgba(var(--ink-rgb),0.55); text-transform:uppercase; letter-spacing:0.6px; }
+.cz-pool-v { font-family:'Bebas Neue',sans-serif; font-size:40px; line-height:1; color:var(--gold); margin-top:4px; }
+.cz-pool-v .cur { font-family:'Inter',sans-serif; font-size:15px; font-weight:700; margin-left:5px; letter-spacing:0; }
+.cz-pool-stats { text-align:right; font-size:12px; color:rgba(var(--ink-rgb),0.5); line-height:1.6; }
+.cz-pool-stats .w { color:var(--win); font-weight:700; } .cz-pool-stats .x { color:var(--loss); font-weight:700; }
+.cz-pool-split { display:grid; grid-template-columns:1fr 1fr; gap:6px; padding:0 16px; }
+.cz-ps { display:grid; grid-template-columns:auto 1fr; column-gap:8px; align-items:center; padding:8px 10px; border-radius:var(--r-md); background:rgba(0,0,0,0.22); border:1px solid rgba(var(--ink-rgb),0.06); }
+.cz-ps .e { grid-row:span 2; font-size:20px; line-height:1; }
+.cz-ps .n { display:flex; justify-content:space-between; gap:6px; font-size:12px; font-weight:600; color:rgba(var(--ink-rgb),0.8); white-space:nowrap; }
+.cz-ps .n span { color:rgba(var(--ink-rgb),0.4); font-weight:700; }
+.cz-ps .b { font-size:13px; font-weight:700; color:rgba(var(--ink-rgb),0.35); font-variant-numeric:tabular-nums; white-space:nowrap; }
+.cz-ps .b.on { color:var(--win); }
+.cz-pool-note { font-size:12px; color:rgba(var(--ink-rgb),0.5); padding:10px 16px 14px; line-height:1.5; }
+.cz-pool-note b { color:var(--ink); }
+.cz-poolnote { margin:6px 16px 0; padding:9px 12px; border-radius:var(--r-md); background:rgba(var(--gold-rgb),0.08); border:1px solid rgba(var(--gold-rgb),0.22); font-size:12px; color:rgba(var(--ink-rgb),0.75); line-height:1.5; }
+.cz-poolnote b.up { color:var(--win); } .cz-poolnote b.down { color:var(--loss); }
+.cz-hist-r { display:flex; align-items:center; gap:10px; flex-shrink:0; }
+.cz-hist-r .amt { font-size:12px; font-weight:700; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.cz-hist-r .amt.up { color:var(--win); } .cz-hist-r .amt.down { color:rgba(var(--loss-rgb),0.85); }
+
+/* Regulamin: nagrody z udziałem w puli */
+.rp-pool { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 16px; background:rgba(var(--gold-rgb),0.08); border-bottom:1px solid rgba(var(--gold-rgb),0.2); font-size:13px; font-weight:600; color:rgba(var(--ink-rgb),0.75); }
+.rp-pool b { color:var(--gold); font-variant-numeric:tabular-nums; }
+.psub { font-size:12px; color:rgba(var(--ink-rgb),0.45); margin-top:2px; line-height:1.4; }
+.psub > span { white-space:nowrap; }
+.psub b { color:var(--win); font-weight:700; }
+.pamt .cur { font-family:'Inter',sans-serif; font-size:12px; font-weight:700; margin-left:3px; letter-spacing:0; }
 `;
