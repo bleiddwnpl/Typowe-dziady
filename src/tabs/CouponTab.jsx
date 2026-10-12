@@ -4,6 +4,7 @@ import {
   COUPON_STAKE, STAKE_TAX, WIN_TAX, WIN_TAX_THRESHOLD, couponPayout, zl, money,
   currentCouponWeekend, isCouponOpen, isCouponTest, couponDeadlineKey, couponMatches, weekendLabel,
   buildCoupon, warsawNowKey, plural,
+  couponMatchesById, buildCouponLedger, poolIfWon, firstRealCouponWeekend,
 } from "../lib";
 import { ClubAvatar } from "../components";
 
@@ -48,6 +49,7 @@ function HowItWorks() {
           <li><span>Remis w głosach rozstrzyga <b>niższy kurs</b>. Gdy na ten sam mecz są różne typy, na kupon trafia ten z większą liczbą głosów.</span></li>
           <li><span>W weekend <b>śledzimy kupon na żywo</b>. Jeśli padnie, zobaczysz, który mecz go zatopił.</span></li>
           <li><span>Gramy za <b>{COUPON_STAKE} zł</b>. Bukmacher pobiera {Math.round(STAKE_TAX * 100)}% podatku od stawki, więc w grze jest <b>{zl(couponPayout(1).inPlay)}</b>. Od wygranej powyżej {WIN_TAX_THRESHOLD} zł potrąca dodatkowo {Math.round(WIN_TAX * 100)}%.</span></li>
+          <li><span>Zysk z wygranych kuponów trafia do <b>puli nagród sezonu</b>: 35% dla 1. miejsca, 20% dla 2., 10% dla 3. i 35% dla zwycięzcy Ekstraklasy — na dokładkę do nagród gwarantowanych. Przegrane kupony najpierw odrabiamy, żeby admin nie był stratny.</span></li>
           <li><span>Strefa kuponów <b>nie wpływa na punkty</b> w rankingu.</span></li>
         </ol>
       )}
@@ -55,8 +57,73 @@ function HowItWorks() {
   );
 }
 
+// Pula nagród sezonu z wygranych kuponów
+function PrizePool({ ledger }) {
+  const started = ledger.played > 0 || ledger.live.length > 0;
+  return (
+    <div className="cz-card cz-pool">
+      <div className="cz-pool-head">
+        <div>
+          <div className="cz-pool-l">💰 Pula nagród z kuponów</div>
+          <div className="cz-pool-v">{money(ledger.pool)}<span className="cur">zł</span></div>
+        </div>
+        {ledger.played > 0 && (
+          <div className="cz-pool-stats">
+            <div>{ledger.played} {plural(ledger.played, "kupon", "kupony", "kuponów")}</div>
+            <div><span className="w">✓ {ledger.won}</span> · <span className="x">✕ {ledger.lost}</span></div>
+          </div>
+        )}
+      </div>
+      <div className="cz-pool-split">
+        {ledger.prizes.map(p => (
+          <div key={p.key} className="cz-ps">
+            <span className="e">{p.emoji}</span>
+            <div className="n">{p.short}<span>{Math.round(p.share * 100)}%</span></div>
+            <div className={`b ${p.bonus > 0 ? "on" : ""}`}>+{money(p.bonus)} zł</div>
+          </div>
+        ))}
+      </div>
+      <div className="cz-pool-note">
+        {ledger.adminDebt > 0
+          ? <>Kolejne wygrane najpierw zwrócą adminowi <b>{zl(ledger.adminDebt)}</b> postawionych stawek, potem rośnie pula.</>
+          : !started
+            ? <>Liczymy od pierwszego realnego kuponu ({weekendLabel(firstRealCouponWeekend())}). Kupony testowe nie wchodzą do puli.</>
+            : <>Pulę dzielimy na koniec sezonu, na dokładkę do nagród gwarantowanych.</>}
+      </div>
+    </div>
+  );
+}
+
+// Co kupon zmienia w puli (tylko realne kupony)
+function PoolNote({ wk, coupon, ledger }) {
+  if (coupon.status === "empty") return null;
+  if (isCouponTest(wk)) return <div className="cz-poolnote">🧪 Kupon testowy — nie wpływa na pulę nagród.</div>;
+  if (coupon.status === "live") {
+    const net = couponPayout(coupon.totalOdds).net;
+    const toPool = poolIfWon(ledger, coupon.totalOdds);
+    const toAdmin = Math.max(0, Math.min(ledger.adminDebt, net - COUPON_STAKE));
+    return (
+      <div className="cz-poolnote">
+        💰 Jeśli wejdzie: {toAdmin > 0 && <>{zl(toAdmin)} wraca do admina, </>}
+        <b className="up">+{zl(toPool)}</b> do puli nagród
+      </div>
+    );
+  }
+  const e = ledger.byWeekend[wk];
+  if (!e) return null;
+  const toAdmin = Math.round((e.delta - e.poolChange) * 100) / 100;
+  return (
+    <div className="cz-poolnote">
+      {e.poolChange > 0 ? <>💰 Do puli nagród: <b className="up">+{zl(e.poolChange)}</b>{toAdmin > 0 && <> · najpierw {zl(toAdmin)} zwrotu stawek dla admina</>}</>
+        : e.poolChange < 0 ? <>💰 Pula nagród: <b className="down">− {zl(-e.poolChange)}</b></>
+        : e.delta > 0 ? <>💰 Cała wygrana ponad stawkę wraca do admina: {zl(e.delta)}</>
+        : <>💰 Bilans kuponu: <b className="down">− {zl(-e.delta)}</b> — admin odrobi to z kolejnych wygranych</>}
+    </div>
+  );
+}
+
 // Kupon złożony (bieżący po terminie albo z historii)
-function CouponCard({ wk, number, coupon, userId, myPicks, profiles }) {
+function CouponCard({ wk, number, coupon, userId, myPicks, profiles, ledger }) {
   const pay = couponPayout(coupon.totalOdds);
   const st = STATUS[coupon.status];
   const name = id => profiles.find(p => p.id === id)?.name || "?";
@@ -101,6 +168,7 @@ function CouponCard({ wk, number, coupon, userId, myPicks, profiles }) {
             {pay.winTax > 0 && <div><span>Podatek od wygranej {Math.round(WIN_TAX * 100)}% (powyżej {WIN_TAX_THRESHOLD} zł)</span><span>− {zl(pay.winTax)}</span></div>}
             <div className="sum"><span>Do wypłaty</span><span>{zl(pay.net)}</span></div>
           </div>
+          <PoolNote wk={wk} coupon={coupon} ledger={ledger} />
           {coupon.killer && (
             <div className="cz-kill">
               🔪 <b>Zabójca kuponu: {coupon.killer.match.home} – {coupon.killer.match.away}</b><br />
@@ -123,10 +191,8 @@ export default function CouponTab({ matches, leagues, profiles, couponPicks, cou
   const { nowKey, days, hours, mins } = useCountdown(wk);
   const open = isCouponOpen(wk, nowKey);
   // Kupon po terminie liczymy z kursów zamrożonych w piątek o 12:00 (późniejsze zmiany go nie ruszają)
-  const matchesById = useMemo(() => new Map(matches.map(m => {
-    const f = couponOdds[m.id];
-    return [m.id, f ? { ...m, odds_home: f.odds_home, odds_draw: f.odds_draw, odds_away: f.odds_away } : m];
-  })), [matches, couponOdds]);
+  const matchesById = useMemo(() => couponMatchesById(matches, couponOdds), [matches, couponOdds]);
+  const ledger = useMemo(() => buildCouponLedger(couponPicks, matchesById, nowKey), [couponPicks, matchesById, nowKey]);
 
   // Po zamknięciu baza odsłania typy kolegów — dociągamy je
   useEffect(() => { onReload?.(); }, [open]); // eslint-disable-line
@@ -199,6 +265,7 @@ export default function CouponTab({ matches, leagues, profiles, couponPicks, cou
             </div>
           </div>
 
+          <PrizePool ledger={ledger} />
           <HowItWorks />
 
           {available.length === 0 && (
@@ -239,7 +306,7 @@ export default function CouponTab({ matches, leagues, profiles, couponPicks, cou
         </>
       ) : (
         closedWeekends.includes(wk)
-          ? <CouponCard wk={wk} number={numberOf(wk)} coupon={couponFor(wk)} userId={userId} myPicks={myPicks.length} profiles={profiles} />
+          ? <CouponCard wk={wk} number={numberOf(wk)} coupon={couponFor(wk)} userId={userId} myPicks={myPicks.length} profiles={profiles} ledger={ledger} />
           : (
             <div className="empty">
               <div className="ei">🧾</div>
@@ -248,6 +315,7 @@ export default function CouponTab({ matches, leagues, profiles, couponPicks, cou
             </div>
           )
       )}
+      {!open && <PrizePool ledger={ledger} />}
 
       {history.length > 0 && <>
         <div className="sh" style={{ marginTop: 16 }}>Poprzednie kupony</div>
@@ -258,13 +326,17 @@ export default function CouponTab({ matches, leagues, profiles, couponPicks, cou
             const desc = c.status === "won" ? `Wszedł! Kurs ${couponPayout(c.totalOdds).odds.toFixed(2)} → ${zl(couponPayout(c.totalOdds).net)} do wypłaty`
               : c.status === "lost" ? `Padł na ${c.killer.match.home} – ${c.killer.match.away} · ${won} z ${c.events.length} trafionych`
               : c.status === "empty" ? "Kupon nie powstał" : "Jeszcze się rozstrzyga";
+            const e = ledger.byWeekend[w];
             return (
               <div key={w} className="cz-hist">
                 <div style={{ minWidth: 0 }}>
                   <div>#{numberOf(w)} · {weekendLabel(w)}<TestTag wk={w} /></div>
                   <div className="d">{desc}</div>
                 </div>
-                <span className={`cz-hist-icon ${c.status}`}>{c.status === "won" ? "✓" : c.status === "lost" ? "✕" : "–"}</span>
+                <div className="cz-hist-r">
+                  {e?.delta !== undefined && <span className={`amt ${e.delta >= 0 ? "up" : "down"}`}>{e.delta >= 0 ? "+" : "−"}{money(Math.abs(e.delta))} zł</span>}
+                  <span className={`cz-hist-icon ${c.status}`}>{c.status === "won" ? "✓" : c.status === "lost" ? "✕" : "–"}</span>
+                </div>
               </div>
             );
           })}
