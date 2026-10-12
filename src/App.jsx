@@ -202,7 +202,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
               if (saved) { setProfile(prev => ({ ...prev, name: saved.name, name_changed_at: saved.name_changed_at })); setMoreView(null); }
             }} />
           )}
-          {tab === "more" && moreView === "rules" && <RulesTab profiles={profiles} tips={tips} matches={matches} leagues={leagues} userId={user.id} />}
+          {tab === "more" && moreView === "rules" && <RulesTab profiles={profiles} tips={tips} matches={matches} leagues={leagues} userId={user.id} couponPicks={couponPicks} couponOdds={couponOdds} />}
           {tab === "more" && moreView === "admin" && isAdmin && (
             <AdminTab activeLeague={activeLeague} activeLg={activeLg} leagues={leagues} upcoming={upcoming} finished={finished}
               leaguePolls={leaguePolls} pollVotes={pollVotes} profiles={profiles} tipStats={tipStats} actions={actions} canSync={!!profile?.is_admin} />
