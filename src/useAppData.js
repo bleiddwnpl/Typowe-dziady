@@ -1,6 +1,21 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { supabase, PICK_LABELS, TEAM_LOGOS, isMatchLocked } from "./lib";
 
+// Supabase zwraca maks. 1000 wierszy naraz — rosnące tabele pobieramy stronami.
+// `query` musi mieć stałą kolejność (order), inaczej strony mogłyby się na siebie nakładać.
+const PAGE = 1000;
+async function fetchAll(query) {
+  let all = [], from = 0;
+  while (true) {
+    const { data, error } = await query().range(from, from + PAGE - 1);
+    if (error || !data) break;
+    all = all.concat(data);
+    if (data.length < PAGE) break;
+    from += PAGE;
+  }
+  return all;
+}
+
 // Cały stan danych aplikacji: ładowanie, zapisy do bazy i aktualizacje na żywo.
 // Zakładki tylko wyświetlają dane i wołają akcje stąd.
 export function useAppData(user, profile) {
@@ -50,10 +65,10 @@ export function useAppData(user, profile) {
   // Strefa kuponów: własne typy zawsze, cudze dopiero po piątku 12:00 (pilnuje baza).
   // Przed terminem widać tylko, kto już dorzucił typy i ile.
   const loadCoupon = useCallback(async () => {
-    const [{ data: cp }, { data: part }, { data: co }] = await Promise.all([
-      supabase.from("coupon_picks").select("*"),
+    const [cp, { data: part }, co] = await Promise.all([
+      fetchAll(() => supabase.from("coupon_picks").select("*").order("id")),
       supabase.rpc("coupon_participants"),
-      supabase.from("coupon_odds").select("*"),
+      fetchAll(() => supabase.from("coupon_odds").select("*").order("match_id")),
     ]);
     setCouponPicks(cp || []);
     setCouponParticipants(part || []);
@@ -61,25 +76,18 @@ export function useAppData(user, profile) {
   }, []);
 
   const load = useCallback(async () => {
-    const [{ data: lg }, { data: m }, { data: p }, { data: pl }, { data: po }, { data: pv }] = await Promise.all([
+    // Mecze i typy przekroczą w sezonie 1000 wierszy — pobieramy je stronami
+    const [{ data: lg }, m, { data: p }, { data: pl }, { data: po }, { data: pv }, allTips] = await Promise.all([
       supabase.from("leagues").select("*").order("name"),
-      supabase.from("matches").select("*").order("match_date").order("match_time"),
+      fetchAll(() => supabase.from("matches").select("*").order("match_date").order("match_time").order("id")),
       supabase.from("profiles").select("*"),
       supabase.from("polls").select("*").order("created_at", { ascending: false }),
       supabase.from("poll_options").select("*"),
       supabase.from("poll_votes").select("*"),
+      fetchAll(() => supabase.from("tips").select("*").order("id")),
     ]);
-    // Typy pobieramy stronami — Supabase zwraca maks. 1000 wierszy naraz
-    let allTips = [], from = 0;
-    while (true) {
-      const { data: page, error } = await supabase.from("tips").select("*").range(from, from + 999);
-      if (error || !page || page.length === 0) break;
-      allTips = [...allTips, ...page];
-      if (page.length < 1000) break;
-      from += 1000;
-    }
     setLeagues(lg || []);
-    setMatches(m || []);
+    setMatches(m);
     setTips(allTips);
     setProfiles(p || []);
     setPolls(pl || []);
