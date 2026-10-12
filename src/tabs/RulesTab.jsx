@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { buildLeaderboard } from "../lib";
+import { buildLeaderboard, couponMatchesById, buildCouponLedger, money, zl, COUPON_STAKE, firstRealCouponWeekend, weekendLabel } from "../lib";
 import { ClubAvatar } from "../components";
 
 const RULES = [
@@ -7,6 +7,8 @@ const RULES = [
   { icon: "🎯", bg: "rgba(var(--loss-rgb),0.1)", title: "Punktacja", text: "Za trafiony typ dostajesz tyle punktów ile wynosił kurs bukmacherski. Za chybiony typ — 0 punktów." },
   { icon: "⭐", bg: "rgba(var(--gold-rgb),0.1)", title: "Gwiazdki za kolejkę", text: "Gracz z najwyższą sumą punktów w danej kolejce zdobywa gwiazdkę ⭐. Przy remisie gwiazdkę dostają wszyscy z najwyższym wynikiem. Licznik gwiazdek widoczny jest w rankingu." },
   { icon: "🏆", bg: "rgba(var(--accent-rgb),0.08)", title: "Klasyfikacja", text: "Wygrywa gracz z największą sumą punktów po zakończeniu sezonu — licząc wszystkie ligi razem. Ekstraklasa ma dodatkowo osobny ranking z nagrodą 100 zł." },
+  { icon: "💰", bg: "rgba(var(--win-rgb),0.1)", title: "Pula z kuponów",
+    text: `Admin stawia ${COUPON_STAKE} zł na każdy kupon ze Strefy kuponów. Gdy kupon wejdzie, wygrana po podatkach minus ${COUPON_STAKE} zł stawki trafia do puli nagród. Przegrane kupony najpierw odrabiamy: dopóki bilans wszystkich kuponów jest na minusie, wygrane zwracają adminowi postawione stawki, a do puli trafia dopiero nadwyżka. Bilans liczymy przez cały sezon, więc przegrany kupon zmniejsza pulę o ${COUPON_STAKE} zł. Na koniec sezonu pula dzieli się: 1. miejsce 35%, 2. miejsce 20%, 3. miejsce 10%, zwycięzca Ekstraklasy 35% — jako dodatek do nagród gwarantowanych, które się nie zmieniają. Liczą się tylko realne kupony, od weekendu ${weekendLabel(firstRealCouponWeekend())}.` },
 ];
 
 // Harmonogram automatu (funkcja sync-odds w Supabase) — godziny w czasie polskim
@@ -33,7 +35,7 @@ function RuleCard({ icon, bg, title, text }) {
 }
 
 // ── ZAKŁADKA REGULAMIN ────────────────────────────────────────────────────────
-export default function RulesTab({ profiles, tips, matches, leagues, userId }) {
+export default function RulesTab({ profiles, tips, matches, leagues, userId, couponPicks = [], couponOdds = {} }) {
   const { globalLb, ekstraLb } = useMemo(() => {
     const ekstraId = leagues.find(l => l.name === "Ekstraklasa")?.id;
     return {
@@ -41,24 +43,36 @@ export default function RulesTab({ profiles, tips, matches, leagues, userId }) {
       ekstraLb: buildLeaderboard(profiles, tips, matches, matches.filter(m => m.league_id === ekstraId).map(m => m.id)),
     };
   }, [profiles, tips, matches, leagues]);
+  const ledger = useMemo(() => buildCouponLedger(couponPicks, couponMatchesById(matches, couponOdds)), [couponPicks, matches, couponOdds]);
 
-  const prizes = [
-    { emoji: "🥇", name: "1. miejsce (wszystkie ligi)", amount: "100 zł", color: "#ffd700", bg: "rgba(255,215,0,0.08)", leader: globalLb[0] },
-    { emoji: "🥈", name: "2. miejsce (wszystkie ligi)", amount: "30 zł", color: "#c0c0c0", bg: "rgba(192,192,192,0.08)", leader: globalLb[1] },
-    { emoji: "🥉", name: "3. miejsce (wszystkie ligi)", amount: "20 zł", color: "#cd7f32", bg: "rgba(205,127,50,0.08)", leader: globalLb[2] },
-    { emoji: "🏆", name: "Klasyfikacja Ekstraklasy — 1. miejsce", amount: "100 zł", color: "#f97316", bg: "rgba(249,115,22,0.08)", leader: ekstraLb[0] },
-  ];
+  // Nagroda = kwota gwarantowana + udział w puli z kuponów
+  const look = {
+    p1: { name: "1. miejsce (wszystkie ligi)", color: "#ffd700", bg: "rgba(255,215,0,0.08)", leader: globalLb[0] },
+    p2: { name: "2. miejsce (wszystkie ligi)", color: "#c0c0c0", bg: "rgba(192,192,192,0.08)", leader: globalLb[1] },
+    p3: { name: "3. miejsce (wszystkie ligi)", color: "#cd7f32", bg: "rgba(205,127,50,0.08)", leader: globalLb[2] },
+    ekstra: { name: "Klasyfikacja Ekstraklasy — 1. miejsce", color: "#f97316", bg: "rgba(249,115,22,0.08)", leader: ekstraLb[0] },
+  };
+  const prizes = ledger.prizes.map(p => ({ ...p, ...look[p.key] }));
 
   return (
     <>
       <div className="sh">Nagrody</div>
       <div className="rc" style={{ marginBottom: 10 }}>
+        <div className="rp-pool">
+          <span>💰 Pula z kuponów</span>
+          <b>{zl(ledger.pool)}</b>
+        </div>
         {prizes.map((r, i, arr) => (
           <div key={r.name} className="prow" style={{ borderBottom: i < arr.length - 1 ? "1px solid rgba(var(--ink-rgb),0.05)" : "none", flexDirection: "column", alignItems: "flex-start", gap: 8 }}>
             <div style={{ display: "flex", alignItems: "center", width: "100%", gap: 12 }}>
               <div className="pic2" style={{ background: r.bg }}>{r.emoji}</div>
-              <div style={{ flex: 1 }}><div className="pnm">{r.name}</div></div>
-              <div className="pamt" style={{ color: r.color }}>{r.amount}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div className="pnm">{r.name}</div>
+                <div className="psub">
+                  <span>{r.guaranteed} zł gwarancji</span> + <span><b>{zl(r.bonus)}</b> z puli ({Math.round(r.share * 100)}%)</span>
+                </div>
+              </div>
+              <div className="pamt" style={{ color: r.color }}>{r.bonus > 0 ? money(r.total) : r.guaranteed}<span className="cur">zł</span></div>
             </div>
             {r.leader && r.leader.points > 0 ? (
               <div style={{ display: "flex", alignItems: "center", gap: 8, paddingLeft: 60, width: "100%" }}>
