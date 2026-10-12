@@ -396,6 +396,22 @@ export const COUPON_MAX_PICKS = 10;   // typów na gracza
 export const COUPON_SIZE = 5;         // zdarzeń na kuponie
 export const COUPON_MIN_VOTES = 2;    // minimum głosów, żeby typ trafił na kupon
 export const COUPON_TEST_UNTIL = "2026-11-01"; // październik = miesiąc testowy
+export const COUPON_STAKE = 100;           // stawka kuponu w zł
+export const STAKE_TAX = 0.12;             // podatek od stawki (pobiera bukmacher przy zawarciu zakładu)
+export const WIN_TAX = 0.10;               // podatek od wygranej...
+export const WIN_TAX_THRESHOLD = 2280;     // ...gdy jednorazowa wygrana przekracza 2280 zł (od całej kwoty wygranej)
+
+// Rozliczenie kuponu: 100 zł − 12% = 88 zł w grze; wygrana = 88 × kurs; powyżej 2280 zł bukmacher potrąca 10%
+export function couponPayout(totalOdds, stake = COUPON_STAKE) {
+  const odds = Math.round(totalOdds * 100) / 100;   // kurs łączny jak u bukmachera: 2 miejsca po przecinku
+  const inPlay = Math.round(stake * (1 - STAKE_TAX) * 100) / 100;
+  const gross = Math.round(inPlay * odds * 100) / 100;
+  const winTax = gross > WIN_TAX_THRESHOLD ? Math.round(gross * WIN_TAX * 100) / 100 : 0;
+  return { stake, odds, stakeTax: Math.round((stake - inPlay) * 100) / 100, inPlay, gross, winTax, net: Math.round((gross - winTax) * 100) / 100 };
+}
+
+export const money = x => Number(x).toLocaleString("pl-PL", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+export const zl = x => `${money(x)} zł`;
 
 export const warsawNowKey = () => new Intl.DateTimeFormat("sv-SE", {
   timeZone: "Europe/Warsaw", year: "numeric", month: "2-digit", day: "2-digit",
