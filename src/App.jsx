@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { supabase, LEAGUE_LOGOS, buildLeaderboard, buildRoundStars, buildRankChanges, isMatchLocked, currentCouponWeekend, isCouponOpen, COUPON_MAX_PICKS } from "./lib";
+import { supabase, LEAGUE_LOGOS, buildLeaderboard, buildRoundStars, buildRankChanges, isMatchLocked } from "./lib";
 import { css } from "./styles";
 import { ClubAvatar, TeamPicker, NavIcon, PitchMark, NickEditor } from "./components";
 import { useAppData } from "./useAppData";
@@ -31,7 +31,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
   const [tab, setTab] = useState("matches");
   const [activeLeague, setActiveLeague] = useState(null);
   const [showTeamPicker, setShowTeamPicker] = useState(false);
-  const [moreView, setMoreView] = useState(null); // null | "coupons" | "nick" | "rules" | "admin"
+  const [moreView, setMoreView] = useState(null); // null | "stats" | "nick" | "rules" | "admin"
 
   const data = useAppData(user, profile);
   const { leagues, matches, tips, tipStats, profiles, polls, pollOptions, pollVotes, loading, toast, onlineUsers, couponPicks, couponParticipants, couponOdds, actions } = data;
@@ -90,7 +90,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
   const tabs = [
     { key: "matches", label: "Mecze" },
     { key: "leaderboard", label: "Tabela" },
-    { key: "stats", label: "Statystyki" },
+    { key: "coupons", label: "Kupony" },
     { key: "chat", label: "Czat" },
     { key: "more", label: "Więcej" },
   ];
@@ -168,21 +168,16 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
               onLocked={actions.refreshMatchTips} missingCount={missingByLeague[activeLeague] || 0} />
           )}
           {tab === "leaderboard" && <LeaderboardTab lb={lb} roundStars={roundStars} rankChanges={rankChanges} userId={user.id} activeLg={activeLg} finished={finished} tips={tips} />}
-          {tab === "stats" && <StatsTab profiles={profiles} tips={tips} matches={matches} leagues={leagues} userId={user.id} />}
+          {tab === "coupons" && (
+            <CouponTab matches={matches} leagues={leagues} profiles={profiles} couponPicks={couponPicks}
+              couponParticipants={couponParticipants} couponOdds={couponOdds} userId={user.id} onToggle={actions.toggleCouponPick} onReload={actions.reloadCoupon} />
+          )}
           {tab === "chat" && <ChatTab user={user} profile={profile} profiles={profiles} />}
           {tab === "more" && !moreView && (
             <>
               <div className="sh">Więcej</div>
               <div className="more-menu">
-                <button onClick={() => setMoreView("coupons")}>
-                  Strefa kuponów
-                  {(() => {
-                    const wk = currentCouponWeekend();
-                    if (!isCouponOpen(wk)) return <span>zobacz kupon ›</span>;
-                    const mine = couponPicks.filter(c => c.user_id === user.id && c.weekend === wk).length;
-                    return <span>do pt 12:00<i className="badge" style={{ fontStyle: "normal" }}>{mine}/{COUPON_MAX_PICKS}</i></span>;
-                  })()}
-                </button>
+                <button onClick={() => setMoreView("stats")}>Statystyki <span>›</span></button>
                 <button onClick={() => setMoreView("rules")}>Regulamin i nagrody <span>›</span></button>
                 {isAdmin && <button onClick={() => setMoreView("admin")}>Panel admina <span>{activeLg?.name} ›</span></button>}
                 <button onClick={() => setShowTeamPicker(true)}>Ulubiony klub <span>{profile?.favorite_team || "wybierz"} ›</span></button>
@@ -192,10 +187,7 @@ function MainApp({ user, profile: initialProfile, onLogout }) {
             </>
           )}
           {tab === "more" && moreView && <button className="more-back" onClick={() => setMoreView(null)}>‹ Więcej</button>}
-          {tab === "more" && moreView === "coupons" && (
-            <CouponTab matches={matches} leagues={leagues} profiles={profiles} couponPicks={couponPicks}
-              couponParticipants={couponParticipants} couponOdds={couponOdds} userId={user.id} onToggle={actions.toggleCouponPick} onReload={actions.reloadCoupon} />
-          )}
+          {tab === "more" && moreView === "stats" && <StatsTab profiles={profiles} tips={tips} matches={matches} leagues={leagues} userId={user.id} />}
           {tab === "more" && moreView === "nick" && (
             <NickEditor profile={profile} profiles={profiles} onSave={async name => {
               const saved = await actions.changeNick(name);
