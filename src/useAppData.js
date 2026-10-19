@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { supabase, PICK_LABELS, TEAM_LOGOS, isMatchLocked } from "./lib";
+import { supabase, PICK_LABELS, TEAM_LOGOS, isMatchLocked, scorePick, SPECIAL_EXACT_MULT } from "./lib";
 
 // Supabase zwraca maks. 1000 wierszy naraz — rosnące tabele pobieramy stronami.
 // `query` musi mieć stałą kolejność (order), inaczej strony mogłyby się na siebie nakładać.
@@ -163,21 +163,28 @@ export function useAppData(user, profile) {
     return true;
   };
 
-  const placeTip = async (matchId, pick) => {
+  // pred = { home, away } — dokładny wynik w meczu specjalnym (1/X/2 wynika z niego)
+  const placeTip = async (matchId, pick, pred = null) => {
     const match = matches.find(m => m.id === matchId);
-    if (!match || isMatchLocked(match)) { showToast("⛔ Typowanie zamknięte"); return; }
+    if (!match || isMatchLocked(match)) { showToast("⛔ Typowanie zamknięte"); return false; }
+    if (pred) pick = scorePick(pred.home, pred.away);
+    const row = { user_id: user.id, match_id: matchId, pick, points: 0, ...(pred ? { pred_home: pred.home, pred_away: pred.away } : {}) };
     const { data, error } = await supabase.from("tips")
-      .upsert({ user_id: user.id, match_id: matchId, pick, points: 0 }, { onConflict: "user_id,match_id" })
+      .upsert(row, { onConflict: "user_id,match_id" })
       .select().single();
-    if (error) { showToast("⚠️ Błąd zapisu typu"); return; }
+    if (error) { showToast(error.message?.includes("zamknięte") ? "⛔ Typowanie zamknięte" : "⚠️ Błąd zapisu typu"); return false; }
     setTips(prev => {
       const idx = prev.findIndex(t => t.user_id === user.id && t.match_id === matchId);
       if (idx >= 0) { const u = [...prev]; u[idx] = data; return u; }
       return [...prev, data];
     });
-    showToast(`Typ: ${PICK_LABELS[pick]} · +${parseFloat(match[`odds_${pick}`]).toFixed(2)} pkt`);
+    const odds = parseFloat(match[`odds_${pick}`]);
+    showToast(pred
+      ? `Typ: ${pred.home}:${pred.away} · dokładny wynik +${(odds * SPECIAL_EXACT_MULT).toFixed(2)} pkt`
+      : `Typ: ${PICK_LABELS[pick]} · +${odds.toFixed(2)} pkt`);
     loadStats();
     statsChannelRef.current?.send({ type: "broadcast", event: "changed", payload: {} });
+    return true;
   };
 
   const castVote = async (pollId, optionId) => {
@@ -257,6 +264,11 @@ export function useAppData(user, profile) {
     match_date: d.match_date, match_time: d.match_time, round: d.round,
     odds_home: parseFloat(d.odds_home), odds_draw: parseFloat(d.odds_draw), odds_away: parseFloat(d.odds_away),
     ...(d.odds_manual !== undefined ? { odds_manual: d.odds_manual } : {}),
+    ...(d.special !== undefined ? {
+      special: !!d.special,
+      special_title: d.special ? d.special_title?.trim() || null : null,
+      special_image: d.special ? d.special_image?.trim() || null : null,
+    } : {}),
   });
 
   const addMatch = async d => {
@@ -276,8 +288,12 @@ export function useAppData(user, profile) {
   };
 
   // Wynik + punkty wszystkich graczy zapisywane w bazie naraz (funkcja save_match_result)
-  const saveResult = async (matchId, result) => {
-    const { error } = await supabase.rpc("save_match_result", { p_match_id: matchId, p_result: result });
+  // score = { home, away } — wynik bramkowy (mecz specjalny); 1/X/2 wynika wtedy z bramek
+  const saveResult = async (matchId, result, score = null) => {
+    const params = score
+      ? { p_match_id: matchId, p_result: scorePick(score.home, score.away), p_score_home: score.home, p_score_away: score.away }
+      : { p_match_id: matchId, p_result: result };
+    const { error } = await supabase.rpc("save_match_result", params);
     if (error) { showToast(`⚠️ ${error.message}`); return false; }
     await load(); showToast("Wynik zapisany!");
     return true;
