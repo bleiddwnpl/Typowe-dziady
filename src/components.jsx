@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { TEAM_LOGOS, TEAMS_BY_LEAGUE, FEATURED_TEAMS, PICK_LABELS, getAvatar, getTeamsForLeague, getFeaturedTeam, isMatchLocked, plural, formatDate, oddsTrend, normalizeNick, NICK_MIN, NICK_MAX, NICK_DAYS } from "./lib";
+import { TEAM_LOGOS, TEAMS_BY_LEAGUE, FEATURED_TEAMS, PICK_LABELS, getAvatar, getTeamsForLeague, getFeaturedTeam, isMatchLocked, plural, formatDate, oddsTrend, normalizeNick, NICK_MIN, NICK_MAX, NICK_DAYS, SPECIAL_EXACT_MULT, SCORE_MAX, scorePick, hasPred, predLabel } from "./lib";
 
 // Wspólne elementy interfejsu używane przez kilka zakładek
 
@@ -242,6 +242,8 @@ export function MatchCard({ match, tip, stats, tips, profiles, userId, onTip, on
   // Po gwizdku dociągamy typy wszystkich graczy tego meczu
   useEffect(() => { if (lck) onLocked?.(match.id); }, [lck, match.id]); // eslint-disable-line
 
+  if (match.special) return <SpecialMatchCard match={match} tip={tip} stats={stats} tips={tips} profiles={profiles} userId={userId} onTip={onTip} lck={lck} />;
+
   const missing = !tip && !lck;
   const bottom = (
     <>
@@ -374,6 +376,134 @@ function FeaturedMatchCard({ match, tip, onTip, lck, featured, missing, bottom }
           )}
           {bottom}
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ── MECZ SPECJALNY: typowanie dokładnego wyniku ───────────────────────────────
+// Przed meczem: tablica z wynikiem na grafice meczu. Po zapisaniu tablica się zwija (dotknięcie = zmiana).
+// Po gwizdku: typy wszystkich graczy, a po meczu z punktami (dokładny wynik = kurs × 3).
+function ScoreDigit({ value, team, onChange }) {
+  return (
+    <div className="sp-dig">
+      {onChange && <button onClick={() => onChange(Math.min(SCORE_MAX, value + 1))} disabled={value >= SCORE_MAX} aria-label={`${team}: o jednego gola więcej`}>+</button>}
+      <div className="v">{value ?? "–"}</div>
+      {onChange && <button onClick={() => onChange(Math.max(0, value - 1))} disabled={value <= 0} aria-label={`${team}: o jednego gola mniej`}>−</button>}
+    </div>
+  );
+}
+
+export function SpecialMatchCard({ match, tip, stats, tips, profiles, userId, onTip, lck }) {
+  const mine = hasPred(tip);
+  // Start tablicy: zapisany wynik, a przy samym typie 1/X/2 — najprostszy wynik zgodny z tym typem
+  const initial = () => mine ? { home: tip.pred_home, away: tip.pred_away }
+    : { home: tip?.pick === "home" ? 1 : 0, away: tip?.pick === "away" ? 1 : 0 };
+  const [editing, setEditing] = useState(false);
+  const [pred, setPred] = useState(initial);
+  const [saving, setSaving] = useState(false);
+  useEffect(() => { if (!editing) setPred(initial()); }, [tip?.pred_home, tip?.pred_away, tip?.pick]); // eslint-disable-line
+
+  const homeFt = FEATURED_TEAMS[match.home], awayFt = FEATURED_TEAMS[match.away];
+  const finished = match.status === "finished";
+  const title = match.special_title || "Mecz specjalny";
+  const time = match.match_time?.slice(0, 5);
+  const missing = !tip && !lck;
+  const frame = { "--sp-a": missing ? "var(--loss)" : homeFt?.color || "var(--accent)", "--sp-b": missing ? "var(--loss)" : awayFt?.color || "var(--gold)" };
+  const art = (
+    <>
+      {match.special_image
+        ? <div className="sp-bg" style={{ backgroundImage: `url('${match.special_image}')` }} />
+        : homeFt && awayFt ? <SplitPhotos homeFt={homeFt} awayFt={awayFt} /> : null}
+      <div className="sp-ov" />
+    </>
+  );
+
+  // ── Po gwizdku: typy wszystkich ──
+  if (lck) {
+    const rows = tips.filter(t => t.match_id === match.id)
+      .map(t => ({ t, p: profiles.find(pr => pr.id === t.user_id) })).filter(x => x.p);
+    const exact = t => hasPred(t) && t.pick === match.result && t.pred_home === match.score_home && t.pred_away === match.score_away;
+    const kind = t => !finished ? "" : exact(t) ? "ex" : t.pick === match.result ? "w" : "x";
+    const label = t => ({ ex: "Dokładny wynik", w: match.result === "draw" ? "Trafiony remis" : "Trafiony zwycięzca", x: "Pudło" })[kind(t)];
+    const rowsCls = finished ? "sp-row done" : "sp-row";
+    rows.sort((a, b) => (finished ? (b.t.points || 0) - (a.t.points || 0) : 0) || a.p.name.localeCompare(b.p.name, "pl"));
+    const missingP = profiles.filter(p => !rows.some(r => r.p.id === p.id));
+    const final = match.score_home != null ? `${match.score_home}:${match.score_away}` : PICK_LABELS[match.result];
+    return (
+      <div className="sp" style={frame}>
+        <div className="sp-head">
+          {art}
+          <div className="sp-head-in">
+            <div style={{ minWidth: 0 }}>
+              <div className="sp-title">{title}</div>
+              <div className="sp-when">{finished ? "Koniec meczu · typy graczy" : "Typowanie zamknięte · typy graczy"}</div>
+            </div>
+            {finished ? <div className="sp-final">{final}</div> : <span className="sp-tag">Twój typ: {predLabel(tip)}</span>}
+          </div>
+        </div>
+        {rows.length === 0 && <div className="sp-empty">Nikt nie wytypował tego meczu</div>}
+        {rows.map(({ t, p }) => (
+          <div key={p.id} className={`${rowsCls} ${kind(t)}`}>
+            <ClubAvatar favoriteTeam={p.favorite_team} name={p.name} size={24} />
+            <span className="n">{p.name}{p.id === userId && <span className="lbme" style={{ marginLeft: 6 }}>TY</span>}</span>
+            <span className="p">{predLabel(t)}</span>
+            {finished && <span className="k"><b>{(t.points || 0).toFixed(2)} pkt</b><small>{label(t)}</small></span>}
+          </div>
+        ))}
+        {!finished && missingP.length > 0 && <div className="sp-missing">Bez typu: {missingP.map(p => p.name).join(", ")}</div>}
+      </div>
+    );
+  }
+
+  // ── Przed meczem: tablica ──
+  const input = !mine || editing;
+  const shown = input ? pred : { home: tip.pred_home, away: tip.pred_away };
+  const pick = scorePick(shown.home, shown.away);
+  const odds = parseFloat(match[`odds_${pick}`]) || 0;
+  const tipped = stats?.tipped?.length || 0;
+  const save = async () => {
+    setSaving(true);
+    const ok = await onTip(match.id, null, pred);
+    setSaving(false);
+    if (ok) setEditing(false);
+  };
+  const set = side => v => setPred(prev => ({ ...prev, [side]: v }));
+
+  return (
+    <div className="sp" style={frame}>
+      {art}
+      <div className="sp-in">
+        <div className="sp-top">
+          <div style={{ minWidth: 0 }}>
+            <div className="sp-title">{title}</div>
+            <div className="sp-when">{formatDate(match.match_date)}, {time}{tipped > 0 ? ` · ${tipped} z ${profiles.length} już typuje` : ""}</div>
+          </div>
+          <span className="sp-tag">{input ? "Dokładny wynik" : "Twój typ"}</span>
+        </div>
+        <div className={`sp-board ${input ? "" : "static"}`} {...(!input ? { role: "button", tabIndex: 0, "aria-label": "Zmień typ", onClick: () => setEditing(true), onKeyDown: e => (e.key === "Enter" || e.key === " ") && setEditing(true) } : {})}>
+          <div className="sp-team"><TeamLogo name={match.home} size={38} /><span>{match.home}</span></div>
+          <div className="sp-mid">
+            <ScoreDigit value={shown.home} team={match.home} onChange={input ? set("home") : null} />
+            <div className="sp-colon">:</div>
+            <ScoreDigit value={shown.away} team={match.away} onChange={input ? set("away") : null} />
+          </div>
+          <div className="sp-team"><TeamLogo name={match.away} size={38} /><span>{match.away}</span></div>
+        </div>
+        {input ? (
+          <>
+            <div className="sp-pts">
+              Dokładny wynik: <b>{(odds * SPECIAL_EXACT_MULT).toFixed(2)} pkt</b> (kurs {odds.toFixed(2)} × {SPECIAL_EXACT_MULT}) · {pick === "draw" ? "sam remis" : "sam zwycięzca"}: {odds.toFixed(2)} pkt
+            </div>
+            {tip && !mine && <div className="sp-note">Masz typ {PICK_LABELS[tip.pick]} bez wyniku. Wpisz dokładny wynik, żeby grać o kurs × {SPECIAL_EXACT_MULT}.</div>}
+            <div className="sp-actions">
+              {editing && <button className="sp-cancel" onClick={() => { setEditing(false); setPred(initial()); }}>Anuluj</button>}
+              <button className="sp-save" onClick={save} disabled={saving}>{saving ? "Zapisuję…" : `Zapisz typ ${pred.home}:${pred.away}`}</button>
+            </div>
+          </>
+        ) : (
+          <div className="sp-pts">Za dokładny wynik <b>{(odds * SPECIAL_EXACT_MULT).toFixed(2)} pkt</b> · dotknij tablicy, żeby zmienić<br />Typy innych odsłonią się o {time}</div>
+        )}
       </div>
     </div>
   );
