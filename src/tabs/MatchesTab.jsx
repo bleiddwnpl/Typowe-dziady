@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { PICK_LABELS, buildRoundSummary, plural } from "../lib";
-import { TeamLogo, ClubAvatar, PollCard, MatchCard, PickReveal } from "../components";
+import { TeamLogo, ClubAvatar, PollCard, MatchCard, PickReveal, SpecialMatchCard } from "../components";
 
 // ── FINISHED MATCHES ──────────────────────────────────────────────────────────
 function FinishedMatches({ matches, myTip, tips, profiles, userId }) {
@@ -16,6 +16,7 @@ function FinishedMatches({ matches, myTip, tips, profiles, userId }) {
         <div style={{ marginTop: 8 }}>
           {matches.map(match => {
             const tip = myTip(match.id);
+            if (match.special) return <SpecialMatchCard key={match.id} match={match} tip={tip} tips={tips} profiles={profiles} userId={userId} lck />;
             const isCor = tip?.pick === match.result;
             return (
               <div key={match.id} className="mc" style={{ opacity: 0.85 }}>
