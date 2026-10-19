@@ -276,8 +276,9 @@ export function buildRoundSummary(leagueMatches, tips, profiles) {
   // Miejsca z remisami: ten sam wynik = to samo miejsce
   const ranked = players.map(x => ({ ...x, pos: 1 + players.filter(y => y.pts > x.pts).length }));
 
-  const maxOdds = Math.max(0, ...roundTips.map(t => t.points || 0));
-  const bestTips = maxOdds > 0 ? roundTips.filter(t => t.points === maxOdds) : [];
+  const hitOdds = t => (t.points > 0 ? parseFloat(byId.get(t.match_id)?.[`odds_${t.pick}`]) || 0 : 0);
+  const maxOdds = Math.max(0, ...roundTips.map(hitOdds));
+  const bestTips = maxOdds > 0 ? roundTips.filter(t => hitOdds(t) === maxOdds) : [];
   const bestNames = [...new Set(bestTips.map(t => profiles.find(p => p.id === t.user_id)?.name).filter(Boolean))];
   const best = bestTips.length ? { odds: maxOdds, names: bestNames, detail: pickLabel(byId.get(bestTips[0].match_id), bestTips[0].pick) } : null;
 
@@ -549,6 +550,15 @@ export function buildCouponLedger(couponPicks, matchesById, nowKey = warsawNowKe
 // O ile urośnie pula, jeśli rozgrywany teraz kupon wejdzie
 export const poolIfWon = (ledger, totalOdds) =>
   round2(Math.max(0, ledger.balance + couponPayout(totalOdds).net - COUPON_STAKE) - ledger.pool);
+
+// ── MECZ SPECJALNY ────────────────────────────────────────────────────────────
+// Admin oznacza wybrany mecz (np. El Clásico): gracze typują dokładny wynik.
+// Punkty liczy baza (save_match_result): dokładny wynik = kurs × 3, sam zwycięzca/remis = kurs, pudło = 0.
+export const SPECIAL_EXACT_MULT = 3;
+export const SCORE_MAX = 20;
+export const scorePick = (h, a) => (h > a ? "home" : h < a ? "away" : "draw");
+export const hasPred = t => !!t && t.pred_home != null && t.pred_away != null;
+export const predLabel = t => (hasPred(t) ? `${t.pred_home}:${t.pred_away}` : t ? PICK_LABELS[t.pick] : "–");
 
 // ── NICK ──────────────────────────────────────────────────────────────────────
 export const NICK_MIN = 2, NICK_MAX = 20, NICK_DAYS = 7;   // te same zasady pilnuje baza
