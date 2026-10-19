@@ -128,11 +128,19 @@ export default function AdminTab({ activeLeague, activeLg, leagues, upcoming, fi
       match_time: m.match_time?.slice(0, 5), round: m.round,
       odds_home: parseFloat(m.odds_home).toFixed(2), odds_draw: parseFloat(m.odds_draw).toFixed(2), odds_away: parseFloat(m.odds_away).toFixed(2),
       odds_manual: !!m.odds_manual,
+      special: !!m.special, special_title: m.special_title || "", special_image: m.special_image || "",
     });
     setEditModal(m);
   };
 
   const handleSaveResult = async pick => { if (await actions.saveResult(resultModal.id, pick)) setResultModal(null); };
+  // Mecz specjalny: wynik bramkowy (punkty za dokładny wynik), 1/X/2 wynika z bramek
+  const [score, setScore] = useState({ home: "", away: "" });
+  const openResult = m => { setScore({ home: m.score_home ?? "", away: m.score_away ?? "" }); setResultModal(m); };
+  const scoreOk = [score.home, score.away].every(v => v !== "" && Number.isInteger(+v) && +v >= 0 && +v <= 30);
+  const handleSaveScore = async () => {
+    if (scoreOk && await actions.saveResult(resultModal.id, null, { home: +score.home, away: +score.away })) setResultModal(null);
+  };
   const handleAddMatch = async () => { if (await actions.addMatch(newMatch)) { setAddModal(false); setNewMatch(EMPTY_MATCH); } };
   const handleSaveEdit = async () => { if (await actions.updateMatch(editModal.id, editData)) setEditModal(null); };
   const handleAddPoll = async () => {
@@ -184,12 +192,12 @@ export default function AdminTab({ activeLeague, activeLg, leagues, upcoming, fi
               <div key={m.id} style={{ borderBottom: i < upcoming.length - 1 ? "1px solid rgba(var(--ink-rgb),0.05)" : "none" }}>
                 <div className="ar" style={{ borderBottom: "none" }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div className="an">{m.home} vs {m.away}</div>
-                    <div className="at">{formatDate(m.match_date)} · {m.match_time?.slice(0, 5)} · {m.round}</div>
+                    <div className="an">{m.special && "🔥 "}{m.home} vs {m.away}</div>
+                    <div className="at">{formatDate(m.match_date)} · {m.match_time?.slice(0, 5)} · {m.round}{m.special ? " · mecz specjalny" : ""}</div>
                   </div>
                   <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
                     <button className="aedt" onClick={() => openEdit(m)}>Edytuj</button>
-                    <button className="ares-btn" onClick={() => setResultModal(m)}>Wynik</button>
+                    <button className="ares-btn" onClick={() => openResult(m)}>Wynik</button>
                   </div>
                 </div>
                 <div style={{ padding: "0 16px 12px" }}>
@@ -223,12 +231,12 @@ export default function AdminTab({ activeLeague, activeLg, leagues, upcoming, fi
           {finished.map((m, i) => (
             <div key={m.id} className="ar" style={{ borderBottom: i < finished.length - 1 ? "1px solid rgba(var(--ink-rgb),0.05)" : "none" }}>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div className="an">{m.home} vs {m.away}</div>
-                <div className="at" style={{ color: "var(--accent-light)" }}>Wynik: {PICK_LABELS[m.result]}</div>
+                <div className="an">{m.special && "🔥 "}{m.home} vs {m.away}</div>
+                <div className="at" style={{ color: "var(--accent-light)" }}>Wynik: {m.score_home != null ? `${m.score_home}:${m.score_away} (${PICK_LABELS[m.result]})` : PICK_LABELS[m.result]}</div>
               </div>
               <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
                 <button className="aedt" onClick={() => openEdit(m)}>Edytuj</button>
-                <button className="ares-btn" onClick={() => setResultModal(m)}>Popraw</button>
+                <button className="ares-btn" onClick={() => openResult(m)}>Popraw</button>
               </div>
             </div>
           ))}
@@ -237,15 +245,26 @@ export default function AdminTab({ activeLeague, activeLg, leagues, upcoming, fi
 
       {/* OKNA */}
       {resultModal && (
-        <Sheet title={`${resultModal.home} vs ${resultModal.away}`} subtitle="Wybierz wynik meczu" onClose={() => setResultModal(null)}>
-          <div style={{ display: "flex", gap: 10 }}>
-            {["home", "draw", "away"].map(pick => (
-              <button key={pick} className="rbtn" onClick={() => handleSaveResult(pick)}>
-                <div style={{ fontSize: 22, fontWeight: 700 }}>{PICK_LABELS[pick]}</div>
-                <div style={{ fontSize: 11, marginTop: 4, color: "rgba(var(--ink-rgb),0.4)" }}>{PICK_NAMES[pick]}</div>
-              </button>
-            ))}
-          </div>
+        <Sheet title={`${resultModal.home} vs ${resultModal.away}`} subtitle={resultModal.special ? "Mecz specjalny — wpisz wynik bramkowy" : "Wybierz wynik meczu"} onClose={() => setResultModal(null)}>
+          {resultModal.special ? (
+            <>
+              <div className="score-in">
+                <label><span>{resultModal.home}</span><input className="mi" type="number" inputMode="numeric" min="0" max="30" value={score.home} onChange={e => setScore({ ...score, home: e.target.value })} /></label>
+                <b>:</b>
+                <label><span>{resultModal.away}</span><input className="mi" type="number" inputMode="numeric" min="0" max="30" value={score.away} onChange={e => setScore({ ...score, away: e.target.value })} /></label>
+              </div>
+              <button className="mprim" disabled={!scoreOk} onClick={handleSaveScore}>Zapisz wynik{scoreOk ? ` ${+score.home}:${+score.away}` : ""}</button>
+            </>
+          ) : (
+            <div style={{ display: "flex", gap: 10 }}>
+              {["home", "draw", "away"].map(pick => (
+                <button key={pick} className="rbtn" onClick={() => handleSaveResult(pick)}>
+                  <div style={{ fontSize: 22, fontWeight: 700 }}>{PICK_LABELS[pick]}</div>
+                  <div style={{ fontSize: 11, marginTop: 4, color: "rgba(var(--ink-rgb),0.4)" }}>{PICK_NAMES[pick]}</div>
+                </button>
+              ))}
+            </div>
+          )}
           <button className="msec" style={{ marginTop: 12 }} onClick={() => setResultModal(null)}>Anuluj</button>
         </Sheet>
       )}
@@ -272,6 +291,17 @@ export default function AdminTab({ activeLeague, activeLg, leagues, upcoming, fi
                 : "Jeśli zmienisz kursy ręcznie, automat dla tego meczu się wyłączy."}</small>
             </span>
           </label>
+          <label className="auto-toggle">
+            <input type="checkbox" checked={!!editData.special} onChange={e => setEditData({ ...editData, special: e.target.checked })} />
+            <span>
+              Mecz specjalny
+              <small>Gracze typują dokładny wynik: trafiony wynik = kurs × 3, sam zwycięzca/remis = kurs.</small>
+            </span>
+          </label>
+          {editData.special && <>
+            <input className="mi" placeholder="Nazwa na karcie (np. El Clásico)" value={editData.special_title} onChange={e => setEditData({ ...editData, special_title: e.target.value })} />
+            <input className="mi" placeholder="Link do grafiki (np. z Supabase Storage)" value={editData.special_image} onChange={e => setEditData({ ...editData, special_image: e.target.value })} />
+          </>}
           <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 4 }}>
             <button className="mprim" onClick={handleSaveEdit}>Zapisz zmiany</button>
             <button className="msec" onClick={() => setEditModal(null)}>Anuluj</button>
