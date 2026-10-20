@@ -483,6 +483,8 @@ button, input, select, textarea { font-family:inherit; }
 .sp-row.ex { background:rgba(var(--gold-rgb),0.08); } .sp-row.ex .k { color:var(--gold); }
 .sp-row.w .k { color:var(--win); } .sp-row.x .k { color:rgba(255,255,255,0.35); }
 .sp-empty, .sp-missing { padding:10px 16px 12px; font-size:12px; color:rgba(255,255,255,0.45); border-top:1px solid rgba(255,255,255,0.06); }
+.sp-dist:empty { display:none; }
+.sp-dist > div { margin-top:0 !important; }
 .score-in { display:flex; align-items:flex-end; gap:10px; margin-bottom:12px; }
 .score-in label { flex:1; display:flex; flex-direction:column; gap:6px; font-size:12px; font-weight:600; color:rgba(var(--ink-rgb),0.6); }
 .score-in .mi { margin-bottom:0; text-align:center; font-size:22px; font-weight:700; }
