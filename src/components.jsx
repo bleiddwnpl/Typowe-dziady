@@ -504,6 +504,8 @@ export function SpecialMatchCard({ match, tip, stats, tips, profiles, userId, on
         ) : (
           <div className="sp-pts">Za dokładny wynik <b>{(odds * SPECIAL_EXACT_MULT).toFixed(2)} pkt</b> · dotknij tablicy, żeby zmienić<br />Typy innych odsłonią się o {time}</div>
         )}
+        {/* Rozkład głosów 1/X/2 — jak na zwykłych kartach (z wpisanego wyniku wynika 1, X albo 2) */}
+        <div className="sp-dist"><TipDistribution stats={stats} /></div>
       </div>
     </div>
   );
