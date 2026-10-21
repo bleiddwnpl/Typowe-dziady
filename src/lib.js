@@ -559,6 +559,15 @@ export const SCORE_MAX = 20;
 export const scorePick = (h, a) => (h > a ? "home" : h < a ? "away" : "draw");
 export const hasPred = t => !!t && t.pred_home != null && t.pred_away != null;
 export const predLabel = t => (hasPred(t) ? `${t.pred_home}:${t.pred_away}` : t ? PICK_LABELS[t.pick] : "–");
+// Dotknięcie kursu 1/X/2 na karcie meczu specjalnego: wynik dopasowany do wybranego typu.
+// Zgodny wynik zostaje; 3:1 → „2” daje 1:3; 2:1 → „X” daje 1:1; 1:1 → „1” daje 2:1.
+export function scoreForPick({ home: h, away: a }, pick) {
+  if (scorePick(h, a) === pick) return { home: h, away: a };
+  if (pick === "draw") { const n = Math.min(h, a); return { home: n, away: n }; }
+  const hi = h === a ? Math.min(h + 1, SCORE_MAX) : Math.max(h, a);
+  const lo = h === a ? Math.min(h, hi - 1) : Math.min(h, a);
+  return pick === "home" ? { home: hi, away: lo } : { home: lo, away: hi };
+}
 
 // ── NICK ──────────────────────────────────────────────────────────────────────
 export const NICK_MIN = 2, NICK_MAX = 20, NICK_DAYS = 7;   // te same zasady pilnuje baza
