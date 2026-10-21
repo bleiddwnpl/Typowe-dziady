@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { TEAM_LOGOS, TEAMS_BY_LEAGUE, FEATURED_TEAMS, PICK_LABELS, getAvatar, getTeamsForLeague, getFeaturedTeam, isMatchLocked, plural, formatDate, oddsTrend, normalizeNick, NICK_MIN, NICK_MAX, NICK_DAYS, SPECIAL_EXACT_MULT, SCORE_MAX, scorePick, hasPred, predLabel } from "./lib";
+import { TEAM_LOGOS, TEAMS_BY_LEAGUE, FEATURED_TEAMS, PICK_LABELS, getAvatar, getTeamsForLeague, getFeaturedTeam, isMatchLocked, plural, formatDate, oddsTrend, normalizeNick, NICK_MIN, NICK_MAX, NICK_DAYS, SPECIAL_EXACT_MULT, SCORE_MAX, scorePick, scoreForPick, hasPred, predLabel } from "./lib";
 
 // Wspólne elementy interfejsu używane przez kilka zakładek
 
@@ -387,18 +387,36 @@ function FeaturedMatchCard({ match, tip, onTip, lck, featured, missing, bottom }
 function ScoreDigit({ value, team, onChange }) {
   return (
     <div className="sp-dig">
-      {onChange && <button onClick={() => onChange(Math.min(SCORE_MAX, value + 1))} disabled={value >= SCORE_MAX} aria-label={`${team}: o jednego gola więcej`}>+</button>}
+      {onChange && <button onClick={() => onChange(Math.min(SCORE_MAX, (value ?? 0) + 1))} disabled={value >= SCORE_MAX} aria-label={`${team}: o jednego gola więcej`}>+</button>}
       <div className="v">{value ?? "–"}</div>
-      {onChange && <button onClick={() => onChange(Math.max(0, value - 1))} disabled={value <= 0} aria-label={`${team}: o jednego gola mniej`}>−</button>}
+      {onChange && <button onClick={() => onChange(Math.max(0, (value ?? 0) - 1))} disabled={(value ?? 0) <= 0} aria-label={`${team}: o jednego gola mniej`}>−</button>}
+    </div>
+  );
+}
+
+// Aktualne kursy 1/X/2 na karcie meczu specjalnego. Przed meczem dotknięcie kursu ustawia pasujący wynik.
+function SpecialOdds({ match, active, onPick, locked, finished }) {
+  const cls = p => finished ? (p === match.result ? "ok" : p === active ? "no" : "")
+    : locked ? (p === active ? "" : "no")
+    : p === active ? "sel" : "";
+  return (
+    <div className="odds sp-odds">
+      {["home", "draw", "away"].map(p => (
+        <button key={p} className={`odd ${cls(p)}`} onClick={onPick ? () => onPick(p) : undefined} disabled={!onPick} aria-pressed={!locked && p === active}>
+          <div className="ol">{PICK_LABELS[p]}</div>
+          <div className="ov">{parseFloat(match[`odds_${p}`]).toFixed(2)}</div>
+          <OddsTrend match={match} pick={p} />
+        </button>
+      ))}
     </div>
   );
 }
 
 export function SpecialMatchCard({ match, tip, stats, tips, profiles, userId, onTip, lck }) {
   const mine = hasPred(tip);
-  // Start tablicy: zapisany wynik, a przy samym typie 1/X/2 — najprostszy wynik zgodny z tym typem
+  // Start tablicy: zapisany wynik; przy samym typie 1/X/2 — najprostszy wynik zgodny z tym typem; bez typu — pusta tablica
   const initial = () => mine ? { home: tip.pred_home, away: tip.pred_away }
-    : { home: tip?.pick === "home" ? 1 : 0, away: tip?.pick === "away" ? 1 : 0 };
+    : tip ? { home: tip.pick === "home" ? 1 : 0, away: tip.pick === "away" ? 1 : 0 } : null;
   const [editing, setEditing] = useState(false);
   const [pred, setPred] = useState(initial);
   const [saving, setSaving] = useState(false);
@@ -442,6 +460,7 @@ export function SpecialMatchCard({ match, tip, stats, tips, profiles, userId, on
             {finished ? <div className="sp-final">{final}</div> : <span className="sp-tag">Twój typ: {predLabel(tip)}</span>}
           </div>
         </div>
+        <div className="sp-odds-wrap"><SpecialOdds match={match} active={tip?.pick} locked finished={finished} /></div>
         {rows.length === 0 && <div className="sp-empty">Nikt nie wytypował tego meczu</div>}
         {rows.map(({ t, p }) => (
           <div key={p.id} className={`${rowsCls} ${kind(t)}`}>
@@ -459,8 +478,9 @@ export function SpecialMatchCard({ match, tip, stats, tips, profiles, userId, on
   // ── Przed meczem: tablica ──
   const input = !mine || editing;
   const shown = input ? pred : { home: tip.pred_home, away: tip.pred_away };
-  const pick = scorePick(shown.home, shown.away);
-  const odds = parseFloat(match[`odds_${pick}`]) || 0;
+  const pick = shown ? scorePick(shown.home, shown.away) : null;
+  const odds = pick ? parseFloat(match[`odds_${pick}`]) || 0 : 0;
+  const ZERO = { home: 0, away: 0 };
   const tipped = stats?.tipped?.length || 0;
   const save = async () => {
     setSaving(true);
@@ -468,7 +488,7 @@ export function SpecialMatchCard({ match, tip, stats, tips, profiles, userId, on
     setSaving(false);
     if (ok) setEditing(false);
   };
-  const set = side => v => setPred(prev => ({ ...prev, [side]: v }));
+  const set = side => v => setPred(prev => ({ ...(prev || ZERO), [side]: v }));
 
   return (
     <div className="sp" style={frame}>
@@ -484,25 +504,30 @@ export function SpecialMatchCard({ match, tip, stats, tips, profiles, userId, on
         <div className={`sp-board ${input ? "" : "static"}`} {...(!input ? { role: "button", tabIndex: 0, "aria-label": "Zmień typ", onClick: () => setEditing(true), onKeyDown: e => (e.key === "Enter" || e.key === " ") && setEditing(true) } : {})}>
           <div className="sp-team"><TeamLogo name={match.home} size={38} /><span>{match.home}</span></div>
           <div className="sp-mid">
-            <ScoreDigit value={shown.home} team={match.home} onChange={input ? set("home") : null} />
+            <ScoreDigit value={shown?.home} team={match.home} onChange={input ? set("home") : null} />
             <div className="sp-colon">:</div>
-            <ScoreDigit value={shown.away} team={match.away} onChange={input ? set("away") : null} />
+            <ScoreDigit value={shown?.away} team={match.away} onChange={input ? set("away") : null} />
           </div>
           <div className="sp-team"><TeamLogo name={match.away} size={38} /><span>{match.away}</span></div>
         </div>
+        <SpecialOdds match={match} active={pick}
+          onPick={input
+            ? p => setPred(prev => scoreForPick(prev || ZERO, p))
+            : p => { setPred(scoreForPick({ home: tip.pred_home, away: tip.pred_away }, p)); setEditing(true); }} />
         {input ? (
           <>
             <div className="sp-pts">
-              Dokładny wynik: <b>{(odds * SPECIAL_EXACT_MULT).toFixed(2)} pkt</b> (kurs {odds.toFixed(2)} × {SPECIAL_EXACT_MULT}) · {pick === "draw" ? "sam remis" : "sam zwycięzca"}: {odds.toFixed(2)} pkt
+              {pred ? <>Dokładny wynik: <b>{(odds * SPECIAL_EXACT_MULT).toFixed(2)} pkt</b> (×{SPECIAL_EXACT_MULT}) · {pick === "draw" ? "sam remis" : "sam zwycięzca"}: {odds.toFixed(2)} pkt</>
+                : <>Wybierz kurs, potem ustaw dokładny wynik</>}
             </div>
             {tip && !mine && <div className="sp-note">Masz typ {PICK_LABELS[tip.pick]} bez wyniku. Wpisz dokładny wynik, żeby grać o kurs × {SPECIAL_EXACT_MULT}.</div>}
             <div className="sp-actions">
               {editing && <button className="sp-cancel" onClick={() => { setEditing(false); setPred(initial()); }}>Anuluj</button>}
-              <button className="sp-save" onClick={save} disabled={saving}>{saving ? "Zapisuję…" : `Zapisz typ ${pred.home}:${pred.away}`}</button>
+              <button className="sp-save" onClick={save} disabled={saving || !pred}>{saving ? "Zapisuję…" : pred ? `Zapisz typ ${pred.home}:${pred.away}` : "Wybierz typ"}</button>
             </div>
           </>
         ) : (
-          <div className="sp-pts">Za dokładny wynik <b>{(odds * SPECIAL_EXACT_MULT).toFixed(2)} pkt</b> · dotknij tablicy, żeby zmienić<br />Typy innych odsłonią się o {time}</div>
+          <div className="sp-pts">Dokładny wynik: <b>{(odds * SPECIAL_EXACT_MULT).toFixed(2)} pkt</b> · {pick === "draw" ? "sam remis" : "sam zwycięzca"}: {odds.toFixed(2)} pkt<br />Zmiana: dotknij wyniku lub kursu · typy innych o {time}</div>
         )}
         {/* Rozkład głosów 1/X/2 — jak na zwykłych kartach (z wpisanego wyniku wynika 1, X albo 2) */}
         <div className="sp-dist"><TipDistribution stats={stats} /></div>
